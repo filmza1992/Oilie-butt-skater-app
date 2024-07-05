@@ -49,10 +49,10 @@ class _TextFieldPasswordState extends State<TextFieldPassword> {
                 Radius.circular(widget.circular ?? 10),
               ),
             ),
-            hintText: widget.hint,
-            hintStyle: GoogleFonts.kanit(
-              fontSize: 16,
-            ),
+            labelText: widget.hint,
+            labelStyle: GoogleFonts.kanit(
+                fontSize: 16,
+              ),
             contentPadding: widget.edgeInsets ??
                 const EdgeInsets.symmetric(vertical: 13, horizontal: 13),
             prefixIcon: widget.prefixIcon, // ไอคอนทางซ้าย

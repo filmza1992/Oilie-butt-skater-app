@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:oilie_butt_skater_app/components/button_custom.dart';
 import 'package:oilie_butt_skater_app/components/icon_button.dart';
 import 'package:oilie_butt_skater_app/components/text_custom.dart';
 import 'package:oilie_butt_skater_app/components/text_field_custom.dart';
@@ -19,7 +20,7 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final _usernameController = TextEditingController();
+  final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   User user = User(
     id: 0,
@@ -39,9 +40,17 @@ class _LoginPageState extends State<LoginPage> {
 
   void _incrementCounter() {
     setState(() {
-      _usernameController.text = "";
+      _emailController.text = "";
       _passwordController.text = "";
     });
+  }
+
+  Future<void> mylogin() async {
+    print("Success");
+  }
+
+  void mySignIn() {
+    Get.to(const RegisterPage());
   }
 
   @override
@@ -63,18 +72,17 @@ class _LoginPageState extends State<LoginPage> {
                     height: 25,
                   ),
                   TextFieldCustom(
-                    controller: _usernameController,
+                    controller: _emailController,
                     hint: 'อีเมล',
                     prefixIcon: const Icon(Icons.email_outlined),
                   ),
                   const SizedBox(
-                    height: 10,
+                    height: 15,
                   ),
                   TextFieldPassword(
                     controller: _passwordController,
                     hint: 'รหัสผ่าน',
                     prefixIcon: const Icon(Icons.vpn_key_outlined),
-                  
                   ),
                   const SizedBox(
                     height: 7,
@@ -93,16 +101,7 @@ class _LoginPageState extends State<LoginPage> {
                   const SizedBox(
                     height: 12,
                   ),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed: _Mylogin,
-                          child: Text("Login"),
-                        ),
-                      ),
-                    ],
-                  ),
+                  ButtonCustom(text: "เข้าสู่ระบบ", onPressed: mylogin),
                   const SizedBox(
                     height: 10,
                   ),
@@ -131,7 +130,7 @@ class _LoginPageState extends State<LoginPage> {
                         text: "สร้างบัญชี",
                         size: 13,
                         color: AppColors.secondaryColor,
-                        onTap: () => {print("signup")},
+                        onTap: () => mySignIn(),
                         underline: TextDecoration.underline,
                       )
                     ],
@@ -141,13 +140,5 @@ class _LoginPageState extends State<LoginPage> {
             ),
           ),
         ));
-  }
-
-  Future<void> _Mylogin() async {
-    print("Success");
-  }
-
-  void _MySignIn() {
-    Get.to(const RegisterPage());
   }
 }

@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 // ignore: must_be_immutable
-class TextFieldCustom extends StatefulWidget {
-  TextFieldCustom({
+class TextFieldDateCustom extends StatefulWidget {
+  TextFieldDateCustom({
     key,
     this.label,
     required this.hint,
@@ -32,10 +32,25 @@ class TextFieldCustom extends StatefulWidget {
   Icon? prefixIcon;
   Icon? suffixIcon;
   @override
-  State<TextFieldCustom> createState() => _TextFieldCustomState();
+  State<TextFieldDateCustom> createState() => _TextFieldDateCustomState();
 }
 
-class _TextFieldCustomState extends State<TextFieldCustom> {
+class _TextFieldDateCustomState extends State<TextFieldDateCustom> {
+  Future<void> selectDate() async {
+    DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(1980),
+      lastDate: DateTime(2080),
+    );
+
+    if (picked != null) {
+      setState(() {
+        widget.controller.text = picked.toString().split(" ")[0];
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -53,16 +68,19 @@ class _TextFieldCustomState extends State<TextFieldCustom> {
               labelStyle: GoogleFonts.kanit(
                 fontSize: 16,
               ),
-              contentPadding: widget.edgeInsets ?? const EdgeInsets.symmetric(vertical: 13,horizontal: 13),
+              contentPadding: widget.edgeInsets ??
+                  const EdgeInsets.symmetric(vertical: 13, horizontal: 13),
               prefixIcon: widget.prefixIcon, // ไอคอนทางซ้าย
               suffixIcon: widget.suffixIcon, // ไอคอนทางขวา),
-              
             ),
             textAlign: widget.textAlign ?? TextAlign.start,
             style: GoogleFonts.kanit(
               fontSize: 16,
             ),
-            onChanged: (String value) {},
+            readOnly: true,
+            onTap: () {
+              selectDate();
+            },
           ),
         ),
       ],
