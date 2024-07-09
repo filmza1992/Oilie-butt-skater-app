@@ -17,6 +17,7 @@ class TextFieldDateCustom extends StatefulWidget {
     this.ob,
     this.prefixIcon,
     this.suffixIcon,
+    this.validator
   });
 
   String? label;
@@ -31,6 +32,7 @@ class TextFieldDateCustom extends StatefulWidget {
   String? ob;
   Icon? prefixIcon;
   Icon? suffixIcon;
+  FormFieldValidator<String>? validator;
   @override
   State<TextFieldDateCustom> createState() => _TextFieldDateCustomState();
 }
@@ -56,7 +58,7 @@ class _TextFieldDateCustomState extends State<TextFieldDateCustom> {
     return Row(
       children: [
         Expanded(
-          child: TextField(
+          child: TextFormField(
             controller: widget.controller,
             decoration: InputDecoration(
               border: OutlineInputBorder(
@@ -81,6 +83,7 @@ class _TextFieldDateCustomState extends State<TextFieldDateCustom> {
             onTap: () {
               selectDate();
             },
+            validator: widget.validator,
           ),
         ),
       ],

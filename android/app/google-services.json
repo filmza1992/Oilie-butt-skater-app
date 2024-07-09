@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "835311886740",
+    "project_id": "oilie-butt-skater-app",
+    "storage_bucket": "oilie-butt-skater-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:835311886740:android:acaf8ac6f39b37b99faf81",
+        "android_client_info": {
+          "package_name": "com.example.myapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAwMFu_rrMDIAieRqPt2VFYdQcLg2DvqF8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:835311886740:android:9ac408b5c2e8ad109faf81",
+        "android_client_info": {
+          "package_name": "com.example.oilie_butt_skater_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAwMFu_rrMDIAieRqPt2VFYdQcLg2DvqF8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

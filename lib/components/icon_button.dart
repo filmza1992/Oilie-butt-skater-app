@@ -23,6 +23,8 @@ class _IconButtonCustomState extends State<IconButtonCustom> {
       color: AppColors.backgroundColor,
       child: Center(
         child: Ink(
+          width: 50,
+          height: 50,
           decoration: const ShapeDecoration(
             color: Color.fromARGB(255, 60, 61, 62),
             shape: CircleBorder(),

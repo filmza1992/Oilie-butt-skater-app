@@ -6,11 +6,14 @@ import 'package:oilie_butt_skater_app/components/text_custom.dart';
 import 'package:oilie_butt_skater_app/components/text_field_custom.dart';
 import 'package:oilie_butt_skater_app/components/text_field_password.dart';
 import 'package:oilie_butt_skater_app/contant/color.dart';
+import 'package:oilie_butt_skater_app/controller/user_controller.dart';
+import 'package:oilie_butt_skater_app/pages/home_page.dart';
 import 'package:oilie_butt_skater_app/pages/register_page.dart';
 
 import '../../models/user.dart';
 
-import '../components/backgroundLogin.dart';
+import '../api/api_auth.dart';
+import '../components/background/backgroundLogin.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -22,14 +25,16 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final UserController userController = Get.find<UserController>();
+
   User user = User(
-    id: 0,
-    firstName: "0",
-    lastName: "0",
-    user: "0",
-    password: "0",
-    phone: "0",
-    image: "0",
+    id: '',
+    username: '',
+    email: '',
+    password: '',
+    imageUrl: '',
+    birthDay: '',
+    createAt: '',
   );
 
   @override
@@ -45,9 +50,13 @@ class _LoginPageState extends State<LoginPage> {
     });
   }
 
-  Future<void> mylogin() async {
-    print("Success");
-  }
+  Future<void> myLogin() async {
+    user = await ApiAuth.verifyUser(
+        _emailController.text, _passwordController.text);
+
+    userController.updateUser(user);
+    Get.to(const HomePage());
+    }
 
   void mySignIn() {
     Get.to(const RegisterPage());
@@ -101,7 +110,10 @@ class _LoginPageState extends State<LoginPage> {
                   const SizedBox(
                     height: 12,
                   ),
-                  ButtonCustom(text: "เข้าสู่ระบบ", onPressed: mylogin),
+                  ButtonCustom(
+                    text: "เข้าสู่ระบบ",
+                    onPressed: myLogin,
+                  ),
                   const SizedBox(
                     height: 10,
                   ),
