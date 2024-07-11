@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:oilie_butt_skater_app/components/button_custom.dart';
 import 'package:oilie_butt_skater_app/components/icon_button.dart';
 import 'package:oilie_butt_skater_app/components/text_custom.dart';
 import 'package:oilie_butt_skater_app/components/text_field_custom.dart';
 import 'package:oilie_butt_skater_app/components/text_field_password.dart';
-import 'package:oilie_butt_skater_app/contant/color.dart';
+import 'package:oilie_butt_skater_app/constant/color.dart';
 import 'package:oilie_butt_skater_app/controller/user_controller.dart';
 import 'package:oilie_butt_skater_app/pages/home_page.dart';
 import 'package:oilie_butt_skater_app/pages/register_page.dart';
@@ -26,6 +27,7 @@ class _LoginPageState extends State<LoginPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final UserController userController = Get.find<UserController>();
+  final GoogleSignIn _googleSignIn = GoogleSignIn();
 
   User user = User(
     id: '',
@@ -56,10 +58,45 @@ class _LoginPageState extends State<LoginPage> {
 
     userController.updateUser(user);
     Get.to(const HomePage());
-    }
+  }
 
   void mySignIn() {
     Get.to(const RegisterPage());
+  }
+
+  Future<void> signInWithGoogle() async {
+    try {
+      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+      if (googleUser != null) {
+        final GoogleSignInAuthentication googleAuth =
+            await googleUser.authentication;
+
+        final googleProfile = {
+          "email": googleUser.email,
+          "username": googleUser.displayName,
+          "image_url": googleUser.photoUrl,
+          "birth_day": "" // ใช้ birth_day เป็นค่าว่างไปก่อน
+        };
+
+        // เรียกใช้ API เพื่อตรวจสอบและเพิ่มข้อมูลผู้ใช้ในฐานข้อมูลของคุณ
+        User user = await ApiAuth.registerGoogleUser(googleProfile);
+        // อัปเดตผู้ใช้ใน controller
+        userController.updateUser(User(
+          id: user.id, // ID ควรดึงมาจากฐานข้อมูล
+          username: googleUser.displayName ?? '',
+          email: googleUser.email,
+          password: '', // ไม่ควรเก็บรหัสผ่านในกรณีนี้
+          imageUrl: googleUser.photoUrl ?? '',
+          birthDay: '',
+          createAt: '',
+        ));
+
+        print(userController.user.value);
+        Get.to(const HomePage());
+      }
+    } catch (error) {
+      print('Sign-In failed: $error');
+    }
   }
 
   @override
@@ -125,7 +162,7 @@ class _LoginPageState extends State<LoginPage> {
                     height: 15,
                   ),
                   IconButtonCustom(
-                      onPressed: () {},
+                      onPressed: signInWithGoogle,
                       icon: Image.asset('assets/icons/google_color.png')),
                   const SizedBox(
                     height: 10,

@@ -6,7 +6,7 @@ import 'package:get/get_navigation/src/root/get_material_app.dart';
 import 'package:oilie_butt_skater_app/controller/user_controller.dart';
 import 'package:oilie_butt_skater_app/pages/login_page.dart';
 
-import 'contant/color.dart';
+import 'constant/color.dart';
 import 'firebase_options.dart';
 Future<void> main() async {
   // Ensure that the Flutter binding is initialized

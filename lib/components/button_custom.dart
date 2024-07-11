@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:oilie_butt_skater_app/contant/color.dart';
+import 'package:oilie_butt_skater_app/constant/color.dart';
 
 class ButtonCustom extends StatelessWidget {
   const ButtonCustom(

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/route_manager.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../contant/color.dart';
+import '../constant/color.dart';
 
 class Alert {
   final String? title;

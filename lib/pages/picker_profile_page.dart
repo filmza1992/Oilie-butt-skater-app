@@ -15,7 +15,7 @@ import 'package:oilie_butt_skater_app/pages/home_page.dart';
 import '../components/button_custom.dart';
 import '../components/text_custom.dart';
 
-import '../contant/color.dart';
+import '../constant/color.dart';
 
 class PickerProfilePage extends StatefulWidget {
   const PickerProfilePage({
@@ -79,7 +79,7 @@ class _PickerProfilePageState extends State<PickerProfilePage> {
 
     User u = await ApiAuth.signUpUser(user);
     userController.updateUser(u);
-    Get.to(HomePage());
+    Get.to(const HomePage());
   }
 
   Future<String> uploadImageToFirebase(File imageFile) async {

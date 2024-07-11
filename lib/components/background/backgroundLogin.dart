@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:oilie_butt_skater_app/components/text_custom.dart';
-import 'package:oilie_butt_skater_app/contant/color.dart';
+import 'package:oilie_butt_skater_app/constant/color.dart';
 
 class BackgroundLogin extends StatelessWidget {
   const BackgroundLogin({super.key, required this.child});

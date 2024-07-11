@@ -8,7 +8,7 @@ import 'package:image_picker/image_picker.dart';
 import '../components/button_custom.dart';
 import '../components/text_custom.dart';
 
-import '../contant/color.dart';
+import '../constant/color.dart';
 
 class ProfileImageEditPage extends StatefulWidget {
   const ProfileImageEditPage({

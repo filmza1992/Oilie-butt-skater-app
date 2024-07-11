@@ -76,4 +76,33 @@ class ApiAuth {
       throw Exception(e);
     }
   }
+
+  static Future<User> registerGoogleUser(
+      Map<String, String?> googleProfile) async {
+    try {
+      // ตรวจสอบว่ามีผู้ใช้อยู่แล้วหรือไม่
+      final email = googleProfile['email'];
+      final existingUser = await ApiUser.getUserByEmail(email!);
+
+      if (existingUser != null) {
+        // ถ้ามีผู้ใช้อยู่แล้ว, return user object
+        return existingUser;
+      } else {
+        // ถ้าไม่มีผู้ใช้, ลงทะเบียนผู้ใช้ใหม่
+        final newUser = {
+          'email': googleProfile['email'],
+          'username': googleProfile['username'],
+          'password':
+              '', // หรือสามารถตั้งค่าเป็นค่าว่างหรือ hash password ของ Google ได้
+          'birth_day': googleProfile['birth_day'],
+          'image_url': googleProfile['image_url'],
+        };
+
+        final User user = await signUpUser(newUser);
+        return user;
+      }
+    } catch (e) {
+      throw Exception(e);
+    }
+  }
 }

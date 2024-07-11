@@ -8,7 +8,7 @@ import 'package:oilie_butt_skater_app/pages/picker_profile_page.dart';
 import '../components/button_custom.dart';
 import '../components/text_custom.dart';
 import '../components/text_field_custom.dart';
-import '../contant/color.dart';
+import '../constant/color.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
