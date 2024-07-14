@@ -46,15 +46,17 @@ class DefaultFirebaseOptions {
     messagingSenderId: '835311886740',
     projectId: 'oilie-butt-skater-app',
     authDomain: 'oilie-butt-skater-app.firebaseapp.com',
+    databaseURL: 'https://oilie-butt-skater-app-default-rtdb.asia-southeast1.firebasedatabase.app',
     storageBucket: 'oilie-butt-skater-app.appspot.com',
     measurementId: 'G-VP7XP68N7S',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyAwMFu_rrMDIAieRqPt2VFYdQcLg2DvqF8',
-    appId: '1:835311886740:android:acaf8ac6f39b37b99faf81',
+    appId: '1:835311886740:android:f5496abf59bf21739faf81',
     messagingSenderId: '835311886740',
     projectId: 'oilie-butt-skater-app',
+    databaseURL: 'https://oilie-butt-skater-app-default-rtdb.asia-southeast1.firebasedatabase.app',
     storageBucket: 'oilie-butt-skater-app.appspot.com',
   );
 
@@ -63,7 +65,10 @@ class DefaultFirebaseOptions {
     appId: '1:835311886740:ios:73545926153022f99faf81',
     messagingSenderId: '835311886740',
     projectId: 'oilie-butt-skater-app',
+    databaseURL: 'https://oilie-butt-skater-app-default-rtdb.asia-southeast1.firebasedatabase.app',
     storageBucket: 'oilie-butt-skater-app.appspot.com',
+    androidClientId: '835311886740-kl9ip8bkefscjapeq0f8hk4mn1mea295.apps.googleusercontent.com',
+    iosClientId: '835311886740-hb6v6mo4d4olog7cjhd0a4tv06843b1p.apps.googleusercontent.com',
     iosBundleId: 'com.example.oilieButtSkaterApp',
   );
 
@@ -72,7 +77,10 @@ class DefaultFirebaseOptions {
     appId: '1:835311886740:ios:73545926153022f99faf81',
     messagingSenderId: '835311886740',
     projectId: 'oilie-butt-skater-app',
+    databaseURL: 'https://oilie-butt-skater-app-default-rtdb.asia-southeast1.firebasedatabase.app',
     storageBucket: 'oilie-butt-skater-app.appspot.com',
+    androidClientId: '835311886740-kl9ip8bkefscjapeq0f8hk4mn1mea295.apps.googleusercontent.com',
+    iosClientId: '835311886740-hb6v6mo4d4olog7cjhd0a4tv06843b1p.apps.googleusercontent.com',
     iosBundleId: 'com.example.oilieButtSkaterApp',
   );
 
@@ -82,6 +90,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '835311886740',
     projectId: 'oilie-butt-skater-app',
     authDomain: 'oilie-butt-skater-app.firebaseapp.com',
+    databaseURL: 'https://oilie-butt-skater-app-default-rtdb.asia-southeast1.firebasedatabase.app',
     storageBucket: 'oilie-butt-skater-app.appspot.com',
     measurementId: 'G-RZDFX0YG9C',
   );

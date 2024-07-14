@@ -3,6 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:oilie_butt_skater_app/components/post.dart';
 import 'package:oilie_butt_skater_app/constant/color.dart';
+import 'package:oilie_butt_skater_app/pages/chat_room.dart';
 import 'package:oilie_butt_skater_app/pages/create_post_page.dart';
 import 'package:oilie_butt_skater_app/pages/login_page.dart';
 import 'package:oilie_butt_skater_app/pages/profile_page.dart';
@@ -92,7 +93,7 @@ class _HomePageState extends State<HomePage> {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => CreatePostPage()),
+                MaterialPageRoute(builder: (context) => const ChatRoomPage()),
               );
             },
             icon: SvgPicture.asset(
