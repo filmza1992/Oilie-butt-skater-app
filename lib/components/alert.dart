@@ -12,7 +12,7 @@ class Alert {
     this.title,
     this.message,
   });
-  void loading(BuildContext context) {
+  static void loading(BuildContext context) {
     CoolAlert.show(
       context: context,
       type: CoolAlertType.loading,
@@ -22,7 +22,7 @@ class Alert {
     );
   }
 
-  void success(BuildContext context,
+  static void success(BuildContext context,
       [VoidCallback? onConfirmBtnTap, bool barrierDismissible = true]) {
     CoolAlert.show(
       context: context,
@@ -35,7 +35,7 @@ class Alert {
     );
   }
 
-  void error(BuildContext context) {
+  static void error(BuildContext context) {
     CoolAlert.show(
       context: context,
       type: CoolAlertType.error,

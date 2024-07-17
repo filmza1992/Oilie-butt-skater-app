@@ -14,7 +14,7 @@ class ProfilePage extends StatefulWidget {
 void _logout() {
     // Implement your logout logic here
     print("User logged out");
-    Get.to(const LoginPage());
+    Get.back();
   }
 class _ProfilePageState extends State<ProfilePage> {
   final UserController userController = Get.find<UserController>();

@@ -1,12 +1,11 @@
-import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:oilie_butt_skater_app/api/api_chat.dart';
+import 'package:oilie_butt_skater_app/components/chat_room_detail.dart';
 import 'package:oilie_butt_skater_app/components/text_custom.dart';
 import 'package:oilie_butt_skater_app/constant/color.dart';
 import 'package:oilie_butt_skater_app/controller/user_controller.dart';
-import 'package:oilie_butt_skater_app/models/chat_room.dart';
-import 'package:oilie_butt_skater_app/pages/chat_message.dart';
+import 'package:oilie_butt_skater_app/models/chat_room_model.dart';
 
 class ChatRoomPage extends StatefulWidget {
   const ChatRoomPage({super.key});
@@ -17,16 +16,31 @@ class ChatRoomPage extends StatefulWidget {
 
 class _ChatRoomPageState extends State<ChatRoomPage> {
   UserController userController = Get.find<UserController>();
-  List<ChatRoom> chatRooms = [];
+
+  List<ChatRoom> filteredChatRooms = [];
   bool isLoading = true;
+
+  TextEditingController searchController = TextEditingController();
+  ValueNotifier<String> searchQuery = ValueNotifier<String>('');
+  ValueNotifier<List<ChatRoom>> chatRooms = ValueNotifier<List<ChatRoom>>([]);
+  void updateMessage(List<ChatRoom> data) {
+    if (mounted) {
+      // Check if the new messages are different from the current messages
+      setState(() {
+        chatRooms.value = 
+            data; // Ensure to create a new list to avoid reference issues
+        filteredChatRooms = data;
+      });
+    }
+  }
 
   void fetchChatRooms() async {
     try {
       final fetchedChatRooms =
-          await ApiChat.getChatRooms(userController.user.value);
-        print("get Message");
+          await ApiChat.getChatRooms(userController.user.value, updateMessage);
       setState(() {
-        chatRooms = fetchedChatRooms;
+        chatRooms.value = fetchedChatRooms;
+        filteredChatRooms = fetchedChatRooms;
         isLoading = false;
       });
     } catch (e) {
@@ -37,10 +51,31 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
     }
   }
 
+  void filterChatRooms(String query) {
+    final List<ChatRoom> results = chatRooms.value
+        .where((chatRoom) => chatRoom.target['username']
+            .toLowerCase()
+            .contains(query.toLowerCase()))
+        .toList();
+    setState(() {
+      filteredChatRooms = results;
+    });
+  }
+
   @override
   void initState() {
     super.initState();
     fetchChatRooms();
+    searchController.addListener(() {
+      searchQuery.value = searchController.text;
+      filterChatRooms(searchQuery.value);
+    });
+  }
+
+  @override
+  void dispose() {
+    searchController.dispose();
+    super.dispose();
   }
 
   @override
@@ -63,7 +98,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
           ? const Center(
               child: CircularProgressIndicator(),
             )
-          : chatRooms.isEmpty
+          : chatRooms.value.isEmpty
               ? const Center(
                   child: TextCustom(
                     text: "No chat rooms available.",
@@ -71,86 +106,48 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                     color: AppColors.primaryColor,
                   ),
                 )
-              : ListView.builder(
-                  itemCount: chatRooms.length,
-                  itemBuilder: (context, index) {
-                    final chatRoom = chatRooms[index];
-                    return Card(
-                      margin: const EdgeInsets.all(10),
-                      child: ListTile(
-                        title: TextCustom(
-                          text: 'Chat Room ${chatRoom.chatRoomId}',
-                          size: 20,
-                          color: AppColors.primaryColor,
-                        ),
-                        subtitle: TextCustom(
-                          text: 'Last updated: ${chatRoom.updateAt}',
-                          size: 16,
-                          color: AppColors.secondaryColor,
-                        ),
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => ChatMessagePage(
-                                roomId: chatRoom.chatRoomId,
+              : ValueListenableBuilder(
+                  valueListenable: chatRooms,
+                  builder: (context, value, child) {
+                    return Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: TextField(
+                            controller: searchController,
+                            decoration: InputDecoration(
+                              labelText: 'ค้นหา',
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
                               ),
+                              suffixIcon: const Icon(Icons.search),
                             ),
-                          );
-                        },
-                      ),
+                          ),
+                        ),
+                        Expanded(
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 3, horizontal: 10),
+                            child: ListView.builder(
+                              itemCount: filteredChatRooms.length,
+                              itemBuilder: (context, index) {
+                                final chatRoom = filteredChatRooms[index];
+                                return Card(
+                                  margin: const EdgeInsets.symmetric(
+                                      vertical: 3, horizontal: 0),
+                                  child: ChatRoomDetail(
+                                      chatRoom: chatRoom,
+                                      user: userController.user.value,
+                                      searchController: searchController),
+                                );
+                              },
+                            ),
+                          ),
+                        ),
+                      ],
                     );
                   },
                 ),
-    );
-  }
-}
-
-class ChatRoomDetailsPage extends StatelessWidget {
-  final Map<String, dynamic> chatRoom;
-
-  const ChatRoomDetailsPage({super.key, required this.chatRoom});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Chat Room ${chatRoom['room_id']}'),
-      ),
-      body: ListView(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            child: Row(
-              children: [
-                CircleAvatar(
-                  backgroundImage: NetworkImage(chatRoom['']),
-                  radius: 25,
-                ),
-                const SizedBox(width: 10),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    TextCustom(
-                      text: chatRoom['room_name'],
-                      size: 20,
-                      color: Colors.green,
-                      isBold: true,
-                    ),
-                    TextCustom(
-                      text: chatRoom['last_message'],
-                      size: 16,
-                      color: Colors.grey,
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          const Divider(),
-          // Add more details as needed
-        ],
-      ),
     );
   }
 }

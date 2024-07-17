@@ -1,15 +1,11 @@
-import 'dart:convert';
-
 import 'package:firebase_database/firebase_database.dart';
-import 'package:get/get.dart';
-import 'package:oilie_butt_skater_app/%E0%B8%B5util/date.dart';
-import 'package:oilie_butt_skater_app/models/chat.dart';
-import 'package:oilie_butt_skater_app/models/chat_room.dart';
+import 'package:oilie_butt_skater_app/models/chat_model.dart';
+import 'package:oilie_butt_skater_app/models/chat_room_model.dart';
 import 'package:oilie_butt_skater_app/models/user.dart';
-import 'package:oilie_butt_skater_app/models/user_chat.dart';
+import 'package:oilie_butt_skater_app/models/user_chat_model.dart';
 
 class ApiChat {
-  static Future<List<ChatRoom>> getChatRooms(User user) async {
+  static Future<List<ChatRoom>> getChatRooms(User user, updateMessage) async {
     try {
       final DatabaseReference chatRoomsRef =
           FirebaseDatabase.instance.ref().child('chat_rooms');
@@ -19,7 +15,7 @@ class ApiChat {
       chatRoomsRef.onValue.listen((event) {
         chatRooms.clear();
         final dynamic data = event.snapshot.value;
-
+        print("get room");
         if (data != null) {
           data.forEach((key, value) {
             dynamic users = value['users'];
@@ -27,18 +23,43 @@ class ApiChat {
             bool isUserInRoom =
                 users.any((userMap) => userMap['user_id'] == user.id);
 
+            List<dynamic> messages = [];
+            if (value['messages'] != null) {
+              messages = value['messages'];
+            }
+
+            String lastMessage = "";
+            if (messages.isNotEmpty) {
+              if (messages.last['text'] != null) {
+                lastMessage = messages.last['text'];
+              } else if (messages.last['url'] != null) {
+                lastMessage = 'ได้ส่งรูปภาพ';
+              }
+            } else {
+              lastMessage = 'แชทใหม่ข้อความเลย';
+            }
+
+            final target =
+                users.where((userMap) => userMap['user_id'] != user.id).first;
+
             if (isUserInRoom) {
               ChatRoom chatRoom = ChatRoom(
-                  value['chat_room_id'],
-                  value['users'],
-                  value['messages'],
-                  DateTimeUtil.formatDateTimeYMD(
-                      DateTimeUtil.getCurrentDateTime()),
-                  value['create_at']);
+                value['chat_room_id'],
+                value['users'],
+                value['messages'],
+                value['update_at'],
+                value['create_at'],
+                lastMessage,
+                target,
+              );
               chatRooms.add(chatRoom);
+
             }
           });
         }
+              chatRooms.sort((a, b) => DateTime.parse(b.updateAt)
+                .compareTo(DateTime.parse(a.updateAt)));
+              updateMessage(chatRooms);
       });
 
       return chatRooms;
@@ -50,9 +71,8 @@ class ApiChat {
   static Future<dynamic> getMessages(
       String roomId, String userId, updateMessages) async {
     try {
-      final messagesRef = FirebaseDatabase.instance
-          .ref()
-          .child("chat_rooms/${roomId}/messages");
+      final messagesRef =
+          FirebaseDatabase.instance.ref().child("chat_rooms/$roomId/messages");
 
       final userRef =
           FirebaseDatabase.instance.ref().child("chat_rooms/$roomId/users");
@@ -88,7 +108,8 @@ class ApiChat {
                 }
               });
             }
-            messageRooms.sort((a, b) => DateTime.parse(b.createAt).compareTo(DateTime.parse(a.createAt)));
+            messageRooms.sort((a, b) => DateTime.parse(b.createAt)
+                .compareTo(DateTime.parse(a.createAt)));
             updateMessages(messageRooms);
           },
         );
@@ -101,7 +122,7 @@ class ApiChat {
     }
   }
 
-  static Future<void> sendMessage(
+  static Future<void> sendMessageText(
       String roomId, String userId, String messageText) async {
     try {
       final DatabaseReference messagesRef =
@@ -117,10 +138,50 @@ class ApiChat {
 
       messagesList = List.from(messagesList);
       // Create a new message object
-      final Map<String, dynamic> messageData = {
+      Map<String, dynamic> messageData = {
         'create_at': DateTime.now().toIso8601String(),
         'text': messageText,
         'type': 1, // Assuming type 1 is for text messages
+        'user_id': userId,
+      };
+
+      // Append the new message to the array
+      messagesList.add(messageData);
+
+      // Update the messages array in Firebase
+      await messagesRef.set(messagesList);
+      final DatabaseReference roomRef =
+          FirebaseDatabase.instance.ref().child('chat_rooms/$roomId');
+
+      roomRef.update({
+        "update_at": DateTime.now().toIso8601String(),
+      });
+    } catch (e) {
+      print('Error sending message: $e');
+      throw Exception('Failed to send message');
+    }
+  }
+
+  static Future<void> sendMessageImage(
+      String roomId, String userId, String url) async {
+    try {
+      final DatabaseReference messagesRef =
+          FirebaseDatabase.instance.ref().child('chat_rooms/$roomId/messages');
+
+      // Fetch the current messages array
+      final DataSnapshot snapshot = await messagesRef.get();
+      List<dynamic> messagesList = [];
+
+      if (snapshot.value != null) {
+        messagesList = snapshot.value as List<dynamic>;
+      }
+
+      messagesList = List.from(messagesList);
+      // Create a new message object
+      Map<String, dynamic> messageData = {
+        'create_at': DateTime.now().toIso8601String(),
+        'url': url,
+        'type': 2, // Assuming type 1 is for text messages
         'user_id': userId,
       };
 

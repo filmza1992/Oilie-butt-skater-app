@@ -1,41 +1,43 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:oilie_butt_skater_app/components/profile_post.dart';
-import 'package:oilie_butt_skater_app/controller/user_controller.dart';
 
-class Post extends StatelessWidget {
+class PostComponent extends StatelessWidget {
   final String username;
+  final String userImage;
   final String postText;
   final int likes;
   final int dislikes;
   final int comments;
-  final String imageUrl;
+  final String content;
 
-  const Post({
+  const PostComponent({
     super.key,
     required this.username,
+    required this.userImage,
     required this.postText,
     required this.likes,
     required this.dislikes,
     required this.comments,
-    required this.imageUrl,
+    required this.content,
   });
 
   @override
   Widget build(BuildContext context) {
-    final UserController userController = Get.find<UserController>();
-    return Container(
+    return SizedBox(
       width: double.infinity,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: EdgeInsets.all(10),
+            padding: const EdgeInsets.all(10),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                ProfilePost(user: userController.user.value),
-                SizedBox(
+                ProfilePost(
+                  username: username,
+                  userImage: userImage,
+                ),
+                const SizedBox(
                   height: 20,
                 ),
                 // Post Text
@@ -45,14 +47,14 @@ class Post extends StatelessWidget {
           ),
           // Username
 
-          SizedBox(height: 10.0),
-          Image.asset(
-            'assets/images/istockphoto-465492606-612x612.jpg',
+          const SizedBox(height: 10.0),
+          Image.network(
+            content,
             fit: BoxFit.cover,
           ),
 
           Padding(
-            padding: EdgeInsets.symmetric(horizontal: 10, vertical: 0),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -61,7 +63,7 @@ class Post extends StatelessWidget {
                     SizedBox(
                       height: 35,
                       child: IconButton(
-                        icon: Icon(Icons.thumb_up_outlined),
+                        icon: const Icon(Icons.thumb_up_outlined),
                         onPressed: () {},
                       ),
                     ),
@@ -74,7 +76,7 @@ class Post extends StatelessWidget {
                     SizedBox(
                       height: 35,
                       child: IconButton(
-                        icon: Icon(Icons.mode_comment_outlined),
+                        icon: const Icon(Icons.mode_comment_outlined),
                         onPressed: () {
                           // Comment button pressed
                         },
@@ -83,25 +85,30 @@ class Post extends StatelessWidget {
                     Text('$comments'),
                   ],
                 ),
-               Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      SizedBox(
-                         height: 35,
-                        child: IconButton(
-                          icon: Icon(Icons.thumb_down_outlined),
-                          onPressed: () {
-                            // Dislike button pressed
-                          },
-                        ),
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    SizedBox(
+                      height: 35,
+                      child: IconButton(
+                        icon: const Icon(Icons.thumb_down_outlined),
+                        onPressed: () {
+                          // Dislike button pressed
+                        },
                       ),
-                      Text('$dislikes'),
-                    ],
-                  ),
-                
+                    ),
+                    Text('$dislikes'),
+                  ],
+                ),
               ],
             ),
           ),
+          
+          
+          Divider(
+            color: Color.fromARGB(255, 44, 44, 44),
+          ),
+          const SizedBox(height: 10.0),
         ],
       ),
     );

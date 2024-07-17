@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:oilie_butt_skater_app/%E0%B8%B5util/firebase_upload_image_.dart';
 import 'package:oilie_butt_skater_app/api/api_auth.dart';
 import 'package:oilie_butt_skater_app/components/profile_image_edit.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -73,7 +74,7 @@ class _PickerProfilePageState extends State<PickerProfilePage> {
 
   void signup(File imageFile) async {
     // อัปโหลดรูปภาพไปยัง Firebase Storage
-    String imageUrl = await uploadImageToFirebase(imageFile);
+    String imageUrl = await uploadImageToFirebaseProfile(imageFile);
     dynamic user = widget.user;
     user['image_url'] = imageUrl;
 
@@ -82,21 +83,7 @@ class _PickerProfilePageState extends State<PickerProfilePage> {
     Get.to(const HomePage());
   }
 
-  Future<String> uploadImageToFirebase(File imageFile) async {
-    String fileName =
-        '${DateFormat('yyyyMMdd_HHmmss').format(DateTime.now())}_${imageFile.path.split('/').last}';
-
-    try {
-      final storageRef =
-          FirebaseStorage.instance.ref().child("profile/$fileName");
-      await storageRef.putFile(imageFile);
-      String downloadUrl = await storageRef.getDownloadURL();
-      return downloadUrl;
-    } catch (e) {
-      print("Error uploading image: $e");
-      return '';
-    }
-  }
+  
 
   @override
   Widget build(BuildContext context) {

@@ -1,27 +1,22 @@
-import 'dart:io';
-import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:image_cropper/image_cropper.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:oilie_butt_skater_app/models/user.dart';
-
-import '../constant/color.dart';
 
 class ProfilePost extends StatefulWidget {
   const ProfilePost({
-    required this.user,
+    required this.username,
+    required this.userImage,
     super.key,
   });
 
-  final User user;
+  final String username;
+  final String userImage;
   @override
   State<ProfilePost> createState() => _ProfilePostState();
 }
 
 class _ProfilePostState extends State<ProfilePost> {
   Widget buildImage() {
-    final dynamic image = widget.user.imageUrl != ''
-        ? NetworkImage(widget.user.imageUrl)
+    final dynamic image = widget.userImage != ''
+        ? NetworkImage(widget.userImage)
         : const NetworkImage(
             'https://i0.wp.com/sbcf.fr/wp-content/uploads/2018/03/sbcf-default-avatar.png');
     return ClipOval(
@@ -44,8 +39,10 @@ class _ProfilePostState extends State<ProfilePost> {
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           buildImage(),
-          SizedBox(width: 10,),
-          Text(widget.user.username),
+          const SizedBox(
+            width: 10,
+          ),
+          Text(widget.username),
         ],
       ),
     );
