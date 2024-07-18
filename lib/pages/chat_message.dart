@@ -72,13 +72,7 @@ class _ChatMessagePageState extends State<ChatMessagePage> {
   List<AssetEntity> images = [];
 
   Future<void> _fetchImages() async {
-    var status = await Permission.photos.request();
-    if (status.isGranted) {
-     
-    } else {
-      // Handle permission denied
-      print('Permission denied');
-    }
+    
     final PermissionState permission =
         await PhotoManager.requestPermissionExtend();
         PhotoManager.setIgnorePermissionCheck(true);
@@ -120,6 +114,7 @@ class _ChatMessagePageState extends State<ChatMessagePage> {
               onImageSelected(selectedImage);
               Navigator.pop(context);
             }, isShowButton: true,
+            
           ),
         );
       },

@@ -5,12 +5,11 @@ import 'package:oilie_butt_skater_app/api/api_post.dart';
 import 'package:oilie_butt_skater_app/components/post.dart';
 import 'package:oilie_butt_skater_app/constant/color.dart';
 import 'package:oilie_butt_skater_app/controller/user_controller.dart';
-import 'package:oilie_butt_skater_app/models/chat_room_model.dart';
 import 'package:oilie_butt_skater_app/models/post_model.dart';
 import 'package:oilie_butt_skater_app/pages/chat_room.dart';
 import 'package:oilie_butt_skater_app/pages/post/create_post_page.dart';
-import 'package:oilie_butt_skater_app/pages/login_page.dart';
 import 'package:oilie_butt_skater_app/pages/profile_page.dart';
+import 'package:oilie_butt_skater_app/pages/search_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -40,7 +39,7 @@ class _HomePageState extends State<HomePage> {
           shape: BoxShape.circle,
         ),
         child: Center(
-          child: Container(
+          child: SizedBox(
             width: 45, // ปรับขนาดไอคอนที่นี่
             height: 45, // ปรับขนาดไอคอนที่นี่
             child: Image.asset('assets/images/skateboard_home.png',
@@ -72,11 +71,11 @@ class _HomePageState extends State<HomePage> {
       body: IndexedStack(
         index: _selectedIndex,
         children: [
-          Center(child: Text('Trophy')),
-          Center(child: Text('Room')),
+          const Center(child: Text('Trophy')),
+          const Center(child: Text('Room')),
           Center(child: page()),
-          Center(child: Text('Notifications Page')),
-          if (_selectedIndex == 4) Center(child: ProfilePage()),
+          const Center(child: Text('Notifications Page')),
+          if (_selectedIndex == 4) const Center(child: ProfilePage()),
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
@@ -91,6 +90,9 @@ class _HomePageState extends State<HomePage> {
 
   ValueNotifier<List<Post>> posts = ValueNotifier<List<Post>>([]);
   UserController userController = Get.find<UserController>();
+  void update() {
+    fetchPosts();
+  }
 
   void updateMessage(List<Post> data) {
     if (mounted) {
@@ -106,7 +108,7 @@ class _HomePageState extends State<HomePage> {
     print('initState');
     try {
       final fetchedPosts =
-          await ApiPost.getAllPost();
+          await ApiPost.getAllPost(userController.user.value.id);
       setState(() {
         posts.value = fetchedPosts;
       });
@@ -127,6 +129,14 @@ class _HomePageState extends State<HomePage> {
         backgroundColor: AppColors.backgroundColor,
         automaticallyImplyLeading: false,
         actions: [
+          IconButton(
+              onPressed: () {
+               Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const SearchPage()),
+              );
+              },
+              icon: const Icon(Icons.search)),
           IconButton(
             onPressed: () {
               Navigator.push(
@@ -149,20 +159,29 @@ class _HomePageState extends State<HomePage> {
             valueListenable: posts,
             builder: (context, value, child) {
               return ListView.builder(
-              itemCount: value.length,
-              itemBuilder: (context, index) {
-                final post = value[index];
-                return PostComponent(
-                  username: post.username, 
-                  userImage: post.userImage,
-                  postText: post.title,
-                  likes: post.likes,
-                  dislikes: post.dislikes,
-                  comments: post.comments,
-                  content: post.content,
-                );
-              },
-            );
+                itemCount: value.length,
+                itemBuilder: (context, index) {
+                  final post = value[index];
+                  return PostComponent(
+                      userId: post.userId,
+                      postId: post.postId,
+                      username: post.username,
+                      userImage: post.userImage,
+                      postText: post.title,
+                      likes: post.likes,
+                      dislikes: post.dislikes,
+                      comments: post.comments,
+                      content: post.content,
+                      status: post.status,
+                      updateStatus: (int status, int likes, int dislikes) {
+                        setState(() {
+                          post.status = status;
+                          post.likes = likes;
+                          post.dislikes = dislikes;
+                        });
+                      });
+                },
+              );
             }),
       ),
       floatingActionButton: FloatingActionButton(
@@ -170,7 +189,8 @@ class _HomePageState extends State<HomePage> {
           // Navigate to the post creation screen
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => CreatePostPage()),
+            MaterialPageRoute(
+                builder: (context) => CreatePostPage(update: update)),
           );
         },
         backgroundColor: Colors.transparent,
@@ -178,7 +198,7 @@ class _HomePageState extends State<HomePage> {
         child: Container(
           width: 50.0,
           height: 50.0,
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
             color: Colors.white,
             shape: BoxShape.circle,
           ),

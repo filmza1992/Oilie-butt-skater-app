@@ -18,7 +18,8 @@ Post _$PostFromJson(Map<String, dynamic> json) => Post(
       json['content'],
       json['likes'],
       json['dislikes'],
-      json['comments']
+      json['comments'],
+      json['status']
     );
 
 Map<String, dynamic> _$PostToJson(Post instance) => <String, dynamic>{

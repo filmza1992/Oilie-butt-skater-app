@@ -13,9 +13,10 @@ class Post {
   final String tag;
   final dynamic createAt;
   final dynamic content;
-  final int likes;
-  final int dislikes;
+  int likes;
+  int dislikes;
   final int comments;
+  int status;
 
   Post(
     this.postId,
@@ -30,6 +31,7 @@ class Post {
     this.likes,
     this.dislikes,
     this.comments,
+    this.status
   );
 
   factory Post.fromJson(Map<String, dynamic> json) => _$PostFromJson(json);

@@ -12,8 +12,9 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:photo_manager/photo_manager.dart';
 
 class CreatePostPage extends StatefulWidget {
-  const CreatePostPage({super.key});
+  const CreatePostPage({super.key, required this.update});
 
+  final Function update;
   @override
   State<CreatePostPage> createState() => _CreatePostPageState();
 }
@@ -52,14 +53,14 @@ class _CreatePostPageState extends State<CreatePostPage> {
       );
 
       if (croppedImage != null) {
-       setState(() {
+        setState(() {
           _imageFile = File(croppedImage.path);
           Get.to(CreateTextPostPage(
             imageFile: _imageFile,
+            update: widget.update
           ));
         });
       }
-      
     } catch (e) {
       print("Image cropper error: $e");
     }

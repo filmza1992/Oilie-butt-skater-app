@@ -54,8 +54,9 @@ class _PhotoGalleryState extends State<PhotoGallery> {
                 onTap: () {
                   setState(() {
                     selectedImage = image;
-                    widget.updateSelected!();
+                    
                     if(widget.updateSelected != null){
+                      widget.updateSelected!();
                       widget.onImageSelected(selectedImage!);
                     }
                   });

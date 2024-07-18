@@ -12,9 +12,10 @@ import 'package:oilie_butt_skater_app/models/post_create_model.dart';
 import 'package:oilie_butt_skater_app/pages/home_page.dart';
 
 class CreateTextPostPage extends StatefulWidget {
-  const CreateTextPostPage({super.key, required this.imageFile});
+  const CreateTextPostPage({super.key, required this.imageFile, required this.update});
 
   final File? imageFile;
+  final Function update;
   @override
   State<CreateTextPostPage> createState() => _CreateTextPostPageState();
 }
@@ -72,7 +73,7 @@ class _CreateTextPostPageState extends State<CreateTextPostPage> {
                         1,
                         "tag",
                         "create_at",
-                        widget.imageFile),context);
+                        widget.imageFile),context,widget.update);
                        
                   }),
             ],

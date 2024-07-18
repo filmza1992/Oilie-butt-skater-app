@@ -66,6 +66,7 @@ class _LoginPageState extends State<LoginPage> {
 
   Future<void> signInWithGoogle() async {
     try {
+      await _googleSignIn.signOut();
       final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
       if (googleUser != null) {
         final GoogleSignInAuthentication googleAuth =
@@ -105,6 +106,7 @@ class _LoginPageState extends State<LoginPage> {
         appBar: AppBar(
           backgroundColor: Theme.of(context).colorScheme.inversePrimary,
           actions: [],
+           automaticallyImplyLeading: false,
         ),
         body: BackgroundLogin(
           child: SizedBox(
