@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:oilie_butt_skater_app/api/api_chat.dart';
+import 'package:oilie_butt_skater_app/api/api_room.dart';
 import 'package:oilie_butt_skater_app/components/chat_room_detail.dart';
 import 'package:oilie_butt_skater_app/components/text_custom.dart';
 import 'package:oilie_butt_skater_app/constant/color.dart';
 import 'package:oilie_butt_skater_app/controller/user_controller.dart';
 import 'package:oilie_butt_skater_app/models/chat_room_model.dart';
+import 'package:oilie_butt_skater_app/pages/chat_message.dart';
 
 class ChatRoomPage extends StatefulWidget {
   const ChatRoomPage({super.key});
@@ -27,7 +29,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
     if (mounted) {
       // Check if the new messages are different from the current messages
       setState(() {
-        chatRooms.value = 
+        chatRooms.value =
             data; // Ensure to create a new list to avoid reference issues
         filteredChatRooms = data;
       });
@@ -37,7 +39,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
   void fetchChatRooms() async {
     try {
       final fetchedChatRooms =
-          await ApiChat.getChatRooms(userController.user.value, updateMessage);
+          await ApiRoom.getChatRooms(userController.user.value, updateMessage);
       setState(() {
         chatRooms.value = fetchedChatRooms;
         filteredChatRooms = fetchedChatRooms;
@@ -132,13 +134,23 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                               itemCount: filteredChatRooms.length,
                               itemBuilder: (context, index) {
                                 final chatRoom = filteredChatRooms[index];
-                                return Card(
-                                  margin: const EdgeInsets.symmetric(
-                                      vertical: 3, horizontal: 0),
-                                  child: ChatRoomDetail(
-                                      chatRoom: chatRoom,
-                                      user: userController.user.value,
-                                      searchController: searchController),
+                                return GestureDetector(
+                                  onTap: () {
+                                    Get.to(ChatMessagePage(
+                                        roomId: chatRoom.chatRoomId,
+                                        users: chatRoom.users));
+                                    setState(() {
+                                      searchController.text = "";
+                                    });
+                                  },
+                                  child: Card(
+                                    margin: const EdgeInsets.symmetric(
+                                        vertical: 3, horizontal: 0),
+                                    child: ChatRoomDetail(
+                                        chatRoom: chatRoom,
+                                        user: userController.user.value,
+                                        searchController: searchController),
+                                  ),
                                 );
                               },
                             ),

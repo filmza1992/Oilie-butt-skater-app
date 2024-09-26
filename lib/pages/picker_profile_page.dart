@@ -122,6 +122,7 @@ class _PickerProfilePageState extends State<PickerProfilePage> {
               ButtonCustom(
                 text: "ยืนยันการเลือกรูปภาพ",
                 onPressed: () => signup(_imageFile),
+                type: 'Elevated'
               ),
             ],
           ),

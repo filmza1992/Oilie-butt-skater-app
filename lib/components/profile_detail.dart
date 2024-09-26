@@ -5,23 +5,21 @@ import 'package:oilie_butt_skater_app/constant/color.dart';
 import 'package:oilie_butt_skater_app/models/chat_room_model.dart';
 import 'package:oilie_butt_skater_app/models/user.dart';
 import 'package:oilie_butt_skater_app/pages/chat_message.dart';
+import 'package:oilie_butt_skater_app/pages/profile/profile_page.dart';
 
-class ChatRoomDetail extends StatefulWidget {
-  const ChatRoomDetail(
+class ProfileDetail extends StatefulWidget {
+  const ProfileDetail(
       {super.key,
-      required this.chatRoom,
       required this.user,
-      required this.searchController});
+     });
 
-  final ChatRoom chatRoom;
   final User user;
-  final TextEditingController searchController;
-
+ 
   @override
-  State<ChatRoomDetail> createState() => _ChatRoomDetailState();
+  State<ProfileDetail> createState() => _ProfileDetailState();
 }
 
-class _ChatRoomDetailState extends State<ChatRoomDetail> {
+class _ProfileDetailState extends State<ProfileDetail> {
   String isPrivateChat(dynamic users) {
     bool isPrivate = false;
     if (users.length == 2) {
@@ -39,13 +37,13 @@ class _ChatRoomDetailState extends State<ChatRoomDetail> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return  Container(
         padding: const EdgeInsets.all(10),
         child: Row(
           children: [
             CircleAvatar(
-              backgroundImage: widget.chatRoom.target['image_url'] != null
-                  ? NetworkImage(widget.chatRoom.target['image_url'])
+              backgroundImage: widget.user.imageUrl != null
+                  ? NetworkImage(widget.user.imageUrl)
                   : const NetworkImage(
                       'https://i0.wp.com/sbcf.fr/wp-content/uploads/2018/03/sbcf-default-avatar.png'),
               radius: 25,
@@ -55,20 +53,17 @@ class _ChatRoomDetailState extends State<ChatRoomDetail> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 TextCustom(
-                  text: isPrivateChat(widget.chatRoom.users),
+                  text: widget.user.username,
                   size: 20,
-                  color: AppColors.primaryColor,
-                  isBold: true,
+                  color: AppColors.textColor,
+                  isBold: false,
                 ),
-                TextCustom(
-                  text: widget.chatRoom.lastMessage,
-                  size: 16,
-                  color: Colors.grey,
-                ),
+              
               ],
             ),
           ],
         ),
+ 
     );
     // Add more details as needed
   }

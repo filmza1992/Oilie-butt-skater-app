@@ -5,68 +5,7 @@ import 'package:oilie_butt_skater_app/models/user.dart';
 import 'package:oilie_butt_skater_app/models/user_chat_model.dart';
 
 class ApiChat {
-  static Future<List<ChatRoom>> getChatRooms(User user, updateMessage) async {
-    try {
-      final DatabaseReference chatRoomsRef =
-          FirebaseDatabase.instance.ref().child('chat_rooms');
-
-      final List<ChatRoom> chatRooms = [];
-
-      chatRoomsRef.onValue.listen((event) {
-        chatRooms.clear();
-        final dynamic data = event.snapshot.value;
-        print("get room");
-        if (data != null) {
-          data.forEach((key, value) {
-            dynamic users = value['users'];
-            // Check if the current user is in this chat room
-            bool isUserInRoom =
-                users.any((userMap) => userMap['user_id'] == user.id);
-
-            List<dynamic> messages = [];
-            if (value['messages'] != null) {
-              messages = value['messages'];
-            }
-
-            String lastMessage = "";
-            if (messages.isNotEmpty) {
-              if (messages.last['text'] != null) {
-                lastMessage = messages.last['text'];
-              } else if (messages.last['url'] != null) {
-                lastMessage = 'ได้ส่งรูปภาพ';
-              }
-            } else {
-              lastMessage = 'แชทใหม่ข้อความเลย';
-            }
-
-            final target =
-                users.where((userMap) => userMap['user_id'] != user.id).first;
-
-            if (isUserInRoom) {
-              ChatRoom chatRoom = ChatRoom(
-                value['chat_room_id'],
-                value['users'],
-                value['messages'],
-                value['update_at'],
-                value['create_at'],
-                lastMessage,
-                target,
-              );
-              chatRooms.add(chatRoom);
-
-            }
-          });
-        }
-              chatRooms.sort((a, b) => DateTime.parse(b.updateAt)
-                .compareTo(DateTime.parse(a.updateAt)));
-              updateMessage(chatRooms);
-      });
-
-      return chatRooms;
-    } catch (e) {
-      throw Exception(e);
-    }
-  }
+ 
 
   static Future<dynamic> getMessages(
       String roomId, String userId, updateMessages) async {

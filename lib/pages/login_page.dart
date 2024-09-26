@@ -30,7 +30,7 @@ class _LoginPageState extends State<LoginPage> {
   final GoogleSignIn _googleSignIn = GoogleSignIn();
 
   User user = User(
-    id: '',
+    userId: '',
     username: '',
     email: '',
     password: '',
@@ -83,7 +83,7 @@ class _LoginPageState extends State<LoginPage> {
         User user = await ApiAuth.registerGoogleUser(googleProfile);
         // อัปเดตผู้ใช้ใน controller
         userController.updateUser(User(
-          id: user.id, // ID ควรดึงมาจากฐานข้อมูล
+          userId: user.userId, // ID ควรดึงมาจากฐานข้อมูล
           username: googleUser.displayName ?? '',
           email: googleUser.email,
           password: '', // ไม่ควรเก็บรหัสผ่านในกรณีนี้
@@ -106,7 +106,7 @@ class _LoginPageState extends State<LoginPage> {
         appBar: AppBar(
           backgroundColor: Theme.of(context).colorScheme.inversePrimary,
           actions: [],
-           automaticallyImplyLeading: false,
+          automaticallyImplyLeading: false,
         ),
         body: BackgroundLogin(
           child: SizedBox(
@@ -149,9 +149,16 @@ class _LoginPageState extends State<LoginPage> {
                   const SizedBox(
                     height: 12,
                   ),
-                  ButtonCustom(
-                    text: "เข้าสู่ระบบ",
-                    onPressed: myLogin,
+                  Row(
+                    children: [
+                      Expanded(
+                        child: ButtonCustom(
+                          text: "เข้าสู่ระบบ",
+                          onPressed: myLogin,
+                          type: 'Elevated'
+                        ),
+                      )
+                    ],
                   ),
                   const SizedBox(
                     height: 10,

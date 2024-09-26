@@ -117,7 +117,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       return null;
                     },
                   ),
-                  ButtonCustom(text: "เข้าสู่ระบบ", onPressed: register),
+                  ButtonCustom(text: "เข้าสู่ระบบ", onPressed: register,type: 'Elevated'),
                 ],
               ),
             ),

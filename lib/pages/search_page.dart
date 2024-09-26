@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:oilie_butt_skater_app/api/api_search.dart';
+import 'package:oilie_butt_skater_app/components/profile_detail.dart';
 import 'package:oilie_butt_skater_app/components/text_custom.dart';
 import 'package:oilie_butt_skater_app/constant/color.dart';
-import 'package:oilie_butt_skater_app/controller/user_controller.dart';
 import 'package:oilie_butt_skater_app/models/chat_room_model.dart';
+import 'package:oilie_butt_skater_app/models/response_profile.dart';
+import 'package:oilie_butt_skater_app/models/response_search_profile.dart';
+import 'package:oilie_butt_skater_app/pages/profile/profile_page.dart';
+import 'package:oilie_butt_skater_app/pages/profile/target_page.dart';
 
 class SearchPage extends StatefulWidget {
   const SearchPage({super.key});
@@ -14,37 +19,27 @@ class SearchPage extends StatefulWidget {
 
 class _SearchPageState extends State<SearchPage>
     with SingleTickerProviderStateMixin {
-  UserController userController = Get.find<UserController>();
-
-  List<ChatRoom> filteredChatRooms = [];
   bool isLoading = true;
 
   TextEditingController searchController = TextEditingController();
   ValueNotifier<String> searchQuery = ValueNotifier<String>('');
-  ValueNotifier<List<ChatRoom>> chatRooms = ValueNotifier<List<ChatRoom>>([]);
+  ValueNotifier<DataSearchUser> data =
+      ValueNotifier<DataSearchUser>(DataSearchUser(users: []));
 
-  void fetchChatRooms() async {
-    try {
-      setState(() {
-        isLoading = false;
-      });
-    } catch (e) {
-      print('Error fetching chat rooms: $e');
-      setState(() {
-        isLoading = false;
-      });
+  Future<void> filter(String text) async {
+    if (text == '') {
+      return;
     }
-  }
-
-  void filterChatRooms(String query) {
-    final List<ChatRoom> results = chatRooms.value
-        .where((chatRoom) => chatRoom.target['username']
-            .toLowerCase()
-            .contains(query.toLowerCase()))
-        .toList();
-    setState(() {
-      filteredChatRooms = results;
-    });
+    if (_tabController.index == 0) {
+      try {
+        final d = await ApiSearch.getUsers(text);
+        setState(() {
+          data.value = d;
+        });
+      } catch (e) {
+        print('Error fetching profile post: $e');
+      }
+    } else {}
   }
 
   late TabController _tabController = TabController(length: 2, vsync: this);
@@ -52,12 +47,16 @@ class _SearchPageState extends State<SearchPage>
   @override
   void initState() {
     super.initState();
-    
+
     searchController.addListener(() {
       searchQuery.value = searchController.text;
-      filterChatRooms(searchQuery.value);
+      filter(searchQuery.value);
     });
     _tabController = TabController(length: 2, vsync: this);
+    _tabController.addListener(() {
+      searchQuery.value = searchController.text;
+      filter(searchQuery.value);
+    });
   }
 
   @override
@@ -75,18 +74,16 @@ class _SearchPageState extends State<SearchPage>
           actions: [
             SizedBox(
               width: 270,
-              child: Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: TextField(
-                    controller: searchController,
-                    decoration: InputDecoration(
-                      labelText: 'ค้นหา',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      suffixIcon: const Icon(Icons.search),
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextField(
+                  controller: searchController,
+                  decoration: InputDecoration(
+                    labelText: 'ค้นหา',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
                     ),
+                    suffixIcon: const Icon(Icons.search),
                   ),
                 ),
               ),
@@ -108,8 +105,59 @@ class _SearchPageState extends State<SearchPage>
             ],
           ),
         ),
-        body: const Column(
-          children: [],
+        body: TabBarView(
+          controller: _tabController,
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 10),
+              child: Column(
+                children: [
+                  SizedBox(
+                    height: 10,
+                  ),
+                  ValueListenableBuilder(
+                    valueListenable: data,
+                    builder: (context, value, child) {
+                      return Expanded(
+                        child: Container(
+                          child: ListView.builder(
+                            itemCount: data.value.users.length,
+                            itemBuilder: (context, index) {
+                              final user = data.value.users[index];
+                              return GestureDetector(
+                                onTap: () {
+                                  Get.to(TargetProfilePage(user: user));
+                                },
+                                child: Card(
+                                margin: const EdgeInsets.symmetric(
+                                    vertical: 3, horizontal: 0),
+                                child: ProfileDetail(
+                                  user: user,
+                                ),
+                              ),
+                              );
+                         
+                            },
+                          ),
+                        ),
+                      );
+                    },
+                  )
+                ],
+              ),
+            ),
+
+            // หน้าที่สอง ประวัติการเข้าใช้
+            const Center(
+              child: Text(
+                "History Page", // ข้อความสำหรับแท็บที่สอง
+                style: TextStyle(
+                  fontSize: 24,
+                  color: AppColors.textColor,
+                ),
+              ),
+            ),
+          ],
         ));
   }
 }

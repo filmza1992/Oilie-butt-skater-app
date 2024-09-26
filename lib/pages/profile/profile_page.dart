@@ -7,30 +7,38 @@ import 'package:oilie_butt_skater_app/components/text_custom.dart';
 import 'package:oilie_butt_skater_app/constant/color.dart';
 import 'package:oilie_butt_skater_app/controller/user_controller.dart';
 import 'package:oilie_butt_skater_app/models/post_model.dart';
+import 'package:oilie_butt_skater_app/models/user.dart';
 import 'package:oilie_butt_skater_app/pages/setting_page.dart';
 
 class ProfilePage extends StatefulWidget {
-  const ProfilePage({super.key});
+  const ProfilePage({
+    super.key,
+  });
+
 
   @override
   State<ProfilePage> createState() => _ProfilePageState();
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  final UserController userController = Get.find<UserController>();
   dynamic user;
+  String sumLikes = "0";
+  String follower = "0";
+  final UserController userController = Get.find<UserController>();
   ValueNotifier<List<Post>> posts = ValueNotifier<List<Post>>([]);
 
   void fetchPosts() async {
     print('initState');
     try {
-      final fetchedPosts =
-          await ApiProfile.getAllPost(userController.user.value.id);
+      final fetchedProfile =
+          await ApiProfile.getAllPost(userController.user.value.userId);
       setState(() {
-        posts.value = fetchedPosts;
+        posts.value = fetchedProfile.posts;
+        sumLikes = fetchedProfile.sumLikes.toString();
+        follower = fetchedProfile.follow.toString();
       });
     } catch (e) {
-      print('Error fetching chat rooms: $e');
+      print('Error fetching profile post: $e');
     }
   }
 
@@ -74,17 +82,17 @@ class _ProfilePageState extends State<ProfilePage> {
                           color: AppColors.textColor,
                         ),
                         const SizedBox(height: 15.0),
-                        const Row(
+                        Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
                             Column(
                               children: [
                                 TextCustom(
                                   size: 17,
-                                  text: "0",
+                                  text: follower,
                                   color: AppColors.primaryColor,
                                 ),
-                                TextCustom(
+                                const TextCustom(
                                   size: 17,
                                   text: "ผู้ติดตาม",
                                   color: AppColors.textColor,
@@ -95,10 +103,10 @@ class _ProfilePageState extends State<ProfilePage> {
                               children: [
                                 TextCustom(
                                   size: 17,
-                                  text: "0",
+                                  text: sumLikes,
                                   color: AppColors.primaryColor,
                                 ),
-                                TextCustom(
+                                const TextCustom(
                                   size: 17,
                                   text: "ถูกใจ",
                                   color: AppColors.textColor,
@@ -114,7 +122,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           children: [
                             Expanded(
                                 child: ButtonCustom(
-                                    text: "แก้ไขโปรไฟล์", onPressed: () {})),
+                                    text: "แก้ไขโปรไฟล์", onPressed: () {},type: 'Elevated')),
                           ],
                         ),
                         const Divider(

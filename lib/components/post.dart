@@ -126,10 +126,10 @@ class _PostComponentState extends State<PostComponent> {
                           });
                           if (isLiked) {
                             await ApiPost.updatePostInteraction(
-                                userController.user.value.id, widget.postId, 1);
+                                userController.user.value.userId, widget.postId, 1);
                           } else {
                             await ApiPost.updatePostInteraction(
-                                userController.user.value.id, widget.postId, 0);
+                                userController.user.value.userId, widget.postId, 0);
                           }
                         },
                       ),
@@ -190,12 +190,12 @@ class _PostComponentState extends State<PostComponent> {
                           });
                           if (isDisliked) {
                             await ApiPost.updatePostInteraction(
-                                userController.user.value.id,
+                                userController.user.value.userId,
                                 widget.postId,
                                 -1);
                           } else {
                             await ApiPost.updatePostInteraction(
-                                userController.user.value.id, widget.postId, 0);
+                                userController.user.value.userId, widget.postId, 0);
                           }
                         },
                       ),

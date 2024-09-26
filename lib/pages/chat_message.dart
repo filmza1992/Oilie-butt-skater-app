@@ -41,7 +41,7 @@ class _ChatMessagePageState extends State<ChatMessagePage> {
     String roomName = "";
     if (isPrivate) {
       dynamic user = widget.users
-          .where((item) => item['user_id'] != userController.user.value.id)
+          .where((item) => item['user_id'] != userController.user.value.userId)
           .first;
       roomName = user['username'];
     }
@@ -95,7 +95,7 @@ class _ChatMessagePageState extends State<ChatMessagePage> {
       if (downloadUrl.isNotEmpty) {
         sendImageMessage(downloadUrl);
          await ApiChat.sendMessageImage(
-          widget.roomId, userController.user.value.id, downloadUrl);
+          widget.roomId, userController.user.value.userId, downloadUrl);
 
       }
     }
@@ -131,7 +131,7 @@ class _ChatMessagePageState extends State<ChatMessagePage> {
     try {
       // Assuming you have a method in ApiChat to send messages
       await ApiChat.sendMessageText(
-          widget.roomId, userController.user.value.id, messageText);
+          widget.roomId, userController.user.value.userId, messageText);
 
       // Clear the text field after sending
       _messageController.clear();
@@ -144,7 +144,7 @@ class _ChatMessagePageState extends State<ChatMessagePage> {
   @override
   void initState() {
     super.initState();
-    fetchMessages(widget.roomId, userController.user.value.id);
+    fetchMessages(widget.roomId, userController.user.value.userId);
     _fetchImages();
   }
 

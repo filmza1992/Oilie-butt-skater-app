@@ -12,7 +12,8 @@ import 'package:oilie_butt_skater_app/models/post_create_model.dart';
 import 'package:oilie_butt_skater_app/pages/home_page.dart';
 
 class CreateTextPostPage extends StatefulWidget {
-  const CreateTextPostPage({super.key, required this.imageFile, required this.update});
+  const CreateTextPostPage(
+      {super.key, required this.imageFile, required this.update});
 
   final File? imageFile;
   final Function update;
@@ -64,18 +65,35 @@ class _CreateTextPostPageState extends State<CreateTextPostPage> {
                   ),
                 ),
               ),
-              ButtonCustom(
-                  text: 'โพสต์',
-                  onPressed: () async {
-                    await ApiPost.addPost(PostCreate(
-                        _textController.text,
-                        userController.user.value.id,
-                        1,
-                        "tag",
-                        "create_at",
-                        widget.imageFile),context,widget.update);
-                       
-                  }),
+              SizedBox(
+                height: 10,
+              ),
+              Row(
+                children: [
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                      child: ButtonCustom(
+                        height: 30,
+                        text: 'โพสต์',
+                        onPressed: () async {
+                          await ApiPost.addPost(
+                              PostCreate(
+                                  _textController.text,
+                                  userController.user.value.userId,
+                                  1,
+                                  "tag",
+                                  "create_at",
+                                  widget.imageFile),
+                              context,
+                              widget.update);
+                        },
+                        type: 'Elevated',
+                      ),
+                    ),
+                  )
+                ],
+              )
             ],
           ),
         ),

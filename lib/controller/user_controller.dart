@@ -3,7 +3,7 @@ import 'package:oilie_butt_skater_app/models/user.dart';
 
 class UserController extends GetxController {
   var user = User(
-    id: '',
+    userId: '',
     username: '',
     email: '',
     password: '',

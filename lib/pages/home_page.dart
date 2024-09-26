@@ -8,7 +8,8 @@ import 'package:oilie_butt_skater_app/controller/user_controller.dart';
 import 'package:oilie_butt_skater_app/models/post_model.dart';
 import 'package:oilie_butt_skater_app/pages/chat_room.dart';
 import 'package:oilie_butt_skater_app/pages/post/create_post_page.dart';
-import 'package:oilie_butt_skater_app/pages/profile_page.dart';
+import 'package:oilie_butt_skater_app/pages/profile/profile_page.dart';
+import 'package:oilie_butt_skater_app/pages/room_page.dart';
 import 'package:oilie_butt_skater_app/pages/search_page.dart';
 
 class HomePage extends StatefulWidget {
@@ -72,8 +73,8 @@ class _HomePageState extends State<HomePage> {
         index: _selectedIndex,
         children: [
           const Center(child: Text('Trophy')),
-          const Center(child: Text('Room')),
-          Center(child: page()),
+          const Center(child: const Center(child: RoomPage(),)),
+          Center(child: page()), 
           const Center(child: Text('Notifications Page')),
           if (_selectedIndex == 4) const Center(child: ProfilePage()),
         ],
@@ -108,7 +109,7 @@ class _HomePageState extends State<HomePage> {
     print('initState');
     try {
       final fetchedPosts =
-          await ApiPost.getAllPost(userController.user.value.id);
+          await ApiPost.getAllPost(userController.user.value.userId);
       setState(() {
         posts.value = fetchedPosts;
       });
