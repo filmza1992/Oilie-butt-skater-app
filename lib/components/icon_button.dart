@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:oilie_butt_skater_app/contant/color.dart';
+import 'package:oilie_butt_skater_app/constant/color.dart';
 
 // ignore: must_be_immutable
 class IconButtonCustom extends StatefulWidget {
@@ -23,6 +23,8 @@ class _IconButtonCustomState extends State<IconButtonCustom> {
       color: AppColors.backgroundColor,
       child: Center(
         child: Ink(
+          width: 50,
+          height: 50,
           decoration: const ShapeDecoration(
             color: Color.fromARGB(255, 60, 61, 62),
             shape: CircleBorder(),

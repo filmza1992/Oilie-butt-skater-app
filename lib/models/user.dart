@@ -1,22 +1,49 @@
-import 'package:json_annotation/json_annotation.dart';
+// To parse this JSON data, do
+//
+//     final user = userFromJson(jsonString);
 
-@JsonSerializable()
+import 'dart:convert';
+
+User userFromJson(String str) => User.fromJson(json.decode(str));
+
+String userToJson(User data) => json.encode(data.toJson());
+
 class User {
-  final num id;
-  final String firstName;
-  final String lastName;
-  final String user;
-  final String password;
-  final String phone;
-  final String image;
-  User(
-      {required this.id,
-      required this.firstName,
-      required this.lastName,
-      required this.user,
-      required this.password,
-      required this.image,
-      required this.phone,
-      
-      });
+    String userId;
+    String username;
+    String imageUrl;
+    String email;
+    String password;
+    String birthDay;
+    String createAt;
+
+    User({
+        required this.userId,
+        required this.username,
+        required this.imageUrl,
+        required this.email,
+        required this.password,
+        required this.birthDay,
+        required this.createAt,
+    });
+
+    factory User.fromJson(Map<String, dynamic> json) => User(
+        userId: json["user_id"],
+        username: json["username"],
+        imageUrl: json["image_url"],
+        email: json["email"],
+        password: json["password"],
+        birthDay: json["birth_day"],
+        createAt: json["create_at"],
+    );
+
+    Map<String, dynamic> toJson() => {
+        "user_id": userId,
+        "username": username,
+        "image_url": imageUrl,
+        "email": email,
+        "password": password,
+        "birth_day": birthDay,
+        "create_at": createAt,
+    };
 }

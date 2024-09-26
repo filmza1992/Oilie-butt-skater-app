@@ -15,6 +15,7 @@ class TextFieldPassword extends StatefulWidget {
     this.widthText,
     this.edgeInsets,
     this.prefixIcon,
+    this.validator,
   });
 
   String? label;
@@ -27,6 +28,7 @@ class TextFieldPassword extends StatefulWidget {
   double? widthText;
   EdgeInsets? edgeInsets;
   Icon? prefixIcon;
+  FormFieldValidator<String>? validator;
 
   @override
   State<TextFieldPassword> createState() => _TextFieldPasswordState();
@@ -39,7 +41,7 @@ class _TextFieldPasswordState extends State<TextFieldPassword> {
     return Row(
       children: [
         Expanded(
-            child: TextField(
+            child: TextFormField(
           controller: widget.controller,
           obscureText: isObscure,
           obscuringCharacter: '•',
@@ -49,10 +51,10 @@ class _TextFieldPasswordState extends State<TextFieldPassword> {
                 Radius.circular(widget.circular ?? 10),
               ),
             ),
-            hintText: widget.hint,
-            hintStyle: GoogleFonts.kanit(
-              fontSize: 16,
-            ),
+            labelText: widget.hint,
+            labelStyle: GoogleFonts.kanit(
+                fontSize: 16,
+              ),
             contentPadding: widget.edgeInsets ??
                 const EdgeInsets.symmetric(vertical: 13, horizontal: 13),
             prefixIcon: widget.prefixIcon, // ไอคอนทางซ้าย
@@ -76,6 +78,7 @@ class _TextFieldPasswordState extends State<TextFieldPassword> {
             fontSize: 16,
           ),
           onChanged: (String value) {},
+          validator: widget.validator,
         )),
       ],
     );

@@ -1,15 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:oilie_butt_skater_app/components/button_custom.dart';
 import 'package:oilie_butt_skater_app/components/icon_button.dart';
 import 'package:oilie_butt_skater_app/components/text_custom.dart';
 import 'package:oilie_butt_skater_app/components/text_field_custom.dart';
 import 'package:oilie_butt_skater_app/components/text_field_password.dart';
-import 'package:oilie_butt_skater_app/contant/color.dart';
+import 'package:oilie_butt_skater_app/constant/color.dart';
+import 'package:oilie_butt_skater_app/controller/user_controller.dart';
+import 'package:oilie_butt_skater_app/pages/home_page.dart';
 import 'package:oilie_butt_skater_app/pages/register_page.dart';
 
 import '../../models/user.dart';
 
-import '../components/backgroundLogin.dart';
+import '../api/api_auth.dart';
+import '../components/background/backgroundLogin.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -19,16 +24,19 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final _usernameController = TextEditingController();
+  final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final UserController userController = Get.find<UserController>();
+  final GoogleSignIn _googleSignIn = GoogleSignIn();
+
   User user = User(
-    id: 0,
-    firstName: "0",
-    lastName: "0",
-    user: "0",
-    password: "0",
-    phone: "0",
-    image: "0",
+    userId: '',
+    username: '',
+    email: '',
+    password: '',
+    imageUrl: '',
+    birthDay: '',
+    createAt: '',
   );
 
   @override
@@ -39,9 +47,57 @@ class _LoginPageState extends State<LoginPage> {
 
   void _incrementCounter() {
     setState(() {
-      _usernameController.text = "";
+      _emailController.text = "";
       _passwordController.text = "";
     });
+  }
+
+  Future<void> myLogin() async {
+    user = await ApiAuth.verifyUser(
+        _emailController.text, _passwordController.text);
+
+    userController.updateUser(user);
+    Get.to(const HomePage());
+  }
+
+  void mySignIn() {
+    Get.to(const RegisterPage());
+  }
+
+  Future<void> signInWithGoogle() async {
+    try {
+      await _googleSignIn.signOut();
+      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+      if (googleUser != null) {
+        final GoogleSignInAuthentication googleAuth =
+            await googleUser.authentication;
+
+        final googleProfile = {
+          "email": googleUser.email,
+          "username": googleUser.displayName,
+          "image_url": googleUser.photoUrl,
+          "birth_day": "" // ใช้ birth_day เป็นค่าว่างไปก่อน
+        };
+
+        // เรียกใช้ API เพื่อตรวจสอบและเพิ่มข้อมูลผู้ใช้ในฐานข้อมูลของคุณ
+        User user = await ApiAuth.registerGoogleUser(googleProfile);
+        // อัปเดตผู้ใช้ใน controller
+        userController.updateUser(User(
+          userId: user.userId, // ID ควรดึงมาจากฐานข้อมูล
+          username: googleUser.displayName ?? '',
+          email: googleUser.email,
+          password: '', // ไม่ควรเก็บรหัสผ่านในกรณีนี้
+          imageUrl: googleUser.photoUrl ?? '',
+          birthDay: '',
+          createAt: '',
+        ));
+
+        print(userController.user.value);
+        Get.to(const HomePage());
+      }
+    } catch (error) {
+      print('Sign-In failed: $error');
+    }
   }
 
   @override
@@ -50,6 +106,7 @@ class _LoginPageState extends State<LoginPage> {
         appBar: AppBar(
           backgroundColor: Theme.of(context).colorScheme.inversePrimary,
           actions: [],
+          automaticallyImplyLeading: false,
         ),
         body: BackgroundLogin(
           child: SizedBox(
@@ -63,18 +120,17 @@ class _LoginPageState extends State<LoginPage> {
                     height: 25,
                   ),
                   TextFieldCustom(
-                    controller: _usernameController,
+                    controller: _emailController,
                     hint: 'อีเมล',
                     prefixIcon: const Icon(Icons.email_outlined),
                   ),
                   const SizedBox(
-                    height: 10,
+                    height: 15,
                   ),
                   TextFieldPassword(
                     controller: _passwordController,
                     hint: 'รหัสผ่าน',
                     prefixIcon: const Icon(Icons.vpn_key_outlined),
-                  
                   ),
                   const SizedBox(
                     height: 7,
@@ -96,11 +152,12 @@ class _LoginPageState extends State<LoginPage> {
                   Row(
                     children: [
                       Expanded(
-                        child: ElevatedButton(
-                          onPressed: _Mylogin,
-                          child: Text("Login"),
+                        child: ButtonCustom(
+                          text: "เข้าสู่ระบบ",
+                          onPressed: myLogin,
+                          type: 'Elevated'
                         ),
-                      ),
+                      )
                     ],
                   ),
                   const SizedBox(
@@ -114,7 +171,7 @@ class _LoginPageState extends State<LoginPage> {
                     height: 15,
                   ),
                   IconButtonCustom(
-                      onPressed: () {},
+                      onPressed: signInWithGoogle,
                       icon: Image.asset('assets/icons/google_color.png')),
                   const SizedBox(
                     height: 10,
@@ -131,7 +188,7 @@ class _LoginPageState extends State<LoginPage> {
                         text: "สร้างบัญชี",
                         size: 13,
                         color: AppColors.secondaryColor,
-                        onTap: () => {print("signup")},
+                        onTap: () => mySignIn(),
                         underline: TextDecoration.underline,
                       )
                     ],
@@ -141,13 +198,5 @@ class _LoginPageState extends State<LoginPage> {
             ),
           ),
         ));
-  }
-
-  Future<void> _Mylogin() async {
-    print("Success");
-  }
-
-  void _MySignIn() {
-    Get.to(const RegisterPage());
   }
 }

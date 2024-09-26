@@ -1,0 +1,25 @@
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "oilie-butt-skater-app",
+          "appId": "1:835311886740:android:f5496abf59bf21739faf81",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "oilie-butt-skater-app",
+          "configurations": {
+            "android": "1:835311886740:android:f5496abf59bf21739faf81",
+            "ios": "1:835311886740:ios:73545926153022f99faf81",
+            "macos": "1:835311886740:ios:73545926153022f99faf81",
+            "web": "1:835311886740:web:f90ee78df3b5e8e99faf81",
+            "windows": "1:835311886740:web:ed75e09359e86c149faf81"
+          }
+        }
+      }
+    }
+  }
+}

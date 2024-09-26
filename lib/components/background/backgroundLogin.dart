@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:oilie_butt_skater_app/components/text_custom.dart';
-import 'package:oilie_butt_skater_app/contant/color.dart';
+import 'package:oilie_butt_skater_app/constant/color.dart';
 
 class BackgroundLogin extends StatelessWidget {
   const BackgroundLogin({super.key, required this.child});
@@ -15,15 +15,15 @@ class BackgroundLogin extends StatelessWidget {
             child: Image.asset(
               "assets/icons/app_icon.png",
               fit: BoxFit.cover,
-              width: 130,
-              height: 112,
+              width: 105,
+              height: 87,
             ),
           ),
           const TextCustom(
             text: "ยินดีต้อนรับ",
             size: 20,
             color: AppColors.primaryColor,
-            padding: EdgeInsets.fromLTRB(0,10,0,0),
+            padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
           ),
           const TextCustom(
             text: "กรุณาใส่ข้อมูลบัญชีของคุณ",

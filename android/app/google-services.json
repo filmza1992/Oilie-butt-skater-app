@@ -1,0 +1,135 @@
+{
+  "project_info": {
+    "project_number": "835311886740",
+    "firebase_url": "https://oilie-butt-skater-app-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "oilie-butt-skater-app",
+    "storage_bucket": "oilie-butt-skater-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:835311886740:android:acaf8ac6f39b37b99faf81",
+        "android_client_info": {
+          "package_name": "com.example.myapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "835311886740-p9040pjiq4re5r8bgb151gmv5eaf0sej.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.myapp",
+            "certificate_hash": "34e20976875adc9e8b9ed586150235dcb2c8b911"
+          }
+        },
+        {
+          "client_id": "835311886740-aag80b055v7udcgniqnsuuetnmar98bh.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAwMFu_rrMDIAieRqPt2VFYdQcLg2DvqF8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "835311886740-aag80b055v7udcgniqnsuuetnmar98bh.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "835311886740-hb6v6mo4d4olog7cjhd0a4tv06843b1p.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.oilieButtSkaterApp"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:835311886740:android:9ac408b5c2e8ad109faf81",
+        "android_client_info": {
+          "package_name": "com.example.oilie_butt_skater_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "835311886740-kl9ip8bkefscjapeq0f8hk4mn1mea295.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.oilie_butt_skater_app",
+            "certificate_hash": "34e20976875adc9e8b9ed586150235dcb2c8b911"
+          }
+        },
+        {
+          "client_id": "835311886740-aag80b055v7udcgniqnsuuetnmar98bh.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAwMFu_rrMDIAieRqPt2VFYdQcLg2DvqF8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "835311886740-aag80b055v7udcgniqnsuuetnmar98bh.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "835311886740-hb6v6mo4d4olog7cjhd0a4tv06843b1p.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.oilieButtSkaterApp"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:835311886740:android:f5496abf59bf21739faf81",
+        "android_client_info": {
+          "package_name": "com.exmaple.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "835311886740-aag80b055v7udcgniqnsuuetnmar98bh.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAwMFu_rrMDIAieRqPt2VFYdQcLg2DvqF8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "835311886740-aag80b055v7udcgniqnsuuetnmar98bh.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "835311886740-hb6v6mo4d4olog7cjhd0a4tv06843b1p.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.oilieButtSkaterApp"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

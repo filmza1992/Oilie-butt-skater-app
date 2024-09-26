@@ -17,6 +17,8 @@ class TextFieldCustom extends StatefulWidget {
     this.ob,
     this.prefixIcon,
     this.suffixIcon,
+    this.errorText,
+    this.validator,
   });
 
   String? label;
@@ -31,6 +33,9 @@ class TextFieldCustom extends StatefulWidget {
   String? ob;
   Icon? prefixIcon;
   Icon? suffixIcon;
+  String? errorText;
+  FormFieldValidator<String>? validator;
+
   @override
   State<TextFieldCustom> createState() => _TextFieldCustomState();
 }
@@ -41,7 +46,7 @@ class _TextFieldCustomState extends State<TextFieldCustom> {
     return Row(
       children: [
         Expanded(
-          child: TextField(
+          child: TextFormField(
             controller: widget.controller,
             decoration: InputDecoration(
               border: OutlineInputBorder(
@@ -49,19 +54,23 @@ class _TextFieldCustomState extends State<TextFieldCustom> {
                   Radius.circular(widget.circular ?? 10),
                 ),
               ),
-              hintText: widget.hint,
-              hintStyle: GoogleFonts.kanit(
+              labelText: widget.hint,
+              labelStyle: GoogleFonts.kanit(
                 fontSize: 16,
               ),
-              contentPadding: widget.edgeInsets ?? const EdgeInsets.symmetric(vertical: 13,horizontal: 13),
+              contentPadding: widget.edgeInsets ??
+                  const EdgeInsets.symmetric(vertical: 13, horizontal: 13),
               prefixIcon: widget.prefixIcon, // ไอคอนทางซ้าย
               suffixIcon: widget.suffixIcon, // ไอคอนทางขวา),
+              errorText: widget.errorText,
+              
             ),
             textAlign: widget.textAlign ?? TextAlign.start,
             style: GoogleFonts.kanit(
               fontSize: 16,
             ),
             onChanged: (String value) {},
+            validator : widget.validator
           ),
         ),
       ],

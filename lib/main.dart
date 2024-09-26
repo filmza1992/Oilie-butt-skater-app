@@ -1,10 +1,22 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:get/get.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
+import 'package:oilie_butt_skater_app/controller/user_controller.dart';
 import 'package:oilie_butt_skater_app/pages/login_page.dart';
 
-import 'contant/color.dart';
+import 'constant/color.dart';
+import 'firebase_options.dart';
+Future<void> main() async {
+  // Ensure that the Flutter binding is initialized
+  WidgetsFlutterBinding.ensureInitialized();
 
-void main() {
+  // Load the .env file
+  await dotenv.load(fileName: ".env");
+  await Firebase.initializeApp(
+  options: DefaultFirebaseOptions.currentPlatform,
+);
   runApp(const MyApp());
 }
 
@@ -17,7 +29,7 @@ class MyApp extends StatelessWidget {
     return GetMaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        colorScheme: ColorScheme.dark(
+        colorScheme: const ColorScheme.dark(
           primary: AppColors.primaryColor,
           secondary: AppColors.secondaryColor,
           background: AppColors.backgroundColor,
@@ -30,6 +42,9 @@ class MyApp extends StatelessWidget {
         ),
       ),
       home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      initialBinding: BindingsBuilder(() {
+        Get.put(UserController()); // Initialize your controller
+      }),
     );
   }
 }
