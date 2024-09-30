@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:oilie_butt_skater_app/api/api_search.dart';
@@ -26,6 +28,19 @@ class _SearchPageState extends State<SearchPage>
   ValueNotifier<DataSearchUser> data =
       ValueNotifier<DataSearchUser>(DataSearchUser(users: []));
 
+
+Timer? _debounce;
+
+void onSearchChanged(String text) {
+  if (_debounce?.isActive ?? false) {
+    _debounce!.cancel(); // ยกเลิก Timer เก่าถ้ากำลังทำงานอยู่
+  }
+
+  // ตั้ง Timer ใหม่เมื่อมีการเปลี่ยนแปลงข้อความ
+  _debounce = Timer(const Duration(milliseconds: 500), () {
+    filter(text); // ยิงคำขอค้นหาเมื่อครบกำหนดเวลา 500ms
+  });
+}
   Future<void> filter(String text) async {
     if (text == '') {
       return;
@@ -50,17 +65,19 @@ class _SearchPageState extends State<SearchPage>
 
     searchController.addListener(() {
       searchQuery.value = searchController.text;
-      filter(searchQuery.value);
+      onSearchChanged(searchQuery.value);
     });
     _tabController = TabController(length: 2, vsync: this);
     _tabController.addListener(() {
       searchQuery.value = searchController.text;
-      filter(searchQuery.value);
+       onSearchChanged(searchQuery.value);
     });
   }
 
+
   @override
   void dispose() {
+    _debounce?.cancel(); 
     _tabController.dispose();
     searchController.dispose();
     super.dispose();
@@ -77,6 +94,7 @@ class _SearchPageState extends State<SearchPage>
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: TextField(
+                  onChanged: onSearchChanged,
                   controller: searchController,
                   decoration: InputDecoration(
                     labelText: 'ค้นหา',

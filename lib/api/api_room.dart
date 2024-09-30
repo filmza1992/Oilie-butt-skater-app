@@ -1,21 +1,29 @@
+import 'dart:async';
+
 import 'package:firebase_database/firebase_database.dart';
+import 'package:oilie_butt_skater_app/api/api_follow.dart';
 import 'package:oilie_butt_skater_app/models/chat_room_model.dart';
 import 'package:oilie_butt_skater_app/models/user.dart';
 
 class ApiRoom {
-  static Future<List<ChatRoom>> getChatRooms(User user, updateMessage) async {
+  static Future<Map<String, List<ChatRoom>>> getChatRooms(
+      User user, updateMessage, setLoading,  setSubscription, room) async {
     try {
       final DatabaseReference chatRoomsRef =
           FirebaseDatabase.instance.ref().child('chat_rooms');
 
       final List<ChatRoom> chatRooms = [];
-
-      chatRoomsRef.onValue.listen((event) {
+      final List<ChatRoom> requestRooms = [];
+      StreamSubscription chatRoomsSubscription =
+          chatRoomsRef.onValue.listen((event) async {
         chatRooms.clear();
+        requestRooms.clear();
         final dynamic data = event.snapshot.value;
         print("get room");
         if (data != null) {
-          data.forEach((key, value) {
+          for (var entry in data.entries) {
+            var key = entry.key;
+            var value = entry.value;
             dynamic users = value['users'];
 
             // Check if the current user is in this chat room
@@ -52,21 +60,41 @@ class ApiRoom {
                 lastMessage,
                 target,
               );
-              chatRooms.add(chatRoom);
+              if (chatRoom.messages
+                  .where((message) => message['user_id'] == user.userId)
+                  .isNotEmpty) {
+                print("This room user already chating");
+                chatRooms.add(chatRoom);
+              } else if (await ApiFollow.checkFollower(
+                  user.userId, target['user_id'], room)) {
+                print("This room user already following");
+                chatRooms.add(chatRoom);
+              } else {
+                print("This room is request room");
+                requestRooms.add(chatRoom);
+              }
             }
-          });
-        }
-        chatRooms.sort((a, b) =>
-            DateTime.parse(b.updateAt).compareTo(DateTime.parse(a.updateAt)));
-        updateMessage(chatRooms);
-      });
+          }
 
-      return chatRooms;
+          // Sorting chat rooms and request rooms
+          chatRooms.sort((a, b) =>
+              DateTime.parse(b.updateAt).compareTo(DateTime.parse(a.updateAt)));
+          requestRooms.sort((a, b) =>
+              DateTime.parse(b.updateAt).compareTo(DateTime.parse(a.updateAt)));
+
+          // Call updateMessage after all the operations are done
+          updateMessage(chatRooms, requestRooms);
+          setLoading();
+        }
+      });
+      setSubscription(chatRoomsSubscription);
+      return {"chatRooms": chatRooms, "requestRooms": requestRooms};
     } catch (e) {
       throw Exception(e);
     }
   }
 
+  static void verifyChatRoom() {}
   static Future<ChatRoom> getChatRoomsWithUser(
       String userId, String targetId) async {
     try {
@@ -83,7 +111,7 @@ class ApiRoom {
         }
       }
       List<String> rooms = chatRooms;
-      ChatRoom chatRoom = ChatRoom("", "", "", "", "", "", "");
+      ChatRoom chatRoom = ChatRoom("", [], "", "", "", "", "");
       if (rooms.isNotEmpty) {
         for (var roomId in rooms) {
           final DatabaseReference roomRef =
@@ -132,7 +160,7 @@ class ApiRoom {
         return chatRoom;
       } else {
         print('User is not in any chat rooms.');
-        return ChatRoom("", "", "", "", "", "", "");
+        return ChatRoom("", [], "", "", "", "", "");
       }
     } catch (e) {
       throw Exception(e);
@@ -177,5 +205,76 @@ class ApiRoom {
       print('Error sending message: $e');
       throw Exception('Failed to send message');
     }
+  }
+
+  static Future<String> createRoom(dynamic users, int type) async {
+    final DatabaseReference chatRoomsRef =
+        FirebaseDatabase.instance.ref().child('chat_rooms');
+    String newRoomId = chatRoomsRef.push().key!;
+
+    // เวลาสำหรับ create_at และ update_at
+    String currentTime = DateTime.now().toIso8601String();
+
+    // สร้างข้อมูลห้องแชทใหม่
+    final ChatRoom newChatRoom =
+        ChatRoom(newRoomId, users, [], currentTime, currentTime, "", "");
+
+    // เพิ่มห้องแชทใหม่ลงใน Firebase
+    await chatRoomsRef.child(newRoomId).set({
+      'chat_room_id': newChatRoom.chatRoomId,
+      'create_at': newChatRoom.createAt,
+      'update_at': newChatRoom.updateAt,
+      'users': users
+          .map((user) => {
+                'user_id': user['user_id'],
+                'username': user['username'],
+                'image_url': user['image_url'],
+              })
+          .toList(),
+      'messages': [],
+      'type': type,
+    });
+
+    for (var user in users) {
+      final DatabaseReference chatRoomRef = FirebaseDatabase.instance
+          .ref()
+          .child('user_rooms/${user['user_id']}');
+      final DataSnapshot snapshot = await chatRoomRef.get();
+      Map<String, dynamic> chatRooms = {};
+      print('in function');
+      print(snapshot.value);
+      if (snapshot.value != null) {
+        chatRooms = Map<String, dynamic>.from(snapshot.value as Map);
+        print(chatRooms);
+      }
+
+      chatRooms = {...chatRooms, newChatRoom.chatRoomId: true};
+
+      final DatabaseReference userRoomsRef =
+          FirebaseDatabase.instance.ref().child('user_rooms/');
+      userRoomsRef.update({user['user_id']: chatRooms});
+    }
+
+    return newChatRoom.chatRoomId;
+  }
+
+  static Future<void> deleteRoom(String roomId, dynamic users) async {
+    final DatabaseReference chatRoomsRef =
+        FirebaseDatabase.instance.ref().child('chat_rooms/$roomId');
+
+    // 1. ลบข้อมูลห้องแชทออกจาก chat_rooms
+    await chatRoomsRef.remove();
+
+    // 2. ลบข้อมูล chat_room_id ของห้องที่ลบออกจาก user_rooms ของผู้ใช้แต่ละคน
+    for (var user in users) {
+      final DatabaseReference userRoomRef = FirebaseDatabase.instance
+          .ref()
+          .child('user_rooms/${user['user_id']}/$roomId');
+
+      // ลบ chat_room_id ออกจาก user_rooms ของผู้ใช้
+      await userRoomRef.remove();
+    }
+
+    print("Room $roomId and related user_room entries have been deleted.");
   }
 }

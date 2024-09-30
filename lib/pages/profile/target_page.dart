@@ -49,7 +49,7 @@ class _TargetProfilePageState extends State<TargetProfilePage> {
 
   Future<void> fetchCheckFollower() async {
     final response =
-        await ApiFollow.checkFollower(user.userId, widget.user.userId);
+        await ApiFollow.checkFollower(user.userId, widget.user.userId,"target_page");
     setState(() {
       isFollower = response;
     });
@@ -180,9 +180,28 @@ class _TargetProfilePageState extends State<TargetProfilePage> {
                               child: ButtonCustom(
                                   text: "ส่งข้อความ",
                                   onPressed: () {
+                                    dynamic u = chatRoom.users.length != 0
+                                        ? chatRoom.users
+                                        : [
+                                            {
+                                              "user_id": user.userId,
+                                              "image_url": user.imageUrl,
+                                              "username": user.username
+                                            },
+                                            {
+                                              "user_id": widget.user.userId,
+                                              "image_url": widget.user.imageUrl,
+                                              "username": widget.user.username
+                                            }
+                                          ];
                                     Get.to(ChatMessagePage(
-                                        roomId: chatRoom.chatRoomId,
-                                        users: chatRoom.users));
+                                      roomId: chatRoom.chatRoomId,
+                                      users: u,
+                                      updateRoomId: (String value) {
+                                        chatRoom.chatRoomId = value;
+                                        print("updateRoomId: "+value);
+                                      },
+                                    ));
                                   },
                                   minWidth: 100,
                                   height: 30,

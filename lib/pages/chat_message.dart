@@ -1,26 +1,30 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:oilie_butt_skater_app/%E0%B8%B5util/firebase_upload_image_.dart';
 import 'package:oilie_butt_skater_app/api/api_chat.dart'; // Import your API file
+import 'package:oilie_butt_skater_app/api/api_room.dart';
 import 'package:oilie_butt_skater_app/components/message.dart';
 import 'package:oilie_butt_skater_app/components/photo_gallery.dart';
+import 'package:oilie_butt_skater_app/components/text_custom.dart';
 import 'package:oilie_butt_skater_app/constant/color.dart';
 import 'package:oilie_butt_skater_app/controller/user_controller.dart';
 import 'package:oilie_butt_skater_app/models/chat_model.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:photo_manager/photo_manager.dart';
 
 class ChatMessagePage extends StatefulWidget {
-  const ChatMessagePage({
-    super.key,
-    required this.roomId,
-    required this.users,
-  });
+  const ChatMessagePage(
+      {super.key,
+      required this.roomId,
+      required this.users,
+      this.updateRoomId, this.fetchChatRoom});
 
   final String roomId;
   final dynamic users;
+  final Function? fetchChatRoom;
+  final Function(String value)? updateRoomId;
 
   @override
   State<ChatMessagePage> createState() => _ChatMessagePageState();
@@ -32,6 +36,9 @@ class _ChatMessagePageState extends State<ChatMessagePage> {
 
   final TextEditingController _messageController = TextEditingController();
 
+  String targetImage = "";
+  String defaultRoomId = "";
+   StreamSubscription? messagesSubscription;
   String isPrivateChat() {
     bool isPrivate = false;
     if (widget.users.length == 2) {
@@ -44,6 +51,9 @@ class _ChatMessagePageState extends State<ChatMessagePage> {
           .where((item) => item['user_id'] != userController.user.value.userId)
           .first;
       roomName = user['username'];
+      setState(() {
+        targetImage = user['image_url'];
+      });
     }
     return roomName;
   }
@@ -57,13 +67,31 @@ class _ChatMessagePageState extends State<ChatMessagePage> {
       setState(() {
         messagesNotifier.value = List.from(
             messages); // Ensure to create a new list to avoid reference issues
+        print(messagesNotifier.value);
       });
     }
   }
 
+  void setSubscription(value) {
+    messagesSubscription = value;
+  }
   void fetchMessages(String roomId, String userId) async {
     try {
-      await ApiChat.getMessages(roomId, userId, updateMessage);
+      if (roomId != "") {
+        await ApiChat.getMessages(roomId, userId, updateMessage, setSubscription);
+        print(messagesNotifier.value);
+      } else {
+        String newId = await ApiRoom.createRoom(widget.users, 1);
+        setState(() {
+          defaultRoomId = newId;
+          if (widget.updateRoomId != null) {
+            widget.updateRoomId!(defaultRoomId);
+          }
+        });
+        print("roomId: $newId");
+        await ApiChat.getMessages(newId, userId, updateMessage, setSubscription);
+        print(messagesNotifier.value);
+      }
     } catch (e) {
       print('Error fetching messages: $e');
     }
@@ -72,20 +100,18 @@ class _ChatMessagePageState extends State<ChatMessagePage> {
   List<AssetEntity> images = [];
 
   Future<void> _fetchImages() async {
-    
     final PermissionState permission =
         await PhotoManager.requestPermissionExtend();
-        PhotoManager.setIgnorePermissionCheck(true);
-    
-      List<AssetPathEntity> albums = await PhotoManager.getAssetPathList();
+    PhotoManager.setIgnorePermissionCheck(true);
 
-      List<AssetEntity> photos =
-          await albums[0].getAssetListPaged(page: 0, size: 100);
+    List<AssetPathEntity> albums = await PhotoManager.getAssetPathList();
 
-      setState(() {
-        images = photos;
-      });
-    
+    List<AssetEntity> photos =
+        await albums[0].getAssetListPaged(page: 0, size: 100);
+
+    setState(() {
+      images = photos;
+    });
   }
 
   void onImageSelected(AssetEntity image) async {
@@ -94,9 +120,8 @@ class _ChatMessagePageState extends State<ChatMessagePage> {
       String downloadUrl = await uploadImageToFirebaseMessage(imageFile);
       if (downloadUrl.isNotEmpty) {
         sendImageMessage(downloadUrl);
-         await ApiChat.sendMessageImage(
-          widget.roomId, userController.user.value.userId, downloadUrl);
-
+        await ApiChat.sendMessageImage(
+            defaultRoomId, userController.user.value.userId, downloadUrl);
       }
     }
   }
@@ -113,8 +138,8 @@ class _ChatMessagePageState extends State<ChatMessagePage> {
               // จัดการรูปภาพที่เลือกแล้ว
               onImageSelected(selectedImage);
               Navigator.pop(context);
-            }, isShowButton: true,
-            
+            },
+            isShowButton: true,
           ),
         );
       },
@@ -131,7 +156,7 @@ class _ChatMessagePageState extends State<ChatMessagePage> {
     try {
       // Assuming you have a method in ApiChat to send messages
       await ApiChat.sendMessageText(
-          widget.roomId, userController.user.value.userId, messageText);
+          defaultRoomId, userController.user.value.userId, messageText);
 
       // Clear the text field after sending
       _messageController.clear();
@@ -143,16 +168,64 @@ class _ChatMessagePageState extends State<ChatMessagePage> {
 
   @override
   void initState() {
+    defaultRoomId = widget.roomId;
     super.initState();
-    fetchMessages(widget.roomId, userController.user.value.userId);
+    fetchMessages(defaultRoomId, userController.user.value.userId);
     _fetchImages();
   }
 
+@override
+    void dispose() {
+
+      messagesSubscription?.cancel();
+      super.dispose();
+    }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(isPrivateChat()),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            print(messagesNotifier.value);
+            if (messagesNotifier.value.isEmpty) {
+              setState(() {
+                if (widget.updateRoomId != null) {
+                  ApiRoom.deleteRoom(defaultRoomId, widget.users);
+                  widget.updateRoomId!("");
+                }
+              });
+            }
+            if(widget.fetchChatRoom != null){
+              widget.fetchChatRoom!();
+            }
+            Navigator.pop(context);
+          },
+        ),
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            CircleAvatar(
+              backgroundImage: targetImage != ""
+                  ? NetworkImage(targetImage)
+                  : const NetworkImage(
+                      'https://i0.wp.com/sbcf.fr/wp-content/uploads/2018/03/sbcf-default-avatar.png'),
+              radius: 19,
+            ),
+            const SizedBox(width: 10),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                TextCustom(
+                  text: isPrivateChat(),
+                  size: 15,
+                  color: AppColors.textColor,
+                  isBold: false,
+                ),
+              ],
+            ),
+          ],
+        ),
         backgroundColor: AppColors.backgroundColor,
       ),
       body: ValueListenableBuilder(

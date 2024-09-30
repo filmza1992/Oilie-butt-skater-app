@@ -98,7 +98,7 @@ class ApiFollow {
   }
 
   static Future<bool> checkFollower(
-      String userId, String targetId) async {
+      String userId, String targetId,room) async {
     try {
       final url = Uri.parse(
           'http://${dotenv.env['SERVER_LOCAL_IP']}:${dotenv.env['SERVER_PORT_LOCAL']}/follow/check/following');
@@ -111,6 +111,7 @@ class ApiFollow {
           body: jsonEncode({
             "user_id": userId,
             "target_id": targetId,
+            "room": room
           }));
 
       if (response.statusCode == 200) {

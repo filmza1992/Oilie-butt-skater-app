@@ -1,14 +1,12 @@
+import 'dart:async';
+
 import 'package:firebase_database/firebase_database.dart';
 import 'package:oilie_butt_skater_app/models/chat_model.dart';
-import 'package:oilie_butt_skater_app/models/chat_room_model.dart';
-import 'package:oilie_butt_skater_app/models/user.dart';
 import 'package:oilie_butt_skater_app/models/user_chat_model.dart';
 
 class ApiChat {
- 
-
   static Future<dynamic> getMessages(
-      String roomId, String userId, updateMessages) async {
+      String roomId, String userId, updateMessages, setSubscription) async {
     try {
       final messagesRef =
           FirebaseDatabase.instance.ref().child("chat_rooms/$roomId/messages");
@@ -26,8 +24,9 @@ class ApiChat {
         for (var user in usersData) {
           userMap.add(user);
         }
-        messagesRef.onValue.listen(
+        StreamSubscription messagesSubscription = messagesRef.onValue.listen(
           (event) {
+            print("get messages");
             messageRooms.clear();
             final dynamic data = event.snapshot.value;
             if (data != null) {
@@ -52,7 +51,7 @@ class ApiChat {
             updateMessages(messageRooms);
           },
         );
-
+        setSubscription(messagesSubscription);
         return messageRooms;
       }
     } catch (e) {
@@ -88,12 +87,13 @@ class ApiChat {
       messagesList.add(messageData);
 
       // Update the messages array in Firebase
-      await messagesRef.set(messagesList);
+      print("roomId: $roomId");
       final DatabaseReference roomRef =
           FirebaseDatabase.instance.ref().child('chat_rooms/$roomId');
 
       roomRef.update({
         "update_at": DateTime.now().toIso8601String(),
+        "messages": messagesList
       });
     } catch (e) {
       print('Error sending message: $e');
