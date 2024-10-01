@@ -13,8 +13,9 @@ import 'package:oilie_butt_skater_app/pages/profile/profile_page.dart';
 import 'package:oilie_butt_skater_app/pages/profile/target_page.dart';
 
 class SearchPage extends StatefulWidget {
-  const SearchPage({super.key});
+  const SearchPage({super.key, required this.loadMorePosts});
 
+final Function loadMorePosts;
   @override
   State<SearchPage> createState() => _SearchPageState();
 }
@@ -144,7 +145,7 @@ void onSearchChanged(String text) {
                               final user = data.value.users[index];
                               return GestureDetector(
                                 onTap: () {
-                                  Get.to(TargetProfilePage(user: user));
+                                  Get.to(TargetProfilePage(user: user,loadMorePosts: widget.loadMorePosts,));
                                 },
                                 child: Card(
                                 margin: const EdgeInsets.symmetric(

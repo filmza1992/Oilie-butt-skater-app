@@ -13,10 +13,12 @@ import 'package:oilie_butt_skater_app/models/chat_room_model.dart';
 import 'package:oilie_butt_skater_app/models/post_model.dart';
 import 'package:oilie_butt_skater_app/models/user.dart';
 import 'package:oilie_butt_skater_app/pages/chat_message.dart';
+import 'package:oilie_butt_skater_app/pages/post/user_post_page.dart';
 
 class TargetProfilePage extends StatefulWidget {
-  const TargetProfilePage({super.key, required this.user});
+  const TargetProfilePage({super.key, required this.user, required this.loadMorePosts});
 
+final Function loadMorePosts;
   final User user;
   @override
   State<TargetProfilePage> createState() => _TargetProfilePageState();
@@ -36,7 +38,7 @@ class _TargetProfilePageState extends State<TargetProfilePage> {
 
   void fetchPosts() async {
     try {
-      final fetchedProfile = await ApiProfile.getAllPost(widget.user.userId);
+      final fetchedProfile = await ApiProfile.getAllPostByUserId(widget.user.userId,user.userId);
       setState(() {
         posts.value = fetchedProfile.posts;
         sumLikes = fetchedProfile.sumLikes.toString();
@@ -100,141 +102,159 @@ class _TargetProfilePageState extends State<TargetProfilePage> {
         body: ValueListenableBuilder(
             valueListenable: posts,
             builder: (context, value, child) {
-              return Column(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
-                    child: Column(
-                      children: [
-                        ProfileImagePage(user: widget.user),
-                        const SizedBox(height: 20.0),
-                        TextCustom(
-                          size: 22,
-                          text: widget.user.username,
-                          color: AppColors.primaryColor,
-                        ),
-                        const SizedBox(height: 15.0),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            Column(
-                              children: [
-                                TextCustom(
-                                  size: 17,
-                                  text: follower,
-                                  color: AppColors.primaryColor,
-                                ),
-                                const TextCustom(
-                                  size: 17,
-                                  text: "ผู้ติดตาม",
-                                  color: AppColors.textColor,
-                                ),
-                              ],
-                            ),
-                            Column(
-                              children: [
-                                TextCustom(
-                                  size: 17,
-                                  text: sumLikes,
-                                  color: AppColors.primaryColor,
-                                ),
-                                const TextCustom(
-                                  size: 17,
-                                  text: "ถูกใจ",
-                                  color: AppColors.textColor,
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            if (isFollower) ...[
-                              Expanded(
-                                child: ButtonCustom(
-                                  text: "เลิกติดตาม",
-                                  onPressed: followUser,
-                                  minWidth: 100,
-                                  height: 30,
-                                  type: 'Text',
-                                  backgroundColor:
-                                      Color.fromARGB(255, 29, 28, 28),
-                                ),
+              return SingleChildScrollView(
+                child: Column(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      child: Column(
+                        children: [
+                          ProfileImagePage(user: widget.user),
+                          const SizedBox(height: 20.0),
+                          TextCustom(
+                            size: 22,
+                            text: widget.user.username,
+                            color: AppColors.primaryColor,
+                          ),
+                          const SizedBox(height: 15.0),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              Column(
+                                children: [
+                                  TextCustom(
+                                    size: 17,
+                                    text: follower,
+                                    color: AppColors.primaryColor,
+                                  ),
+                                  const TextCustom(
+                                    size: 17,
+                                    text: "ผู้ติดตาม",
+                                    color: AppColors.textColor,
+                                  ),
+                                ],
                               ),
-                            ] else ...[
+                              Column(
+                                children: [
+                                  TextCustom(
+                                    size: 17,
+                                    text: sumLikes,
+                                    color: AppColors.primaryColor,
+                                  ),
+                                  const TextCustom(
+                                    size: 17,
+                                    text: "ถูกใจ",
+                                    color: AppColors.textColor,
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              if (isFollower) ...[
+                                Expanded(
+                                  child: ButtonCustom(
+                                    text: "เลิกติดตาม",
+                                    onPressed: followUser,
+                                    minWidth: 100,
+                                    height: 30,
+                                    type: 'Text',
+                                    backgroundColor:
+                                        Color.fromARGB(255, 29, 28, 28),
+                                  ),
+                                ),
+                              ] else ...[
+                                Expanded(
+                                  child: ButtonCustom(
+                                      text: "ติดตาม",
+                                      onPressed: followUser,
+                                      minWidth: 100,
+                                      height: 30,
+                                      type: 'Elevated'),
+                                ),
+                              ],
+                              const SizedBox(width: 10),
                               Expanded(
                                 child: ButtonCustom(
-                                    text: "ติดตาม",
-                                    onPressed: followUser,
+                                    text: "ส่งข้อความ",
+                                    onPressed: () {
+                                      dynamic u = chatRoom.users.length != 0
+                                          ? chatRoom.users
+                                          : [
+                                              {
+                                                "user_id": user.userId,
+                                                "image_url": user.imageUrl,
+                                                "username": user.username
+                                              },
+                                              {
+                                                "user_id": widget.user.userId,
+                                                "image_url": widget.user.imageUrl,
+                                                "username": widget.user.username
+                                              }
+                                            ];
+                                      Get.to(ChatMessagePage(
+                                        roomId: chatRoom.chatRoomId,
+                                        users: u,
+                                        updateRoomId: (String value) {
+                                          chatRoom.chatRoomId = value;
+                                          print("updateRoomId: "+value);
+                                        },
+                                      ));
+                                    },
                                     minWidth: 100,
                                     height: 30,
                                     type: 'Elevated'),
                               ),
                             ],
-                            const SizedBox(width: 10),
-                            Expanded(
-                              child: ButtonCustom(
-                                  text: "ส่งข้อความ",
-                                  onPressed: () {
-                                    dynamic u = chatRoom.users.length != 0
-                                        ? chatRoom.users
-                                        : [
-                                            {
-                                              "user_id": user.userId,
-                                              "image_url": user.imageUrl,
-                                              "username": user.username
-                                            },
-                                            {
-                                              "user_id": widget.user.userId,
-                                              "image_url": widget.user.imageUrl,
-                                              "username": widget.user.username
-                                            }
-                                          ];
-                                    Get.to(ChatMessagePage(
-                                      roomId: chatRoom.chatRoomId,
-                                      users: u,
-                                      updateRoomId: (String value) {
-                                        chatRoom.chatRoomId = value;
-                                        print("updateRoomId: "+value);
-                                      },
-                                    ));
-                                  },
-                                  minWidth: 100,
-                                  height: 30,
-                                  type: 'Elevated'),
-                            ),
-                          ],
+                          ),
+                           const Divider(
+                          color: Color.fromARGB(255, 158, 158, 158),
                         ),
-                        const Divider(
-                          color: Color.fromARGB(255, 57, 57, 57),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Expanded(
-                    child: GridView.builder(
-                      padding: const EdgeInsets.all(8.0),
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 3,
-                        crossAxisSpacing: 4.0,
-                        mainAxisSpacing: 4.0,
+                        ],
                       ),
-                      itemCount: value.length,
-                      itemBuilder: (context, index) {
-                        final post = value[index];
-                        return Image.network(
-                          post.content,
-                          fit: BoxFit.cover,
-                        );
-                      },
                     ),
+                    GridView.builder(
+                    shrinkWrap: true, // ทำให้ GridView ขยายตามเนื้อหา
+                    physics:
+                        const NeverScrollableScrollPhysics(), // ปิดการเลื่อนในตัว GridView
+                    padding: const EdgeInsets.all(8.0),
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 3,
+                      crossAxisSpacing: 4.0,
+                      mainAxisSpacing: 4.0,
+                    ),
+                    itemCount: value.length,
+                    itemBuilder: (context, index) {
+                      final post = value[index];
+                      return InkWell(
+                        onTap: () {
+                          // เมื่อกดที่รูป จะนำไปยังหน้าถัดไปพร้อมกับส่ง index และ list ของ posts
+                          Get.to(
+                            UserPostPage(
+                              posts: value,
+                              initialIndex: index, 
+                              loadMorePosts: widget.loadMorePosts,
+                            ),
+                          );
+                        },
+                        child: Ink(
+                          decoration: BoxDecoration(
+                            image: DecorationImage(
+                              image: NetworkImage(post.content),
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ),
+                      );
+                    },
                   ),
-                ],
+                  ],
+                ),
               );
             }));
   }
