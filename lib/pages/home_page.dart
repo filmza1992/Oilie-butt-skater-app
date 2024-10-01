@@ -81,7 +81,11 @@ class _HomePageState extends State<HomePage> {
           )),
           Center(child: page()),
           const Center(child: Text('Notifications Page')),
-          if (_selectedIndex == 4) Center(child: ProfilePage(loadMorePosts: _loadMorePosts,)),
+          if (_selectedIndex == 4)
+            Center(
+                child: ProfilePage(
+              loadMorePosts: _loadMorePosts,
+            )),
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
@@ -125,10 +129,11 @@ class _HomePageState extends State<HomePage> {
     print('initState');
     posts.value.clear();
     try {
-      final fetchedPosts =
+      final newPost = await ApiPost.getFeed(userController.user.value.userId);
+      //final fetchedPosts =
           await ApiPost.getAllPost(userController.user.value.userId);
       setState(() {
-        posts.value = fetchedPosts;
+        posts.value = newPost;
       });
     } catch (e) {
       print('Error fetching chat rooms: $e');
@@ -168,7 +173,10 @@ class _HomePageState extends State<HomePage> {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => SearchPage(loadMorePosts: _loadMorePosts,)),
+                  MaterialPageRoute(
+                      builder: (context) => SearchPage(
+                            loadMorePosts: _loadMorePosts,
+                          )),
                 );
               },
               icon: const Icon(Icons.search)),

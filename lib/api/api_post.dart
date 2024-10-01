@@ -43,6 +43,36 @@ class ApiPost {
       throw Exception(e);
     }
   }
+   static Future<List<Post>> getFeed(String userId) async {
+    try {
+      final url = Uri.parse(
+          'http://${dotenv.env['SERVER_LOCAL_IP']}:${dotenv.env['SERVER_PORT_LOCAL']}/post/feed/$userId');
+      print(url);
+      final response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        print('GET request successful');
+        print('Response data: ${response.body}');
+
+        final Map<String, dynamic> jsonData = json.decode(response.body);
+        if (jsonData['data'] != null) {
+          final List<Post> posts = (jsonData['data'] as List)
+              .map((postJson) => Post.fromJson(postJson))
+              .toList();
+          return posts;
+        } else {
+          return [];
+        }
+      } else {
+        print('Failed to make the GET request');
+        print('Status code: ${response.statusCode}');
+        print('Response data: ${response.body}');
+        return [];
+      }
+    } catch (e) {
+      throw Exception(e);
+    }
+  }
 
   static Future<void> addPost(PostCreate post, context, update) async {
     try {
