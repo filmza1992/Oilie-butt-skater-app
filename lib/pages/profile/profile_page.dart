@@ -13,8 +13,10 @@ import 'package:oilie_butt_skater_app/pages/setting_page.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({
-    super.key,
+    super.key, required this.loadMorePosts,
   });
+
+  final Function loadMorePosts;
 
   @override
   State<ProfilePage> createState() => _ProfilePageState();
@@ -165,9 +167,9 @@ class _ProfilePageState extends State<ProfilePage> {
                         // เมื่อกดที่รูป จะนำไปยังหน้าถัดไปพร้อมกับส่ง index และ list ของ posts
                         Get.to(
                           UserPostPage(
-                            posts: value, // ส่ง List ของโพสต์ไปด้วย
-                            initialIndex:
-                                index, // ส่ง index ของรูปที่ถูกกดไปด้วย
+                            posts: value,
+                            initialIndex: index, 
+                            loadMorePosts: widget.loadMorePosts,
                           ),
                         );
                       },

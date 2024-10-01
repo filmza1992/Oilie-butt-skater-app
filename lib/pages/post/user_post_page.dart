@@ -6,9 +6,13 @@ import 'package:oilie_butt_skater_app/models/post_model.dart';
 class UserPostPage extends StatefulWidget {
   final List<Post> posts; // รายการของโพสต์ทั้งหมด
   final int initialIndex; // index ของโพสต์ที่ถูกกด
+  final Function loadMorePosts;
 
   const UserPostPage(
-      {required this.posts, required this.initialIndex, super.key});
+      {required this.posts,
+      required this.initialIndex,
+      super.key,
+      required this.loadMorePosts});
 
   @override
   _UserPostPageState createState() => _UserPostPageState();
@@ -41,23 +45,26 @@ class _UserPostPageState extends State<UserPostPage> {
           itemBuilder: (context, index) {
             final post = widget.posts[index];
             return PostComponent(
-                userId: post.userId,
-                postId: post.postId,
-                username: post.username,
-                userImage: post.userImage,
-                postText: post.title,
-                likes: post.likes,
-                dislikes: post.dislikes,
-                comments: post.comments,
-                content: post.content,
-                status: post.status,
-                updateStatus: (int status, int likes, int dislikes) {
-                  setState(() {
-                    post.status = status;
-                    post.likes = likes;
-                    post.dislikes = dislikes;
-                  });
+              userId: post.userId,
+              postId: post.postId,
+              username: post.username,
+              userImage: post.userImage,
+              postText: post.title,
+              likes: post.likes,
+              dislikes: post.dislikes,
+              comments: post.comments,
+              content: post.content,
+              status: post.status,
+              updateStatus: (int status, int likes, int dislikes) {
+                setState(() {
+                  post.status = status;
+                  post.likes = likes;
+                  post.dislikes = dislikes;
+                  widget.loadMorePosts();
                 });
+              },
+            
+            );
           },
         ),
       ),

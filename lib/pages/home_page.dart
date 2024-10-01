@@ -81,7 +81,7 @@ class _HomePageState extends State<HomePage> {
           )),
           Center(child: page()),
           const Center(child: Text('Notifications Page')),
-          if (_selectedIndex == 4) const Center(child: ProfilePage()),
+          if (_selectedIndex == 4) Center(child: ProfilePage(loadMorePosts: _loadMorePosts,)),
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
@@ -108,7 +108,7 @@ class _HomePageState extends State<HomePage> {
       });
       print(_isLoadingMore);
       // เรียกฟังก์ชันเพื่อโหลดโพสต์เพิ่มเติม
-      Future.delayed(const Duration(seconds: 2), () {
+      Future.delayed(const Duration(seconds: 1), () {
         // เรียกฟังก์ชันเพื่อโหลดโพสต์เพิ่มเติม
         fetchPosts(); // โหลดโพสต์ใหม่
 
