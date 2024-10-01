@@ -13,9 +13,10 @@ import '../constant/color.dart';
 class ProfileImageEditPage extends StatefulWidget {
   const ProfileImageEditPage({
     required this.setImageFile,
-    super.key,
+    super.key, this.imageUrl,
   });
 
+  final String? imageUrl;
   final Function setImageFile;
   @override
   State<ProfileImageEditPage> createState() => _ProfileImageEditState();
@@ -67,7 +68,10 @@ class _ProfileImageEditState extends State<ProfileImageEditPage> {
         ? FileImage(
             _imageFile!,
           )
-        : const NetworkImage(
+        : widget.imageUrl != null ?
+        NetworkImage(
+            widget.imageUrl!)
+        :const NetworkImage(
             'https://i0.wp.com/sbcf.fr/wp-content/uploads/2018/03/sbcf-default-avatar.png');
     return ClipOval(
       child: Material(

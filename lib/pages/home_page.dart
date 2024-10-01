@@ -22,6 +22,8 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int _selectedIndex = 2;
 
+  final ScrollController _scrollController = ScrollController();
+  bool _isLoadingMore = false;
   final List<BottomNavigationBarItem> _bottomNavItems = [
     const BottomNavigationBarItem(
       icon: Icon(Icons.emoji_events),
@@ -73,8 +75,11 @@ class _HomePageState extends State<HomePage> {
         index: _selectedIndex,
         children: [
           const Center(child: Text('Trophy')),
-          const Center(child: const Center(child: RoomPage(),)),
-          Center(child: page()), 
+          const Center(
+              child: Center(
+            child: RoomPage(),
+          )),
+          Center(child: page()),
           const Center(child: Text('Notifications Page')),
           if (_selectedIndex == 4) const Center(child: ProfilePage()),
         ],
@@ -91,22 +96,34 @@ class _HomePageState extends State<HomePage> {
 
   ValueNotifier<List<Post>> posts = ValueNotifier<List<Post>>([]);
   UserController userController = Get.find<UserController>();
+
   void update() {
-    fetchPosts();
+    _loadMorePosts();
   }
 
-  void updateMessage(List<Post> data) {
-    if (mounted) {
-      // Check if the new messages are different from the current messages
+  void _loadMorePosts() {
+    if (!_isLoadingMore) {
       setState(() {
-        posts.value =
-            data; // Ensure to create a new list to avoid reference issues
+        _isLoadingMore = true;
+      });
+      print(_isLoadingMore);
+      // เรียกฟังก์ชันเพื่อโหลดโพสต์เพิ่มเติม
+      Future.delayed(const Duration(seconds: 2), () {
+        // เรียกฟังก์ชันเพื่อโหลดโพสต์เพิ่มเติม
+        fetchPosts(); // โหลดโพสต์ใหม่
+
+        setState(() {
+          _isLoadingMore = false; // เมื่อโหลดเสร็จแล้ว ตั้งค่าเป็นไม่กำลังโหลด
+        });
+
+        print("การโหลดเพิ่มเติมเสร็จสิ้น");
       });
     }
   }
 
   void fetchPosts() async {
     print('initState');
+    posts.value.clear();
     try {
       final fetchedPosts =
           await ApiPost.getAllPost(userController.user.value.userId);
@@ -118,10 +135,26 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  Future<void> _refreshPosts() async {
+    // ฟังก์ชันเพื่อรีเฟรชโพสต์ (pull to refresh)
+    _loadMorePosts();
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
   @override
   void initState() {
     super.initState();
-    fetchPosts();
+    _scrollController.addListener(() {
+      if (_scrollController.position.pixels ==
+          _scrollController.position.maxScrollExtent) {
+        fetchPosts();
+      }
+    });
   }
 
   Widget page() {
@@ -132,10 +165,10 @@ class _HomePageState extends State<HomePage> {
         actions: [
           IconButton(
               onPressed: () {
-               Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const SearchPage()),
-              );
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const SearchPage()),
+                );
               },
               icon: const Icon(Icons.search)),
           IconButton(
@@ -155,36 +188,45 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
-      body: Center(
-        child: ValueListenableBuilder(
-            valueListenable: posts,
-            builder: (context, value, child) {
-              return ListView.builder(
-                itemCount: value.length,
-                itemBuilder: (context, index) {
-                  final post = value[index];
-                  return PostComponent(
-                      userId: post.userId,
-                      postId: post.postId,
-                      username: post.username,
-                      userImage: post.userImage,
-                      postText: post.title,
-                      likes: post.likes,
-                      dislikes: post.dislikes,
-                      comments: post.comments,
-                      content: post.content,
-                      status: post.status,
-                      updateStatus: (int status, int likes, int dislikes) {
-                        setState(() {
-                          post.status = status;
-                          post.likes = likes;
-                          post.dislikes = dislikes;
-                        });
-                      });
+      body: _isLoadingMore
+          ? const Center(
+              child: CircularProgressIndicator(), // แสดง loading ขณะโหลดข้อมูล
+            )
+          : Center(
+              child: ValueListenableBuilder(
+                valueListenable: posts,
+                builder: (context, value, child) {
+                  return RefreshIndicator(
+                    onRefresh: _refreshPosts,
+                    child: ListView.builder(
+                      itemCount: value.length,
+                      itemBuilder: (context, index) {
+                        final post = value[index];
+                        return PostComponent(
+                          userId: post.userId,
+                          postId: post.postId,
+                          username: post.username,
+                          userImage: post.userImage,
+                          postText: post.title,
+                          likes: post.likes,
+                          dislikes: post.dislikes,
+                          comments: post.comments,
+                          content: post.content,
+                          status: post.status,
+                          updateStatus: (int status, int likes, int dislikes) {
+                            setState(() {
+                              post.status = status;
+                              post.likes = likes;
+                              post.dislikes = dislikes;
+                            });
+                          },
+                        );
+                      },
+                    ),
+                  );
                 },
-              );
-            }),
-      ),
+              ),
+            ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           // Navigate to the post creation screen

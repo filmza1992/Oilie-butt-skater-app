@@ -84,11 +84,11 @@ class _LoginPageState extends State<LoginPage> {
         // อัปเดตผู้ใช้ใน controller
         userController.updateUser(User(
           userId: user.userId, // ID ควรดึงมาจากฐานข้อมูล
-          username: googleUser.displayName ?? '',
-          email: googleUser.email,
+          username: user.username ,
+          email: user.email,
           password: '', // ไม่ควรเก็บรหัสผ่านในกรณีนี้
-          imageUrl: googleUser.photoUrl ?? '',
-          birthDay: '',
+          imageUrl: user.imageUrl,
+          birthDay: user.birthDay ,
           createAt: '',
         ));
 
