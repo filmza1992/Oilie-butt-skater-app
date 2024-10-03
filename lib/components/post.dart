@@ -48,14 +48,16 @@ class _PostComponentState extends State<PostComponent> {
 
   UserController userController = Get.find<UserController>();
 
-  void updateCommentCount(int? number) {
-    if (number != null) {
+  void updateCommentCount(int number) {
+    if (number != -1) {
       setState(() {
         comments = number;
+        print(comments);
       });
     } else {
       setState(() {
         comments++;
+        print(comments);
       });
     }
   }
@@ -66,6 +68,7 @@ class _PostComponentState extends State<PostComponent> {
     super.initState();
     likes = widget.likes;
     dislikes = widget.dislikes;
+    comments = widget.comments;
     if (widget.status == 1) {
       isLiked = true;
     } else if (widget.status == -1) {
@@ -157,7 +160,7 @@ class _PostComponentState extends State<PostComponent> {
                 ),
                 CommentPage(
                     postId: widget.postId,
-                    comments: widget.comments,
+                    comments: comments,
                     user: widget.user,
                     updateCommentCount: updateCommentCount),
                 Column(

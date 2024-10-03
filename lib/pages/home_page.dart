@@ -6,11 +6,11 @@ import 'package:oilie_butt_skater_app/components/post.dart';
 import 'package:oilie_butt_skater_app/constant/color.dart';
 import 'package:oilie_butt_skater_app/controller/user_controller.dart';
 import 'package:oilie_butt_skater_app/models/post_model.dart';
-import 'package:oilie_butt_skater_app/pages/chat_room.dart';
+import 'package:oilie_butt_skater_app/pages/chat/chat_room.dart';
 import 'package:oilie_butt_skater_app/pages/post/create_post_page.dart';
 import 'package:oilie_butt_skater_app/pages/profile/profile_page.dart';
-import 'package:oilie_butt_skater_app/pages/room_page.dart';
-import 'package:oilie_butt_skater_app/pages/search_page.dart';
+import 'package:oilie_butt_skater_app/pages/room/room_page.dart';
+import 'package:oilie_butt_skater_app/pages/search/search_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -24,6 +24,7 @@ class _HomePageState extends State<HomePage> {
 
   final ScrollController _scrollController = ScrollController();
   bool _isLoadingMore = false;
+  
   final List<BottomNavigationBarItem> _bottomNavItems = [
     const BottomNavigationBarItem(
       icon: Icon(Icons.emoji_events),
@@ -229,7 +230,7 @@ class _HomePageState extends State<HomePage> {
                               post.likes = likes;
                               post.dislikes = dislikes;
                             });
-                          },
+                          }, 
                           user: userController.user.value,
                         );
                       },

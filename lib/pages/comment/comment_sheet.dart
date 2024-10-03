@@ -35,7 +35,7 @@ class _CommentSheetState extends State<CommentSheet> {
     });
   }
 
-  updateComments(value) {
+  void updateComments(value) {
     setState(() {
       comments = value;
       print(comments);
@@ -154,7 +154,7 @@ class _CommentSheetState extends State<CommentSheet> {
                       ApiComment.addCommentByPostId(widget.postId,
                           widget.user.userId, commentText, updateComments);
                       _commentController.clear();
-                      widget.updateCommentCount();
+                      widget.updateCommentCount(-1);
                     }
                   },
                 ),

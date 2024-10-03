@@ -9,8 +9,8 @@ import 'package:oilie_butt_skater_app/components/text_custom.dart';
 import 'package:oilie_butt_skater_app/constant/color.dart';
 import 'package:oilie_butt_skater_app/controller/user_controller.dart';
 import 'package:oilie_butt_skater_app/models/chat_room_model.dart';
-import 'package:oilie_butt_skater_app/pages/chat_message.dart';
-import 'package:oilie_butt_skater_app/pages/request_room.dart';
+import 'package:oilie_butt_skater_app/pages/chat/chat_message.dart';
+import 'package:oilie_butt_skater_app/pages/chat/request_room.dart';
 
 class ChatRoomPage extends StatefulWidget {
   const ChatRoomPage({super.key});

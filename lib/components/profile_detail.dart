@@ -4,7 +4,7 @@ import 'package:oilie_butt_skater_app/components/text_custom.dart';
 import 'package:oilie_butt_skater_app/constant/color.dart';
 import 'package:oilie_butt_skater_app/models/chat_room_model.dart';
 import 'package:oilie_butt_skater_app/models/user.dart';
-import 'package:oilie_butt_skater_app/pages/chat_message.dart';
+import 'package:oilie_butt_skater_app/pages/chat/chat_message.dart';
 import 'package:oilie_butt_skater_app/pages/profile/profile_page.dart';
 
 class ProfileDetail extends StatefulWidget {

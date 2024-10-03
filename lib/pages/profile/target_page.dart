@@ -12,7 +12,7 @@ import 'package:oilie_butt_skater_app/controller/user_controller.dart';
 import 'package:oilie_butt_skater_app/models/chat_room_model.dart';
 import 'package:oilie_butt_skater_app/models/post_model.dart';
 import 'package:oilie_butt_skater_app/models/user.dart';
-import 'package:oilie_butt_skater_app/pages/chat_message.dart';
+import 'package:oilie_butt_skater_app/pages/chat/chat_message.dart';
 import 'package:oilie_butt_skater_app/pages/post/user_post_page.dart';
 
 class TargetProfilePage extends StatefulWidget {
