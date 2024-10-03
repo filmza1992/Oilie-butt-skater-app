@@ -98,6 +98,7 @@ class _TargetProfilePageState extends State<TargetProfilePage> {
     return Scaffold(
         appBar: AppBar(
           backgroundColor: AppColors.backgroundColor,
+          surfaceTintColor: AppColors.backgroundColor,
         ),
         body: ValueListenableBuilder(
             valueListenable: posts,

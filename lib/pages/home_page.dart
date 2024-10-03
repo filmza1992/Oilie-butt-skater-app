@@ -167,6 +167,7 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: AppColors.backgroundColor,
+        surfaceTintColor: AppColors.backgroundColor,
         automaticallyImplyLeading: false,
         actions: [
           IconButton(
@@ -229,6 +230,7 @@ class _HomePageState extends State<HomePage> {
                               post.dislikes = dislikes;
                             });
                           },
+                          user: userController.user.value,
                         );
                       },
                     ),

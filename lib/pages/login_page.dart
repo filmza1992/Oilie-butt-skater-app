@@ -12,7 +12,6 @@ import 'package:oilie_butt_skater_app/pages/home_page.dart';
 import 'package:oilie_butt_skater_app/pages/register_page.dart';
 
 import '../../models/user.dart';
-
 import '../api/api_auth.dart';
 import '../components/background/backgroundLogin.dart';
 
@@ -84,11 +83,11 @@ class _LoginPageState extends State<LoginPage> {
         // อัปเดตผู้ใช้ใน controller
         userController.updateUser(User(
           userId: user.userId, // ID ควรดึงมาจากฐานข้อมูล
-          username: user.username ,
+          username: user.username,
           email: user.email,
           password: '', // ไม่ควรเก็บรหัสผ่านในกรณีนี้
           imageUrl: user.imageUrl,
-          birthDay: user.birthDay ,
+          birthDay: user.birthDay,
           createAt: '',
         ));
 
@@ -105,7 +104,7 @@ class _LoginPageState extends State<LoginPage> {
     return Scaffold(
         appBar: AppBar(
           backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-          actions: [],
+          actions: const [],
           automaticallyImplyLeading: false,
         ),
         body: BackgroundLogin(
@@ -153,10 +152,9 @@ class _LoginPageState extends State<LoginPage> {
                     children: [
                       Expanded(
                         child: ButtonCustom(
-                          text: "เข้าสู่ระบบ",
-                          onPressed: myLogin,
-                          type: 'Elevated'
-                        ),
+                            text: "เข้าสู่ระบบ",
+                            onPressed: myLogin,
+                            type: 'Elevated'),
                       )
                     ],
                   ),
@@ -164,8 +162,7 @@ class _LoginPageState extends State<LoginPage> {
                     height: 10,
                   ),
                   const Divider(
-                    color: Colors.white,
-                    height: 10,
+                    color: Color.fromARGB(255, 158, 158, 158),
                   ),
                   const SizedBox(
                     height: 15,

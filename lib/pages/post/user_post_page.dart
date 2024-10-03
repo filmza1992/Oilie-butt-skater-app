@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:oilie_butt_skater_app/components/post.dart';
 import 'package:oilie_butt_skater_app/constant/color.dart';
+import 'package:oilie_butt_skater_app/controller/user_controller.dart';
 import 'package:oilie_butt_skater_app/models/post_model.dart';
 
 class UserPostPage extends StatefulWidget {
@@ -20,7 +22,8 @@ class UserPostPage extends StatefulWidget {
 
 class _UserPostPageState extends State<UserPostPage> {
   late ScrollController _scrollController;
-
+  UserController userController = Get.find<UserController>();
+  dynamic user;
   @override
   void initState() {
     super.initState();
@@ -29,6 +32,7 @@ class _UserPostPageState extends State<UserPostPage> {
       initialScrollOffset:
           widget.initialIndex * 541.4, // ปรับให้เลื่อนไปตำแหน่งโพสต์ที่ถูกกด
     );
+    user = userController.user.value;
   }
 
   @override
@@ -63,7 +67,7 @@ class _UserPostPageState extends State<UserPostPage> {
                   widget.loadMorePosts();
                 });
               },
-            
+              user: user,
             );
           },
         ),
