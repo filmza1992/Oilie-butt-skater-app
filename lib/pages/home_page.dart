@@ -11,6 +11,7 @@ import 'package:oilie_butt_skater_app/pages/post/create_post_page.dart';
 import 'package:oilie_butt_skater_app/pages/profile/profile_page.dart';
 import 'package:oilie_butt_skater_app/pages/room/room_page.dart';
 import 'package:oilie_butt_skater_app/pages/search/search_page.dart';
+import 'package:oilie_butt_skater_app/pages/trophy_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -24,7 +25,7 @@ class _HomePageState extends State<HomePage> {
 
   final ScrollController _scrollController = ScrollController();
   bool _isLoadingMore = false;
-  
+
   final List<BottomNavigationBarItem> _bottomNavItems = [
     const BottomNavigationBarItem(
       icon: Icon(Icons.emoji_events),
@@ -75,11 +76,10 @@ class _HomePageState extends State<HomePage> {
       body: IndexedStack(
         index: _selectedIndex,
         children: [
-          const Center(child: Text('Trophy')),
+          const Center(child: TrophyPage()),
           const Center(
-              child: Center(
             child: RoomPage(),
-          )),
+          ),
           Center(child: page()),
           const Center(child: Text('Notifications Page')),
           if (_selectedIndex == 4)
@@ -132,7 +132,7 @@ class _HomePageState extends State<HomePage> {
     try {
       final newPost = await ApiPost.getFeed(userController.user.value.userId);
       //final fetchedPosts =
-          await ApiPost.getAllPost(userController.user.value.userId);
+      await ApiPost.getAllPost(userController.user.value.userId);
       setState(() {
         posts.value = newPost;
       });
@@ -230,7 +230,7 @@ class _HomePageState extends State<HomePage> {
                               post.likes = likes;
                               post.dislikes = dislikes;
                             });
-                          }, 
+                          },
                           user: userController.user.value,
                         );
                       },
