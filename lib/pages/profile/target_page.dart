@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:oilie_butt_skater_app/api/api_chat.dart';
 import 'package:oilie_butt_skater_app/api/api_follow.dart';
 import 'package:oilie_butt_skater_app/api/api_profile.dart';
-import 'package:oilie_butt_skater_app/api/api_room.dart';
+import 'package:oilie_butt_skater_app/api/api_chat_room.dart';
 import 'package:oilie_butt_skater_app/components/button_custom.dart';
 import 'package:oilie_butt_skater_app/components/profile_image.dart';
 import 'package:oilie_butt_skater_app/components/text_custom.dart';
@@ -16,9 +16,10 @@ import 'package:oilie_butt_skater_app/pages/chat/chat_message.dart';
 import 'package:oilie_butt_skater_app/pages/post/user_post_page.dart';
 
 class TargetProfilePage extends StatefulWidget {
-  const TargetProfilePage({super.key, required this.user, required this.loadMorePosts});
+  const TargetProfilePage(
+      {super.key, required this.user, required this.loadMorePosts});
 
-final Function loadMorePosts;
+  final Function loadMorePosts;
   final User user;
   @override
   State<TargetProfilePage> createState() => _TargetProfilePageState();
@@ -38,7 +39,8 @@ class _TargetProfilePageState extends State<TargetProfilePage> {
 
   void fetchPosts() async {
     try {
-      final fetchedProfile = await ApiProfile.getAllPostByUserId(widget.user.userId,user.userId);
+      final fetchedProfile =
+          await ApiProfile.getAllPostByUserId(widget.user.userId, user.userId);
       setState(() {
         posts.value = fetchedProfile.posts;
         sumLikes = fetchedProfile.sumLikes.toString();
@@ -50,8 +52,8 @@ class _TargetProfilePageState extends State<TargetProfilePage> {
   }
 
   Future<void> fetchCheckFollower() async {
-    final response =
-        await ApiFollow.checkFollower(user.userId, widget.user.userId,"target_page");
+    final response = await ApiFollow.checkFollower(
+        user.userId, widget.user.userId, "target_page");
     setState(() {
       isFollower = response;
     });
@@ -59,7 +61,7 @@ class _TargetProfilePageState extends State<TargetProfilePage> {
 
   Future<void> fetchRoomMessage() async {
     final response =
-        await ApiRoom.getChatRoomsWithUser(user.userId, widget.user.userId);
+        await ApiChatRoom.getChatRoomsWithUser(user.userId, widget.user.userId);
     setState(() {
       chatRoom = response;
     });
@@ -166,7 +168,7 @@ class _TargetProfilePageState extends State<TargetProfilePage> {
                                     height: 30,
                                     type: 'Text',
                                     backgroundColor:
-                                        Color.fromARGB(255, 29, 28, 28),
+                                        const Color.fromARGB(255, 29, 28, 28),
                                   ),
                                 ),
                               ] else ...[
@@ -194,7 +196,8 @@ class _TargetProfilePageState extends State<TargetProfilePage> {
                                               },
                                               {
                                                 "user_id": widget.user.userId,
-                                                "image_url": widget.user.imageUrl,
+                                                "image_url":
+                                                    widget.user.imageUrl,
                                                 "username": widget.user.username
                                               }
                                             ];
@@ -203,7 +206,7 @@ class _TargetProfilePageState extends State<TargetProfilePage> {
                                         users: u,
                                         updateRoomId: (String value) {
                                           chatRoom.chatRoomId = value;
-                                          print("updateRoomId: "+value);
+                                          print("updateRoomId: $value");
                                         },
                                       ));
                                     },
@@ -213,47 +216,48 @@ class _TargetProfilePageState extends State<TargetProfilePage> {
                               ),
                             ],
                           ),
-                           const Divider(
-                          color: Color.fromARGB(255, 158, 158, 158),
-                        ),
+                          const Divider(
+                            color: Color.fromARGB(255, 158, 158, 158),
+                          ),
                         ],
                       ),
                     ),
                     GridView.builder(
-                    shrinkWrap: true, // ทำให้ GridView ขยายตามเนื้อหา
-                    physics:
-                        const NeverScrollableScrollPhysics(), // ปิดการเลื่อนในตัว GridView
-                    padding: const EdgeInsets.all(8.0),
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 3,
-                      crossAxisSpacing: 4.0,
-                      mainAxisSpacing: 4.0,
-                    ),
-                    itemCount: value.length,
-                    itemBuilder: (context, index) {
-                      final post = value[index];
-                      return InkWell(
-                        onTap: () {
-                          // เมื่อกดที่รูป จะนำไปยังหน้าถัดไปพร้อมกับส่ง index และ list ของ posts
-                          Get.to(
-                            UserPostPage(
-                              posts: value,
-                              initialIndex: index, 
-                              loadMorePosts: widget.loadMorePosts,
-                            ),
-                          );
-                        },
-                        child: Ink(
-                          decoration: BoxDecoration(
-                            image: DecorationImage(
-                              image: NetworkImage(post.content),
-                              fit: BoxFit.cover,
+                      shrinkWrap: true, // ทำให้ GridView ขยายตามเนื้อหา
+                      physics:
+                          const NeverScrollableScrollPhysics(), // ปิดการเลื่อนในตัว GridView
+                      padding: const EdgeInsets.all(8.0),
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 3,
+                        crossAxisSpacing: 4.0,
+                        mainAxisSpacing: 4.0,
+                      ),
+                      itemCount: value.length,
+                      itemBuilder: (context, index) {
+                        final post = value[index];
+                        return InkWell(
+                          onTap: () {
+                            // เมื่อกดที่รูป จะนำไปยังหน้าถัดไปพร้อมกับส่ง index และ list ของ posts
+                            Get.to(
+                              UserPostPage(
+                                posts: value,
+                                initialIndex: index,
+                                loadMorePosts: widget.loadMorePosts,
+                              ),
+                            );
+                          },
+                          child: Ink(
+                            decoration: BoxDecoration(
+                              image: DecorationImage(
+                                image: NetworkImage(post.content),
+                                fit: BoxFit.cover,
+                              ),
                             ),
                           ),
-                        ),
-                      );
-                    },
-                  ),
+                        );
+                      },
+                    ),
                   ],
                 ),
               );

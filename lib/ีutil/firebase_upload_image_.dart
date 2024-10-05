@@ -19,10 +19,25 @@ Future<String> uploadImageToFirebaseMessage(File imageFile) async {
   }
 }
 
+
+
+Future<String> uploadImageToFirebaseRoom(File imageFile) async {
+  String fileName =
+      '${DateFormat('yyyyMMdd_HHmmss').format(DateTime.now())}_${imageFile.path.split('/').last}';
+  try {
+    final storageRef =
+        FirebaseStorage.instance.ref().child("room/$fileName");
+    await storageRef.putFile(imageFile);
+    String downloadUrl = await storageRef.getDownloadURL();
+    return downloadUrl;
+  } catch (e) {
+    print("Error uploading image: $e");
+    return '';
+  }
+}
 Future<String> uploadImageToFirebaseProfile(File imageFile) async {
   String fileName =
       '${DateFormat('yyyyMMdd_HHmmss').format(DateTime.now())}_${imageFile.path.split('/').last}';
-
   try {
     final storageRef =
         FirebaseStorage.instance.ref().child("profile/$fileName");

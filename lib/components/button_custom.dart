@@ -72,6 +72,7 @@ class ButtonCustom extends StatelessWidget {
           backgroundColor: WidgetStateProperty.all(
             backgroundColor ?? Colors.transparent,
           ),
+          
           shape: WidgetStateProperty.all(
             RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(borderRadius ?? 8),

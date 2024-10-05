@@ -12,25 +12,29 @@ import 'package:oilie_butt_skater_app/components/text_custom.dart';
 import 'package:oilie_butt_skater_app/constant/color.dart';
 import 'package:oilie_butt_skater_app/controller/user_controller.dart';
 import 'package:oilie_butt_skater_app/models/chat_model.dart';
+import 'package:oilie_butt_skater_app/models/room_model.dart';
 import 'package:photo_manager/photo_manager.dart';
 
-class ChatMessagePage extends StatefulWidget {
-  const ChatMessagePage(
+class ChatRoomMessagePage extends StatefulWidget {
+  const ChatRoomMessagePage(
       {super.key,
-      required this.roomId,
+      required this.chatRoomId,
       required this.users,
-      this.updateRoomId, this.fetchChatRoom});
+      this.updateRoomId,
+      this.fetchChatRoom,
+      required this.room});
 
-  final String roomId;
+  final String chatRoomId;
+  final Room room;
   final dynamic users;
   final Function? fetchChatRoom;
   final Function(String value)? updateRoomId;
 
   @override
-  State<ChatMessagePage> createState() => _ChatMessagePageState();
+  State<ChatRoomMessagePage> createState() => _ChatRoomMessagePageState();
 }
 
-class _ChatMessagePageState extends State<ChatMessagePage> {
+class _ChatRoomMessagePageState extends State<ChatRoomMessagePage> {
   UserController userController = Get.find<UserController>();
   List<Chat> messages = [];
 
@@ -38,7 +42,7 @@ class _ChatMessagePageState extends State<ChatMessagePage> {
 
   String targetImage = "";
   String defaultRoomId = "";
-   StreamSubscription? messagesSubscription;
+  StreamSubscription? messagesSubscription;
   String isPrivateChat() {
     bool isPrivate = false;
     if (widget.users.length == 2) {
@@ -54,6 +58,8 @@ class _ChatMessagePageState extends State<ChatMessagePage> {
       setState(() {
         targetImage = user['image_url'];
       });
+    } else {
+      roomName = widget.room.name;
     }
     return roomName;
   }
@@ -75,13 +81,16 @@ class _ChatMessagePageState extends State<ChatMessagePage> {
   void setSubscription(value) {
     messagesSubscription = value;
   }
+
   void fetchMessages(String roomId, String userId) async {
     try {
       if (roomId != "") {
-        await ApiChat.getMessages(roomId, userId, updateMessage, setSubscription);
+        await ApiChat.getMessages(
+            roomId, userId, updateMessage, setSubscription);
         print(messagesNotifier.value);
       } else {
-        String newId = await ApiChatRoom.createRoom(widget.users, 1);
+        String newId = await ApiChatRoom.createRoomChatRoom(
+            widget.users, 2, widget.room.roomId.toString());
         setState(() {
           defaultRoomId = newId;
           if (widget.updateRoomId != null) {
@@ -89,7 +98,8 @@ class _ChatMessagePageState extends State<ChatMessagePage> {
           }
         });
         print("roomId: $newId");
-        await ApiChat.getMessages(newId, userId, updateMessage, setSubscription);
+        await ApiChat.getMessages(
+            newId, userId, updateMessage, setSubscription);
         print(messagesNotifier.value);
       }
     } catch (e) {
@@ -168,18 +178,18 @@ class _ChatMessagePageState extends State<ChatMessagePage> {
 
   @override
   void initState() {
-    defaultRoomId = widget.roomId;
+    defaultRoomId = widget.chatRoomId;
     super.initState();
     fetchMessages(defaultRoomId, userController.user.value.userId);
     _fetchImages();
   }
 
-@override
-    void dispose() {
+  @override
+  void dispose() {
+    messagesSubscription?.cancel();
+    super.dispose();
+  }
 
-      messagesSubscription?.cancel();
-      super.dispose();
-    }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -196,7 +206,7 @@ class _ChatMessagePageState extends State<ChatMessagePage> {
                 }
               });
             }
-            if(widget.fetchChatRoom != null){
+            if (widget.fetchChatRoom != null) {
               widget.fetchChatRoom!();
             }
             Navigator.pop(context);
@@ -205,14 +215,6 @@ class _ChatMessagePageState extends State<ChatMessagePage> {
         title: Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            CircleAvatar(
-              backgroundImage: targetImage != ""
-                  ? NetworkImage(targetImage)
-                  : const NetworkImage(
-                      'https://i0.wp.com/sbcf.fr/wp-content/uploads/2018/03/sbcf-default-avatar.png'),
-              radius: 19,
-            ),
-            const SizedBox(width: 10),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [

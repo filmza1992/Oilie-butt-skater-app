@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:oilie_butt_skater_app/api/api_chat.dart';
-import 'package:oilie_butt_skater_app/api/api_room.dart';
+import 'package:oilie_butt_skater_app/api/api_chat_room.dart';
 import 'package:oilie_butt_skater_app/components/chat_room_detail.dart';
 import 'package:oilie_butt_skater_app/components/text_custom.dart';
 import 'package:oilie_butt_skater_app/constant/color.dart';
@@ -54,7 +54,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
 
   void fetchChatRooms() async {
     try {
-      final fetchedChatRooms = await ApiRoom.getChatRooms(
+      final fetchedChatRooms = await ApiChatRoom.getChatRooms(
           userController.user.value,
           updateMessage,
           setLoading,

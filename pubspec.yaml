@@ -50,6 +50,12 @@ dependencies:
   firebase_database: ^11.0.3
   photo_manager: ^3.2.1
   permission_handler: ^11.3.1
+
+  flutter_map: ^5.0.0
+  latlong2: ^0.9.1
+  geolocator: ^9.0.0
+  geolocator_android: ^4.0.0
+  geocoding: ^2.0.4
   
 
 dev_dependencies:

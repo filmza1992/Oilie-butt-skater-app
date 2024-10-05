@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:oilie_butt_skater_app/components/button_image.dart';
 import 'package:oilie_butt_skater_app/components/text_custom.dart';
 import 'package:oilie_butt_skater_app/constant/color.dart';
+import 'package:oilie_butt_skater_app/pages/map/map_page.dart';
+import 'package:oilie_butt_skater_app/pages/room/public_room_page.dart';
 
 class RoomPage extends StatefulWidget {
   const RoomPage({super.key});
@@ -20,11 +23,16 @@ class _RoomPageState extends State<RoomPage>
     _tabController = TabController(length: 2, vsync: this);
   }
 
-  void navigateToFriendRoom() {}
+  void navigateToFriendRoom() {
+    Get.to(const MapPage());
+  }
 
   void navigateToJoinRoom() {}
 
-  void navigateToPublicRoom() {}
+  void navigateToPublicRoom() {
+    Get.to(const PublicRoomPage());
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
