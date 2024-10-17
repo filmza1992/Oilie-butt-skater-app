@@ -8,9 +8,10 @@ import 'package:oilie_butt_skater_app/api/api_chat_room.dart';
 import 'package:oilie_butt_skater_app/api/api_room.dart';
 import 'package:oilie_butt_skater_app/components/button_custom.dart';
 import 'package:oilie_butt_skater_app/components/text_custom.dart';
-import 'package:oilie_butt_skater_app/components/text_field_custom.dart';
-import 'package:oilie_butt_skater_app/components/text_field_date.dart';
-import 'package:oilie_butt_skater_app/components/text_field_time.dart';
+import 'package:oilie_butt_skater_app/components/textfield/text_field_custom.dart';
+import 'package:oilie_butt_skater_app/components/textfield/text_field_date.dart';
+import 'package:oilie_butt_skater_app/components/textfield/text_field_date_room.dart';
+import 'package:oilie_butt_skater_app/components/textfield/text_field_time.dart';
 import 'package:oilie_butt_skater_app/constant/color.dart';
 import 'package:oilie_butt_skater_app/controller/user_controller.dart';
 import 'package:oilie_butt_skater_app/models/room_model.dart';
@@ -122,6 +123,7 @@ class _CreateTextRoomPageState extends State<CreateTextRoomPage> {
                           TextFieldCustom(
                             hint: 'ชื่อห้อง',
                             controller: _nameController,
+                            maxLength: 30,
                             maxLines: 1,
                           ),
                           const SizedBox(
@@ -129,9 +131,11 @@ class _CreateTextRoomPageState extends State<CreateTextRoomPage> {
                           ),
                           TextFieldCustom(
                             controller: _detailController,
-                            maxLength: 30,
                             maxLines: 1,
                             hint: 'เขียนรายละเอียดโพสต์...',
+                          ),
+                          const SizedBox(
+                            height: 20,
                           ),
                           const TextCustom(
                             text: "วันเวลาที่เริ่มทำกิจกรรม",
@@ -141,7 +145,7 @@ class _CreateTextRoomPageState extends State<CreateTextRoomPage> {
                           const SizedBox(
                             height: 20,
                           ),
-                          TextFieldDateCustom(
+                          TextFieldDateRoomCustom(
                             hint: "เลือกวันที่",
                             controller: _dateController,
                             prefixIcon: const Icon(Icons.date_range),

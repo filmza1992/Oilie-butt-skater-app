@@ -59,6 +59,7 @@ dependencies:
   url_launcher: ^6.3.1
   carousel_slider: ^4.0.0
   smooth_page_indicator: ^1.2.0+3
+  
 
 dev_dependencies:
   build_runner: ^2.4.11

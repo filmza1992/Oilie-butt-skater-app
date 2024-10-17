@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_cropper/image_cropper.dart';
-import 'package:oilie_butt_skater_app/components/photo_gallery.dart';
 import 'package:oilie_butt_skater_app/components/photo_gallery_nomal.dart';
 import 'package:oilie_butt_skater_app/components/text_custom.dart';
 import 'package:oilie_butt_skater_app/constant/color.dart';
@@ -58,17 +57,14 @@ class _ImagePickerRoomState extends State<ImagePickerRoom> {
       );
 
       if (croppedImage != null) {
-        var data = {
-          'latitude': widget.data['latitude'],
-          'longitude': widget.data['longitude'],
-          'image_file': _imageFile
-        };
         setState(() {
           _imageFile = File(croppedImage.path);
-          Get.to(CreateTextRoomPage(
-            imageFile: _imageFile,
-            data: data
-          ));
+          var data = {
+            'latitude': widget.data['latitude'],
+            'longitude': widget.data['longitude'],
+            'image_file': _imageFile
+          };
+          Get.to(CreateTextRoomPage(imageFile: _imageFile, data: data));
         });
       }
     } catch (e) {
@@ -77,12 +73,13 @@ class _ImagePickerRoomState extends State<ImagePickerRoom> {
   }
 
   Future<void> _fetchImages() async {
-    var status = await Permission.photos.request();
-    if (status.isGranted) {
+    var status = await Permission.storage.status;
+    if (await Permission.manageExternalStorage.request().isGranted) {
+      print('Manage External Storage permission granted');
     } else {
-      // Handle permission denied
-      print('Permission denied');
+      print('Manage External Storage permission denied');
     }
+    var s = await Permission.photos.request();
     final PermissionState permission =
         await PhotoManager.requestPermissionExtend();
     PhotoManager.setIgnorePermissionCheck(true);

@@ -4,7 +4,7 @@ import 'package:oilie_butt_skater_app/api/api_profile.dart';
 import 'package:oilie_butt_skater_app/components/alert.dart';
 import 'package:oilie_butt_skater_app/components/button_custom.dart';
 import 'package:oilie_butt_skater_app/components/text_custom.dart';
-import 'package:oilie_butt_skater_app/components/text_field_password.dart';
+import 'package:oilie_butt_skater_app/components/textfield/text_field_password.dart';
 import 'package:oilie_butt_skater_app/constant/color.dart';
 import 'package:oilie_butt_skater_app/controller/user_controller.dart';
 import 'package:oilie_butt_skater_app/models/user.dart';

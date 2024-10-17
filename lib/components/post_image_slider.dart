@@ -30,7 +30,7 @@ class _PostImageSliderState extends State<PostImageSlider> {
   Widget build(BuildContext context) {
     return SizedBox(
       width: double.infinity,
-      height: 300, // กำหนดความสูงให้กับภาพ (ปรับได้ตามต้องการ)
+      height: 400, // กำหนดความสูงให้กับภาพ (ปรับได้ตามต้องการ)
       child: Stack(
         children: [
           PageView.builder(

@@ -3,22 +3,21 @@ import 'package:google_fonts/google_fonts.dart';
 
 // ignore: must_be_immutable
 class TextFieldDateCustom extends StatefulWidget {
-  TextFieldDateCustom({
-    key,
-    this.label,
-    required this.hint,
-    required this.controller,
-    this.textAlign,
-    this.circular,
-    this.widthSizedBox,
-    this.mainAxisAlignment,
-    this.widthText,
-    this.edgeInsets,
-    this.ob,
-    this.prefixIcon,
-    this.suffixIcon,
-    this.validator
-  });
+  TextFieldDateCustom(
+      {super.key,
+      this.label,
+      required this.hint,
+      required this.controller,
+      this.textAlign,
+      this.circular,
+      this.widthSizedBox,
+      this.mainAxisAlignment,
+      this.widthText,
+      this.edgeInsets,
+      this.ob,
+      this.prefixIcon,
+      this.suffixIcon,
+      this.validator});
 
   String? label;
   String hint;
@@ -43,7 +42,7 @@ class _TextFieldDateCustomState extends State<TextFieldDateCustom> {
       context: context,
       initialDate: DateTime.now(),
       firstDate: DateTime(1980),
-      lastDate: DateTime(2080),
+      lastDate: DateTime.now(),
     );
 
     if (picked != null) {

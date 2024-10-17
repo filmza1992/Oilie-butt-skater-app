@@ -34,10 +34,16 @@ class _CreatePostPageState extends State<CreatePostPage> {
   }
 
   Future<void> _fetchImages() async {
-    var status = await Permission.photos.request();
-    if (status.isGranted) {
-      // Handle granted permission
+    var status = await Permission.storage.status;
+    if (await Permission.manageExternalStorage.request().isGranted) {
+      print('Manage External Storage permission granted');
     } else {
+      print('Manage External Storage permission denied');
+    }
+    var s = await Permission.photos.request();
+    if (s.isGranted) {
+    } else {
+      // Handle permission denied
       print('Permission denied');
     }
     final PermissionState permission =
@@ -45,6 +51,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
     PhotoManager.setIgnorePermissionCheck(true);
 
     List<AssetPathEntity> albums = await PhotoManager.getAssetPathList();
+
     List<AssetEntity> photos =
         await albums[0].getAssetListPaged(page: 0, size: 100);
 
@@ -97,8 +104,8 @@ class _CreatePostPageState extends State<CreatePostPage> {
         backgroundColor: AppColors.backgroundColor,
       ),
       body: PhotoGallery(
-        images: images,
-        onImagesSelected: onImagesSelected, // อัปเดตฟังก์ชันนี้
+        mediaItems: images,
+        onMediaSelected: onImagesSelected, // อัปเดตฟังก์ชันนี้
         isShowButton: false,
         updateSelected: updateSelected,
       ),

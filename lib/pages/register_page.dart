@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:oilie_butt_skater_app/components/alert.dart';
-import 'package:oilie_butt_skater_app/components/text_field_date.dart';
-import 'package:oilie_butt_skater_app/components/text_field_password.dart';
+import 'package:oilie_butt_skater_app/components/textfield/text_field_date.dart';
+import 'package:oilie_butt_skater_app/components/textfield/text_field_email.dart';
+import 'package:oilie_butt_skater_app/components/textfield/text_field_password.dart';
 import 'package:oilie_butt_skater_app/pages/picker_profile_page.dart';
 
 import '../components/button_custom.dart';
 import '../components/text_custom.dart';
-import '../components/text_field_custom.dart';
+import '../components/textfield/text_field_custom.dart';
 import '../constant/color.dart';
 
 class RegisterPage extends StatefulWidget {
@@ -32,7 +33,7 @@ class _RegisterPageState extends State<RegisterPage> {
         appBar: AppBar(
           backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         ),
-        body: Container(
+        body: SizedBox(
           width: double.infinity,
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 30),
@@ -84,7 +85,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       return null;
                     },
                   ),
-                  TextFieldCustom(
+                  TextFieldEmailCustom(
                     controller: _emailController,
                     hint: 'อีเมล',
                     prefixIcon: const Icon(Icons.email_outlined),
@@ -117,7 +118,10 @@ class _RegisterPageState extends State<RegisterPage> {
                       return null;
                     },
                   ),
-                  ButtonCustom(text: "เข้าสู่ระบบ", onPressed: register,type: 'Elevated'),
+                  ButtonCustom(
+                      text: "เข้าสู่ระบบ",
+                      onPressed: register,
+                      type: 'Elevated'),
                 ],
               ),
             ),
@@ -136,7 +140,8 @@ class _RegisterPageState extends State<RegisterPage> {
       if (_passwordController.text == _confirmPController.text) {
         Get.to(PickerProfilePage(user: user));
       } else {
-         Alert().newWarning(context, 'รหัสผ่านไม่เหมือนกัน', 'กรุณากรอกรหัสผ่านให้เหมือนกัน');
+        Alert().newWarning(
+            context, 'รหัสผ่านไม่เหมือนกัน', 'กรุณากรอกรหัสผ่านให้เหมือนกัน');
       }
     } else {
       Alert().newWarning(context, 'ข้อมูลไม่ครบ', 'กรุณากรอกข้อมูลให้ครบ');

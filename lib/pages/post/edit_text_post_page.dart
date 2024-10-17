@@ -60,6 +60,7 @@ class _EditTextPostPageState extends State<EditTextPostPage> {
                   width: double.infinity,
                   child: Image.network(
                     widget.imageUrl,
+                    height: 400,
                     fit: BoxFit.cover,
                   ),
                 ),
