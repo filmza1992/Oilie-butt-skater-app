@@ -1,22 +1,22 @@
 import 'dart:io';
 
+import 'package:carousel_slider/carousel_slider.dart'; // นำเข้า carousel_slider
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:oilie_butt_skater_app/api/api_post.dart';
-import 'package:oilie_butt_skater_app/components/alert.dart';
 import 'package:oilie_butt_skater_app/components/button_custom.dart';
 import 'package:oilie_butt_skater_app/components/text_custom.dart';
 import 'package:oilie_butt_skater_app/constant/color.dart';
 import 'package:oilie_butt_skater_app/controller/user_controller.dart';
 import 'package:oilie_butt_skater_app/models/post_create_model.dart';
-import 'package:oilie_butt_skater_app/pages/home_page.dart';
 
 class CreateTextPostPage extends StatefulWidget {
   const CreateTextPostPage(
-      {super.key, required this.imageFile, required this.update});
+      {super.key, required this.imageFiles, required this.update});
 
-  final File? imageFile;
+  final List<File?> imageFiles;
   final Function update;
+
   @override
   State<CreateTextPostPage> createState() => _CreateTextPostPageState();
 }
@@ -24,6 +24,7 @@ class CreateTextPostPage extends StatefulWidget {
 class _CreateTextPostPageState extends State<CreateTextPostPage> {
   final TextEditingController _textController = TextEditingController();
   UserController userController = Get.find<UserController>();
+  int _currentIndex = 0; // สถานะเก็บตำแหน่งที่เลื่อนอยู่
 
   @override
   Widget build(BuildContext context) {
@@ -44,15 +45,30 @@ class _CreateTextPostPageState extends State<CreateTextPostPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              if (widget.imageFile != null)
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10),
-                  width: double.infinity,
-                  child: Image.file(
-                    widget.imageFile!,
-                    fit: BoxFit.cover,
-                  ),
+              // Carousel สำหรับแสดงภาพ
+              CarouselSlider.builder(
+                itemCount: widget.imageFiles.length,
+                itemBuilder: (BuildContext context, int index, int realIndex) {
+                  return Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    width: double.infinity,
+                    child: Image.file(
+                      widget.imageFiles[index]!,
+                      fit: BoxFit.cover,
+                    ),
+                  );
+                },
+                options: CarouselOptions(
+                  height: 200, // ปรับความสูงของ Carousel ตามต้องการ
+                  autoPlay: false,
+                  enlargeCenterPage: true,
+                  onPageChanged: (index, reason) {
+                    setState(() {
+                      _currentIndex = index; // อัปเดตตำแหน่งที่เลื่อนอยู่
+                    });
+                  },
                 ),
+              ),
               const SizedBox(height: 10),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -65,8 +81,23 @@ class _CreateTextPostPageState extends State<CreateTextPostPage> {
                   ),
                 ),
               ),
-              SizedBox(
-                height: 10,
+              const SizedBox(height: 10),
+              // จุดบอกตำแหน่ง
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: List.generate(widget.imageFiles.length, (index) {
+                  return Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 4),
+                    width: 8,
+                    height: 8,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: _currentIndex == index
+                          ? AppColors.secondaryColor
+                          : Colors.grey,
+                    ),
+                  );
+                }),
               ),
               Row(
                 children: [
@@ -84,7 +115,7 @@ class _CreateTextPostPageState extends State<CreateTextPostPage> {
                                   1,
                                   "tag",
                                   "create_at",
-                                  widget.imageFile),
+                                  widget.imageFiles), // ใช้ imageFiles
                               context,
                               widget.update);
                         },

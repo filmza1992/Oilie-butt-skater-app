@@ -6,6 +6,7 @@ import 'package:oilie_butt_skater_app/components/ranking_table.dart';
 import 'package:oilie_butt_skater_app/constant/color.dart';
 import 'package:oilie_butt_skater_app/controller/user_controller.dart';
 import 'package:oilie_butt_skater_app/models/response_ranking.dart';
+import 'package:oilie_butt_skater_app/models/response_ranking_all.dart';
 
 class TrophyPage extends StatefulWidget {
   const TrophyPage({super.key});
@@ -28,6 +29,9 @@ class _TrophyPageState extends State<TrophyPage> {
 
   final ScrollController _scrollController = ScrollController();
 
+  ValueNotifier<List<DataRankingAll>> dataRankingAll =
+      ValueNotifier<List<DataRankingAll>>([]);
+
   void _loadMorePosts() {
     if (!_isLoadingMore) {
       setState(() {
@@ -35,9 +39,7 @@ class _TrophyPageState extends State<TrophyPage> {
       });
       // เรียกฟังก์ชันเพื่อโหลดโพสต์เพิ่มเติม
       Future.delayed(const Duration(seconds: 1), () {
-        // เรียกฟังก์ชันเพื่อโหลดโพสต์เพิ่มเติม
-        fetchData(); // โหลดโพสต์ใหม่
-
+        fetchRankingData();
         setState(() {
           _isLoadingMore = false; // เมื่อโหลดเสร็จแล้ว ตั้งค่าเป็นไม่กำลังโหลด
         });
@@ -47,23 +49,29 @@ class _TrophyPageState extends State<TrophyPage> {
     }
   }
 
-  void fetchData() async {
-    dataUser.value = UserRanking(
-        username: "", rankPosition: "", totalLikes: "", imageUrl: '');
-    dataTop5.value.clear();
-    try {
-      final result = await ApiRanking.getRankingPostPopular(
-          userController.user.value.userId);
-      //final fetchedPosts =
+  Future<Map<String, dynamic>> fetchRankingData() async {
+    // Fetch user ranking
+    final result = await ApiRanking.getRankingPostPopular(
+        userController.user.value.userId);
+    final allRanking =
+        await ApiRanking.getAllRanking(userController.user.value.userId);
 
-      setState(() {
-        dataTop5.value = result.top5Rankings;
-        dataUser.value = result.userRanking;
-        month = result.month;
-      });
-    } catch (e) {
-      print('Error fetching chat rooms: $e');
-    }
+    return {
+      'userRanking': result.userRanking,
+      'top5Rankings': result.top5Rankings,
+      'allRanking': allRanking,
+      'month': result.month,
+    };
+  }
+
+  String selectedMonth = "";
+  void updateDataForSelectedMonth() {
+    // ค้นหา DataRankingAll ที่ตรงกับเดือนที่เลือก
+    setState(() {
+      if (dataRankingAll.value.isNotEmpty) {
+        selectedMonth = dataRankingAll.value.first.month;
+      }
+    });
   }
 
   Future<void> _refreshPosts() async {
@@ -95,24 +103,40 @@ class _TrophyPageState extends State<TrophyPage> {
         surfaceTintColor: AppColors.backgroundColor,
         automaticallyImplyLeading: false,
       ),
-      body: ValueListenableBuilder(
-        valueListenable: dataTop5,
-        builder: (context, value, child) {
+      body: FutureBuilder<Map<String, dynamic>>(
+        future: fetchRankingData(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          } else if (!snapshot.hasData || snapshot.data == null) {
+            return const Center(child: Text('No Data Found'));
+          }
+
+          final data = snapshot.data!;
+          final userRanking = data['userRanking'] as UserRanking;
+          final top5Rankings = data['top5Rankings'] as List<Top5Ranking>;
+          final month = data['month'] as String;
+          final allRanking = data['allRanking'] as List<DataRankingAll>;
+
           return RefreshIndicator(
-            onRefresh: _refreshPosts,
+            onRefresh: () async {
+              setState(() {});
+            },
             child: ListView(
-              controller: _scrollController,
               children: [
                 Rankingbackground(
-                  amount: dataUser.value.totalLikes,
+                  amount: userRanking.totalLikes,
                   month: month,
                   child: Padding(
                     padding: const EdgeInsets.symmetric(
                         vertical: 3.0, horizontal: 20),
                     child: RankingTable(
                       text: "Popular Player",
-                      users: dataTop5.value,
-                      user: dataUser.value,
+                      users: top5Rankings,
+                      user: userRanking,
+                      dataRankingAll: allRanking,
                     ),
                   ),
                 ),

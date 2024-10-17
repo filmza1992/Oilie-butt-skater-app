@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:oilie_butt_skater_app/api/api_post.dart';
 import 'package:oilie_butt_skater_app/api/api_search.dart';
 import 'package:oilie_butt_skater_app/components/post.dart';
 import 'package:oilie_butt_skater_app/constant/color.dart';
@@ -10,7 +9,8 @@ import 'package:oilie_butt_skater_app/models/post_model.dart';
 class TagPostPage extends StatefulWidget {
   const TagPostPage({
     super.key,
-    required this.tag, required this.loadMorePosts,
+    required this.tag,
+    required this.loadMorePosts,
   });
   final String tag;
   final Function loadMorePosts;
@@ -97,6 +97,7 @@ class _TagPostPageState extends State<TagPostPage> {
                 itemBuilder: (context, index) {
                   final post = value[index];
                   return PostComponent(
+                    key: ValueKey(post),
                     userId: post.userId,
                     postId: post.postId,
                     username: post.username,

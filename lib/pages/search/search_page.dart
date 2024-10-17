@@ -7,9 +7,9 @@ import 'package:oilie_butt_skater_app/components/profile_detail.dart';
 import 'package:oilie_butt_skater_app/components/text_custom.dart';
 import 'package:oilie_butt_skater_app/constant/color.dart';
 import 'package:oilie_butt_skater_app/controller/user_controller.dart';
-import 'package:oilie_butt_skater_app/models/response.search_tag.dart';
 import 'package:oilie_butt_skater_app/models/response_search_post.dart';
 import 'package:oilie_butt_skater_app/models/response_search_profile.dart';
+import 'package:oilie_butt_skater_app/models/response_search_tag.dart';
 import 'package:oilie_butt_skater_app/pages/post/tag_post_page.dart';
 import 'package:oilie_butt_skater_app/pages/profile/target_page.dart';
 
@@ -25,9 +25,9 @@ class _SearchPageState extends State<SearchPage>
     with SingleTickerProviderStateMixin {
   bool isLoading = true;
 
- UserController userController = Get.find<UserController>();
+  UserController userController = Get.find<UserController>();
   dynamic user;
-  
+
   TextEditingController searchController = TextEditingController();
   ValueNotifier<String> searchQuery = ValueNotifier<String>('');
   ValueNotifier<DataSearchUser> dataUser =
@@ -47,7 +47,7 @@ class _SearchPageState extends State<SearchPage>
     }
 
     // ตั้ง Timer ใหม่เมื่อมีการเปลี่ยนแปลงข้อความ
-    _debounce = Timer(const Duration(milliseconds: 500), () {
+    _debounce = Timer(const Duration(milliseconds: 100), () {
       filter(text); // ยิงคำขอค้นหาเมื่อครบกำหนดเวลา 500ms
     });
   }
@@ -58,7 +58,7 @@ class _SearchPageState extends State<SearchPage>
     }
     if (_tabController.index == 0) {
       try {
-        final d = await ApiSearch.getUsers(text);
+        final d = await ApiSearch.getUsers(text, user.userId);
         setState(() {
           dataUser.value = d;
         });
@@ -93,7 +93,7 @@ class _SearchPageState extends State<SearchPage>
       onSearchChanged(searchQuery.value);
     });
 
-     user = userController.user.value;
+    user = userController.user.value;
   }
 
   @override
@@ -207,7 +207,10 @@ class _SearchPageState extends State<SearchPage>
                               final tag = dataTag.value.tags[index];
                               return GestureDetector(
                                 onTap: () {
-                                  Get.to(TagPostPage(tag: tag.tag,loadMorePosts: widget.loadMorePosts,));
+                                  Get.to(TagPostPage(
+                                    tag: tag.tag,
+                                    loadMorePosts: widget.loadMorePosts,
+                                  ));
                                 },
                                 child: Card(
                                   child: ListTile(

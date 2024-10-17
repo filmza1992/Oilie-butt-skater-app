@@ -18,4 +18,12 @@ class DateTimeUtil {
     print(dateTime);
     return DateFormat(format).format(dateTime);
   }
+
+  static String formatDate(DateTime? dateTime) {
+    return DateFormat('วันที่ dd-MM-yyyy').format(dateTime!.toLocal());
+  }
+
+  static String formatTime(DateTime? dateTime) {
+    return DateFormat('เวลา HH:mm').format(dateTime!.toLocal());
+  }
 }

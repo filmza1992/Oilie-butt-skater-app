@@ -4,12 +4,16 @@ class Chat {
   final String createAt;
   final String? text;
   final String? url;
+  final double? latitude;
+  final double? longitude;
   final int type;
   final String userType;
   final UserChat user;
 
   Chat(
-      {this.url,
+      {this.latitude,
+      this.longitude,
+      this.url,
       this.text,
       required this.createAt,
       required this.type,
@@ -30,6 +34,15 @@ class Chat {
       return Chat(
         createAt: data['create_at'],
         url: data['url'],
+        type: data['type'],
+        userType: userType,
+        user: user,
+      );
+    } else if (data['type'] == 3) {
+      return Chat(
+        createAt: data['create_at'],
+        latitude: data['latitude'],
+        longitude: data['longitude'],
         type: data['type'],
         userType: userType,
         user: user,

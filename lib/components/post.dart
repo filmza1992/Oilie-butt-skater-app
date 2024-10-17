@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:oilie_butt_skater_app/api/api_post.dart';
+import 'package:oilie_butt_skater_app/components/post_image_slider.dart';
 import 'package:oilie_butt_skater_app/components/profile_post.dart';
+import 'package:oilie_butt_skater_app/components/tag_text.dart';
+import 'package:oilie_butt_skater_app/components/text_custom.dart';
 import 'package:oilie_butt_skater_app/constant/color.dart';
 import 'package:oilie_butt_skater_app/controller/user_controller.dart';
 import 'package:oilie_butt_skater_app/pages/comment/comment.dart';
+import 'package:oilie_butt_skater_app/pages/post/edit_text_post_page.dart';
 
 class PostComponent extends StatefulWidget {
   final String userId;
@@ -15,10 +19,11 @@ class PostComponent extends StatefulWidget {
   final int likes;
   final int dislikes;
   final int comments;
-  final String content;
+  final List<String> content;
   final int status;
   final Function updateStatus;
   final dynamic user;
+
   const PostComponent(
       {super.key,
       required this.userId,
@@ -47,6 +52,7 @@ class _PostComponentState extends State<PostComponent> {
   int comments = 0;
 
   UserController userController = Get.find<UserController>();
+  dynamic user;
 
   void updateCommentCount(int number) {
     if (number != -1) {
@@ -74,151 +80,211 @@ class _PostComponentState extends State<PostComponent> {
     } else if (widget.status == -1) {
       isDisliked = true;
     }
+    user = userController.user.value;
   }
+
+  bool visible = true;
+  double opacity = 1.0; // สถานะความโปร่งใสของ Card
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(10),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                ProfilePost(
-                  username: widget.username,
-                  userImage: widget.userImage,
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
-                // Post Text
-                Text(widget.postText),
-              ],
-            ),
-          ),
-          // Username
-
-          const SizedBox(height: 10.0),
-          SizedBox(
-            width: double.infinity,
-            child: Image.network(
-              widget.content,
-              fit: BoxFit.cover,
-            ),
-          ),
-
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  children: [
-                    SizedBox(
-                      height: 35,
-                      child: IconButton(
-                        icon: Icon(
-                          isLiked ? Icons.thumb_up : Icons.thumb_up_outlined,
-                          color:
-                              isLiked ? AppColors.primaryColor : Colors.white,
+    return AnimatedOpacity(
+      opacity: opacity, // กำหนดความโปร่งใส
+      duration:
+          const Duration(milliseconds: 250), // ระยะเวลาที่ใช้ในการแอนิเมชัน
+      child: visible
+          ? SizedBox(
+              width: double.infinity,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(10),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            ProfilePost(
+                              username: widget.username,
+                              userImage: widget.userImage,
+                            ),
+                            if (user.userId == widget.userId) ...[
+                              PopupMenuButton<String>(
+                                icon:
+                                    const Icon(Icons.more_vert), // ไอคอน 3 จุด
+                                onSelected: (value) {
+                                  // จัดการตามตัวเลือกที่ผู้ใช้เลือก
+                                  if (value == 'edit') {
+                                    // ดำเนินการแก้ไขโพสต์
+                                    print("แก้ไขโพสต์");
+                                    Get.to(EditTextPostPage(
+                                      postId: widget.postId.toString(),
+                                      imageUrl: widget.content[0],
+                                      update: (value) {},
+                                      text: widget.postText,
+                                    ));
+                                    // ใส่โค้ดสำหรับแก้ไขโพสต์ที่นี่
+                                  } else if (value == 'delete') {
+                                    // ดำเนินการลบโพสต์
+                                    ApiPost.deletePost(
+                                        widget.postId.toString(), user.userId);
+                                    print("ลบโพสต์");
+                                    setState(() {
+                                      opacity = 0.0; // เปลี่ยนความโปร่งใสเป็น 0
+                                      visible = false;
+                                    });
+                                    // ใส่โค้ดสำหรับลบโพสต์ที่นี่
+                                  }
+                                },
+                                itemBuilder: (BuildContext context) =>
+                                    <PopupMenuEntry<String>>[
+                                  const PopupMenuItem<String>(
+                                    value: 'edit',
+                                    child: TextCustom(
+                                      text: 'แก้ไข',
+                                      size: 15,
+                                      color: AppColors.textColor,
+                                    ),
+                                  ),
+                                  const PopupMenuItem<String>(
+                                    value: 'delete',
+                                    child: TextCustom(
+                                      text: 'ลบ',
+                                      size: 15,
+                                      color: AppColors.textColor,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ],
                         ),
-                        onPressed: () async {
-                          setState(() {
-                            if (isDisliked) {
-                              isDisliked = !isDisliked;
-                              dislikes--;
-                            }
-                            isLiked = !isLiked;
-                            if (isLiked) {
-                              likes++;
-                              widget.updateStatus(1, likes, dislikes);
-                            } else {
-                              likes--;
-                              widget.updateStatus(0, likes, dislikes);
-                            }
-                          });
-                          if (isLiked) {
-                            await ApiPost.updatePostInteraction(
-                                userController.user.value.userId,
-                                widget.postId,
-                                1);
-                          } else {
-                            await ApiPost.updatePostInteraction(
-                                userController.user.value.userId,
-                                widget.postId,
-                                0);
-                          }
-                        },
-                      ),
-                    ),
-                    Text('$likes'),
-                  ],
-                ),
-                CommentPage(
-                    postId: widget.postId,
-                    comments: comments,
-                    user: widget.user,
-                    updateCommentCount: updateCommentCount),
-                Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    SizedBox(
-                      height: 35,
-                      child: IconButton(
-                        icon: Icon(
-                          isDisliked
-                              ? Icons.thumb_down
-                              : Icons.thumb_down_outlined,
-                          color: isDisliked
-                              ? AppColors.primaryColor
-                              : Colors.white,
+                        const SizedBox(
+                          height: 20,
                         ),
-                        onPressed: () async {
-                          setState(() {
-                            if (isLiked) {
-                              isLiked = !isLiked;
-                              likes--;
-                            }
-                            isDisliked = !isDisliked;
-                            if (isDisliked) {
-                              dislikes++;
-                              widget.updateStatus(-1, likes, dislikes);
-                            } else {
-                              dislikes--;
-                              widget.updateStatus(0, likes, dislikes);
-                            }
-                          });
-                          if (isDisliked) {
-                            await ApiPost.updatePostInteraction(
-                                userController.user.value.userId,
-                                widget.postId,
-                                -1);
-                          } else {
-                            await ApiPost.updatePostInteraction(
-                                userController.user.value.userId,
-                                widget.postId,
-                                0);
-                          }
-                        },
-                      ),
+                        // Post Text
+                        widget.postText != ""
+                            ? TagText(postText: widget.postText)
+                            : const SizedBox.shrink(),
+                      ],
                     ),
-                    Text('$dislikes'),
-                  ],
-                ),
-              ],
-            ),
-          ),
-
-          const Divider(
-            color: Color.fromARGB(255, 158, 158, 158),
-          ),
-          const SizedBox(height: 10.0),
-        ],
-      ),
+                  ),
+                  PostImageSlider(content: widget.content),
+                  Padding(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Column(
+                          children: [
+                            SizedBox(
+                              height: 35,
+                              child: IconButton(
+                                icon: Icon(
+                                  isLiked
+                                      ? Icons.thumb_up
+                                      : Icons.thumb_up_outlined,
+                                  color: isLiked
+                                      ? AppColors.primaryColor
+                                      : Colors.white,
+                                ),
+                                onPressed: () async {
+                                  setState(() {
+                                    if (isDisliked) {
+                                      isDisliked = !isDisliked;
+                                      dislikes--;
+                                    }
+                                    isLiked = !isLiked;
+                                    if (isLiked) {
+                                      likes++;
+                                      widget.updateStatus(1, likes, dislikes);
+                                    } else {
+                                      likes--;
+                                      widget.updateStatus(0, likes, dislikes);
+                                    }
+                                  });
+                                  if (isLiked) {
+                                    await ApiPost.updatePostInteraction(
+                                        userController.user.value.userId,
+                                        widget.postId,
+                                        1);
+                                  } else {
+                                    await ApiPost.updatePostInteraction(
+                                        userController.user.value.userId,
+                                        widget.postId,
+                                        0);
+                                  }
+                                },
+                              ),
+                            ),
+                            Text('$likes'),
+                          ],
+                        ),
+                        CommentPage(
+                            postId: widget.postId,
+                            comments: comments,
+                            user: widget.user,
+                            updateCommentCount: updateCommentCount),
+                        Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            SizedBox(
+                              height: 35,
+                              child: IconButton(
+                                icon: Icon(
+                                  isDisliked
+                                      ? Icons.thumb_down
+                                      : Icons.thumb_down_outlined,
+                                  color: isDisliked
+                                      ? AppColors.primaryColor
+                                      : Colors.white,
+                                ),
+                                onPressed: () async {
+                                  setState(() {
+                                    if (isLiked) {
+                                      isLiked = !isLiked;
+                                      likes--;
+                                    }
+                                    isDisliked = !isDisliked;
+                                    if (isDisliked) {
+                                      dislikes++;
+                                      widget.updateStatus(-1, likes, dislikes);
+                                    } else {
+                                      dislikes--;
+                                      widget.updateStatus(0, likes, dislikes);
+                                    }
+                                  });
+                                  if (isDisliked) {
+                                    await ApiPost.updatePostInteraction(
+                                        userController.user.value.userId,
+                                        widget.postId,
+                                        -1);
+                                  } else {
+                                    await ApiPost.updatePostInteraction(
+                                        userController.user.value.userId,
+                                        widget.postId,
+                                        0);
+                                  }
+                                },
+                              ),
+                            ),
+                            Text('$dislikes'),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  const Divider(
+                    color: Color.fromARGB(255, 158, 158, 158),
+                  ),
+                  const SizedBox(height: 10.0),
+                ],
+              ),
+            )
+          : const SizedBox.shrink(),
     );
   }
 }

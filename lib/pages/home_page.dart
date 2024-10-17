@@ -7,6 +7,7 @@ import 'package:oilie_butt_skater_app/constant/color.dart';
 import 'package:oilie_butt_skater_app/controller/user_controller.dart';
 import 'package:oilie_butt_skater_app/models/post_model.dart';
 import 'package:oilie_butt_skater_app/pages/chat/chat_room.dart';
+import 'package:oilie_butt_skater_app/pages/noitfication/notification_page.dart';
 import 'package:oilie_butt_skater_app/pages/post/create_post_page.dart';
 import 'package:oilie_butt_skater_app/pages/profile/profile_page.dart';
 import 'package:oilie_butt_skater_app/pages/room/room_page.dart';
@@ -14,7 +15,8 @@ import 'package:oilie_butt_skater_app/pages/search/search_page.dart';
 import 'package:oilie_butt_skater_app/pages/trophy_page.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  const HomePage({super.key, this.selectedIndex});
+  final int? selectedIndex;
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -81,7 +83,10 @@ class _HomePageState extends State<HomePage> {
             child: RoomPage(),
           ),
           Center(child: page()),
-          const Center(child: Text('Notifications Page')),
+          Center(
+              child: NotificationPage(
+            loadMorePosts: _loadMorePosts,
+          )),
           if (_selectedIndex == 4)
             Center(
                 child: ProfilePage(
@@ -132,7 +137,6 @@ class _HomePageState extends State<HomePage> {
     try {
       final newPost = await ApiPost.getFeed(userController.user.value.userId);
       //final fetchedPosts =
-      await ApiPost.getAllPost(userController.user.value.userId);
       setState(() {
         posts.value = newPost;
       });
@@ -155,6 +159,7 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
+    _selectedIndex = widget.selectedIndex ?? 2;
     _loadMorePosts();
     _scrollController.addListener(() {
       if (_scrollController.position.pixels ==
@@ -165,103 +170,111 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget page() {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: AppColors.backgroundColor,
-        surfaceTintColor: AppColors.backgroundColor,
-        automaticallyImplyLeading: false,
-        actions: [
-          IconButton(
+    return PopScope(
+      canPop: false,
+      child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: AppColors.backgroundColor,
+          surfaceTintColor: AppColors.backgroundColor,
+          automaticallyImplyLeading: false,
+          actions: [
+            IconButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => SearchPage(
+                              loadMorePosts: _loadMorePosts,
+                            )),
+                  );
+                },
+                icon: const Icon(Icons.search)),
+            IconButton(
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                      builder: (context) => SearchPage(
-                            loadMorePosts: _loadMorePosts,
-                          )),
+                  MaterialPageRoute(builder: (context) => const ChatRoomPage()),
                 );
               },
-              icon: const Icon(Icons.search)),
-          IconButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const ChatRoomPage()),
-              );
-            },
-            icon: SvgPicture.asset(
-              'assets/icons/chatbubble-ellipses-outline.svg',
-              fit: BoxFit.cover,
-              width: 25,
-              height: 25,
-              color: Colors.white,
-            ),
-          ),
-        ],
-      ),
-      body: _isLoadingMore
-          ? const Center(
-              child: CircularProgressIndicator(), // แสดง loading ขณะโหลดข้อมูล
-            )
-          : Center(
-              child: ValueListenableBuilder(
-                valueListenable: posts,
-                builder: (context, value, child) {
-                  return RefreshIndicator(
-                    onRefresh: _refreshPosts,
-                    child: ListView.builder(
-                      itemCount: value.length,
-                      itemBuilder: (context, index) {
-                        final post = value[index];
-                        return PostComponent(
-                          userId: post.userId,
-                          postId: post.postId,
-                          username: post.username,
-                          userImage: post.userImage,
-                          postText: post.title,
-                          likes: post.likes,
-                          dislikes: post.dislikes,
-                          comments: post.comments,
-                          content: post.content,
-                          status: post.status,
-                          updateStatus: (int status, int likes, int dislikes) {
-                            setState(() {
-                              post.status = status;
-                              post.likes = likes;
-                              post.dislikes = dislikes;
-                            });
-                          },
-                          user: userController.user.value,
-                        );
-                      },
-                    ),
-                  );
-                },
+              icon: SvgPicture.asset(
+                'assets/icons/chatbubble-ellipses-outline.svg',
+                fit: BoxFit.cover,
+                width: 25,
+                height: 25,
+                color: Colors.white,
               ),
             ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // Navigate to the post creation screen
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => CreatePostPage(update: update)),
-          );
-        },
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        child: Container(
-          width: 50.0,
-          height: 50.0,
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            shape: BoxShape.circle,
-          ),
-          child: Center(
-            child: SvgPicture.asset(
-              'assets/icons/post-add.svg',
-              width: 40, // ปรับขนาดไอคอน
-              height: 40, // ปรับขนาดไอคอน
+          ],
+        ),
+        body: _isLoadingMore
+            ? const Center(
+                child:
+                    CircularProgressIndicator(), // แสดง loading ขณะโหลดข้อมูล
+              )
+            : Center(
+                child: ValueListenableBuilder(
+                  valueListenable: posts,
+                  builder: (context, value, child) {
+                    return RefreshIndicator(
+                      onRefresh: _refreshPosts,
+                      child: ListView.builder(
+                        itemCount: value.length,
+                        itemBuilder: (context, index) {
+                          final post = value[index];
+                          return PostComponent(
+                            key: ValueKey(post),
+                            userId: post.userId,
+                            postId: post.postId,
+                            username: post.username,
+                            userImage: post.userImage,
+                            postText: post.title,
+                            likes: post.likes,
+                            dislikes: post.dislikes,
+                            comments: post.comments,
+                            content: post.content,
+                            status: post.status,
+                            updateStatus:
+                                (int status, int likes, int dislikes) {
+                              setState(() {
+                                post.status = status;
+                                post.likes = likes;
+                                post.dislikes = dislikes;
+                              });
+                            },
+                            user: userController.user.value,
+                          );
+                        },
+                      ),
+                    );
+                  },
+                ),
+              ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            // Navigate to the post creation screen
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => CreatePostPage(
+                        update: update,
+                      )),
+            );
+          },
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          child: Container(
+            width: 50.0,
+            height: 50.0,
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              shape: BoxShape.circle,
+            ),
+            child: Center(
+              child: SvgPicture.asset(
+                'assets/icons/post-add.svg',
+                width: 40, // ปรับขนาดไอคอน
+                height: 40, // ปรับขนาดไอคอน
+              ),
             ),
           ),
         ),

@@ -6,8 +6,6 @@ import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:oilie_butt_skater_app/%E0%B8%B5util/firebase_upload_image_.dart';
 import 'package:oilie_butt_skater_app/components/alert.dart';
-import 'package:oilie_butt_skater_app/components/post.dart';
-import 'package:oilie_butt_skater_app/controller/post_controller.dart';
 import 'package:oilie_butt_skater_app/models/post_create_model.dart';
 import 'package:oilie_butt_skater_app/models/post_model.dart';
 import 'package:oilie_butt_skater_app/pages/home_page.dart';
@@ -43,7 +41,41 @@ class ApiPost {
       throw Exception(e);
     }
   }
-   static Future<List<Post>> getFeed(String userId) async {
+
+  static Future<List<Post>> getPostWithPostId(
+      String postId, String userId) async {
+    try {
+      final url = Uri.parse(
+          'http://${dotenv.env['SERVER_LOCAL_IP']}:${dotenv.env['SERVER_PORT_LOCAL']}/post/getByPostId/$postId/$userId');
+      print(url);
+      final response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        print('GET request successful');
+        print('Response data: ${response.body}');
+
+        final Map<String, dynamic> jsonData = json.decode(response.body);
+        if (jsonData['data'] != null) {
+          final List<Post> posts = (jsonData['data'] as List)
+              .map((postJson) => Post.fromJson(postJson))
+              .toList();
+              
+          return posts;
+        } else {
+          return [];
+        }
+      } else {
+        print('Failed to make the GET request');
+        print('Status code: ${response.statusCode}');
+        print('Response data: ${response.body}');
+        return [];
+      }
+    } catch (e) {
+      throw Exception(e);
+    }
+  }
+
+  static Future<List<Post>> getFeed(String userId) async {
     try {
       final url = Uri.parse(
           'http://${dotenv.env['SERVER_LOCAL_IP']}:${dotenv.env['SERVER_PORT_LOCAL']}/post/feed/$userId');
@@ -76,8 +108,14 @@ class ApiPost {
 
   static Future<void> addPost(PostCreate post, context, update) async {
     try {
-      Alert.loading(context);
-      String imageUrl = await uploadImageToFirebasePost(post.content);
+      List<String> imageUrls = [];
+
+      // อัปโหลดภาพทั้งหมดที่ได้รับจาก post.images
+      for (var imageFile in post.content) {
+        String imageUrl = await uploadImageToFirebasePost(imageFile);
+        imageUrls.add(imageUrl); // เก็บ URL ของแต่ละภาพ
+      }
+
       final url = Uri.parse(
           'http://${dotenv.env['SERVER_LOCAL_IP']}:${dotenv.env['SERVER_PORT_LOCAL']}/post/addPost');
       print(url);
@@ -86,11 +124,50 @@ class ApiPost {
         "title": post.title,
         "user_id": post.user_id,
         "create_at": DateTime.now().toIso8601String(),
-        "url": imageUrl,
+        "urls": imageUrls, // ส่งลิสต์ URL ของภาพ
         "type": 1
       };
 
       final response = await http.post(
+        url,
+        headers: <String, String>{
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(data),
+      );
+
+      if (response.statusCode == 200) {
+        print('Post request successful');
+        Get.to(const HomePage());
+        return;
+      } else {
+        print('Failed to make the Post request');
+        print('Status code: ${response.statusCode}');
+        print('Response data: ${response.body}');
+        Alert.error(context);
+        Navigator.pop(context);
+        Get.to(const HomePage());
+        return;
+      }
+    } catch (e) {
+      throw Exception(e);
+    }
+  }
+
+  static Future<void> updatePost(
+      PostCreate post, context, update, String postId) async {
+    try {
+      final url = Uri.parse(
+          'http://${dotenv.env['SERVER_LOCAL_IP']}:${dotenv.env['SERVER_PORT_LOCAL']}/post/update/$postId');
+      print(url);
+
+      final data = {
+        "title": post.title,
+        "user_id": post.user_id,
+        "post_id": postId
+      };
+
+      final response = await http.put(
         url,
         headers: <String, String>{
           'Content-Type':
@@ -100,16 +177,8 @@ class ApiPost {
       );
 
       if (response.statusCode == 200) {
-        Navigator.pop(context);
         print('Post request successful');
-        Alert.success(
-          context,
-          () {
-            Get.back();
-            Get.back();
-            update();
-          },
-        );
+        Get.to(const HomePage());
 
         return;
       } else {
@@ -164,6 +233,42 @@ class ApiPost {
         return;
       }
     } catch (e) {
+      throw Exception(e);
+    }
+  }
+
+  static Future<void> deletePost(String postId, String userId) async {
+    try {
+      // สร้าง URL สำหรับการลบโพสต์
+      final url = Uri.parse(
+          'http://${dotenv.env['SERVER_LOCAL_IP']}:${dotenv.env['SERVER_PORT_LOCAL']}/post/delete/');
+
+      print(url);
+
+      final data = {
+        "post_id": postId,
+        "user_id": userId,
+      };
+      // ส่งคำขอ DELETE
+      final response = await http.post(
+        url,
+        headers: <String, String>{
+          'Content-Type':
+              'application/json', // Adjust the content type as needed.
+        },
+        body: jsonEncode(data),
+      );
+
+      if (response.statusCode == 200) {
+        print('DELETE request successful');
+        print('Response data: ${response.body}');
+      } else {
+        print('Failed to make the DELETE request');
+        print('Status code: ${response.statusCode}');
+        print('Response data: ${response.body}');
+      }
+    } catch (e) {
+      print('Exception occurred while deleting post: $e');
       throw Exception(e);
     }
   }

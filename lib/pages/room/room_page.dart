@@ -3,7 +3,9 @@ import 'package:get/get.dart';
 import 'package:oilie_butt_skater_app/components/button_image.dart';
 import 'package:oilie_butt_skater_app/components/text_custom.dart';
 import 'package:oilie_butt_skater_app/constant/color.dart';
-import 'package:oilie_butt_skater_app/pages/map/map_page.dart';
+import 'package:oilie_butt_skater_app/pages/room/friend_room_page.dart';
+import 'package:oilie_butt_skater_app/pages/room/history_room_page.dart';
+import 'package:oilie_butt_skater_app/pages/room/joining_room_page.dart';
 import 'package:oilie_butt_skater_app/pages/room/public_room_page.dart';
 
 class RoomPage extends StatefulWidget {
@@ -24,10 +26,12 @@ class _RoomPageState extends State<RoomPage>
   }
 
   void navigateToFriendRoom() {
-    Get.to(const MapPage());
+    Get.to(const FriendRoomPage());
   }
 
-  void navigateToJoinRoom() {}
+  void navigateToJoinRoom() {
+    Get.to(const JoiningRoomPage());
+  }
 
   void navigateToPublicRoom() {
     Get.to(const PublicRoomPage());
@@ -96,15 +100,7 @@ class _RoomPageState extends State<RoomPage>
           ),
 
           // หน้าที่สอง ประวัติการเข้าใช้
-          const Center(
-            child: Text(
-              "History Page", // ข้อความสำหรับแท็บที่สอง
-              style: TextStyle(
-                fontSize: 24,
-                color: AppColors.textColor,
-              ),
-            ),
-          ),
+          const Center(child: HistoryRoomPage()),
         ],
       ),
     );

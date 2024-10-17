@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:oilie_butt_skater_app/components/photo_gallery.dart';
+import 'package:oilie_butt_skater_app/components/photo_gallery_nomal.dart';
 import 'package:oilie_butt_skater_app/components/text_custom.dart';
 import 'package:oilie_butt_skater_app/constant/color.dart';
 import 'package:oilie_butt_skater_app/pages/room/create_text_room_page.dart';
@@ -168,7 +169,7 @@ class _ImagePickerRoomState extends State<ImagePickerRoom> {
           ),
 
           Expanded(
-            child: PhotoGallery(
+            child: PhotoGalleryNomal(
               images: images,
               onImageSelected: onImageSelected,
               isShowButton: false,

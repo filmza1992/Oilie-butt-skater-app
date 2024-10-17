@@ -16,7 +16,8 @@ class ButtonCustom extends StatelessWidget {
     this.height, // ปรับความสูง
     this.borderRadius,
     this.width, // ปรับขอบโค้ง
-    required this.type, // ระบุประเภทของปุ่ม
+    required this.type,
+    this.icon, // ระบุประเภทของปุ่ม
   });
 
   final String text;
@@ -31,6 +32,7 @@ class ButtonCustom extends StatelessWidget {
   final double? height;
   final double? borderRadius;
   final String type;
+  final IconData? icon;
 
   @override
   Widget build(BuildContext context) {
@@ -53,13 +55,28 @@ class ButtonCustom extends StatelessWidget {
         onPressed: onPressed,
         child: SizedBox(
           width: width,
-          child: Text(
-            text,
-            textAlign: textAlign ?? TextAlign.center,
-            style: GoogleFonts.kanit(
-              fontSize: fontSize,
-              color: color ?? Colors.black,
-            ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              if (icon != null) ...[
+                // เช็คว่ามีไอคอนไหม
+                Icon(
+                  icon, // ใช้ไอคอนที่ระบุ
+                  color: color ?? Colors.black, // กำหนดสีไอคอน
+                ),
+                const SizedBox(width: 8), // เว้นระยะห่างระหว่างไอคอนกับข้อความ
+              ],
+              if (text != "") ...[
+                Text(
+                  text,
+                  textAlign: textAlign ?? TextAlign.center,
+                  style: GoogleFonts.kanit(
+                    fontSize: fontSize,
+                    color: color ?? Colors.black,
+                  ),
+                ),
+              ]
+            ],
           ),
         ),
       );
@@ -67,12 +84,11 @@ class ButtonCustom extends StatelessWidget {
       return TextButton(
         style: ButtonStyle(
           minimumSize: WidgetStateProperty.all(
-            Size(minWidth ?? 100, height ?? 50),
+            Size(minWidth ?? 100, height ?? 40),
           ),
           backgroundColor: WidgetStateProperty.all(
             backgroundColor ?? Colors.transparent,
           ),
-          
           shape: WidgetStateProperty.all(
             RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(borderRadius ?? 8),
@@ -80,22 +96,36 @@ class ButtonCustom extends StatelessWidget {
           ),
         ),
         onPressed: onPressed,
-        child: Text(
-          text,
-          style: GoogleFonts.kanit(
-            fontSize: fontSize,
-            color: color ?? AppColors.primaryColor,
-          ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            if (icon != null) ...[
+              // เช็คว่ามีไอคอนไหม
+              Icon(
+                icon, // ใช้ไอคอนที่ระบุ
+                color: color ?? Colors.black, // กำหนดสีไอคอน
+              ),
+              const SizedBox(width: 8), // เว้นระยะห่างระหว่างไอคอนกับข้อความ
+            ],
+            if (text != "") ...[
+              Text(
+                text,
+                textAlign: textAlign ?? TextAlign.center,
+                style: GoogleFonts.kanit(
+                    fontSize: fontSize, color: color ?? AppColors.primaryColor),
+              ),
+            ]
+          ],
         ),
       );
     } else if (type == 'Outlined') {
       return OutlinedButton(
         style: ButtonStyle(
           minimumSize: WidgetStateProperty.all(
-            Size(minWidth ?? 100, height ?? 50),
+            Size(minWidth ?? 100, height ?? 40),
           ),
           side: WidgetStateProperty.all(
-            const BorderSide(color: AppColors.primaryColor),
+            BorderSide(color: backgroundColor ?? AppColors.primaryColor),
           ),
           shape: WidgetStateProperty.all(
             RoundedRectangleBorder(
@@ -104,12 +134,28 @@ class ButtonCustom extends StatelessWidget {
           ),
         ),
         onPressed: onPressed,
-        child: Text(
-          text,
-          style: GoogleFonts.kanit(
-            fontSize: fontSize,
-            color: color ?? AppColors.primaryColor,
-          ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            if (icon != null) ...[
+              // เช็คว่ามีไอคอนไหม
+              Icon(
+                icon, // ใช้ไอคอนที่ระบุ
+                color: color ?? Colors.black, // กำหนดสีไอคอน
+              ),
+              const SizedBox(width: 8), // เว้นระยะห่างระหว่างไอคอนกับข้อความ
+            ],
+            if (text != "") ...[
+              Text(
+                text,
+                textAlign: textAlign ?? TextAlign.center,
+                style: GoogleFonts.kanit(
+                  fontSize: fontSize,
+                  color: color ?? AppColors.primaryColor,
+                ),
+              ),
+            ]
+          ],
         ),
       );
     } else {

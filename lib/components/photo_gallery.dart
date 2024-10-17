@@ -1,27 +1,30 @@
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:oilie_butt_skater_app/components/alert.dart';
 import 'package:photo_manager/photo_manager.dart';
 
 class PhotoGallery extends StatefulWidget {
   final List<AssetEntity> images;
-  final Function(AssetEntity) onImageSelected;
+  final Function(List<AssetEntity> selectedImages)
+      onImagesSelected; // เปลี่ยนเป็นฟังก์ชันที่รองรับหลายรูปภาพ
   final bool isShowButton;
   final Function? updateSelected;
 
-  const PhotoGallery(
-      {super.key,
-      required this.images,
-      required this.onImageSelected,
-      required this.isShowButton,
-      this.updateSelected});
+  const PhotoGallery({
+    super.key,
+    required this.images,
+    required this.onImagesSelected,
+    required this.isShowButton,
+    this.updateSelected,
+  });
 
   @override
   _PhotoGalleryState createState() => _PhotoGalleryState();
 }
 
 class _PhotoGalleryState extends State<PhotoGallery> {
-  AssetEntity? selectedImage;
+  final Set<AssetEntity> selectedImages = {}; // เก็บรูปภาพที่เลือก
   final Map<String, Uint8List?> _thumbnailsCache = {};
 
   @override
@@ -50,14 +53,29 @@ class _PhotoGalleryState extends State<PhotoGallery> {
               }
 
               final thumbnailData = _thumbnailsCache[image.id];
+              final isSelected = selectedImages.contains(image);
+
               return GestureDetector(
                 onTap: () {
                   setState(() {
-                    selectedImage = image;
-                    
-                    if(widget.updateSelected != null){
+                    if (isSelected) {
+                      selectedImages.remove(image); // ถ้าเลือกแล้ว ให้ลบออก
+                    } else {
+                      if (selectedImages.length < 10) {
+                        // เพิ่มการตรวจสอบที่นี่
+                        selectedImages
+                            .add(image); // ถ้ายังไม่เลือก ให้เพิ่มเข้าไป
+                      } else {
+                        // แสดงข้อความเตือนว่าถึงจำนวนสูงสุดแล้ว
+                        Alert().newWarning(context, "ผิดพลาด",
+                            "คุณสามารถเลือกได้สูงสุด 10 รูป");
+                      }
+                    }
+
+                    if (widget.updateSelected != null) {
                       widget.updateSelected!();
-                      widget.onImageSelected(selectedImage!);
+                      widget.onImagesSelected(
+                          selectedImages.toList()); // ส่งรายชื่อภาพที่เลือก
                     }
                   });
                 },
@@ -72,7 +90,7 @@ class _PhotoGalleryState extends State<PhotoGallery> {
                       )
                     else
                       const Center(child: CircularProgressIndicator()),
-                    if (selectedImage == image)
+                    if (isSelected)
                       const Positioned(
                         right: 5,
                         top: 5,
@@ -93,9 +111,16 @@ class _PhotoGalleryState extends State<PhotoGallery> {
               Expanded(
                 child: ElevatedButton(
                   onPressed: () {
-                    widget.onImageSelected(selectedImage!);
+                    if (selectedImages.isNotEmpty) {
+                      widget.onImagesSelected(
+                          selectedImages.toList()); // ส่งรายชื่อภาพที่เลือก
+                    } else {
+                      // แจ้งเตือนถ้าไม่ได้เลือกรูป
+                      Alert()
+                          .newWarning(context, "ผิดพลาด", "โปรดเลือกรูปก่อน");
+                    }
                   },
-                  child: const Text('เลือกภาพนี้'),
+                  child: const Text('เลือกภาพที่เลือก'),
                 ),
               ),
             ],

@@ -2,8 +2,6 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:image_cropper/image_cropper.dart';
-import 'package:oilie_butt_skater_app/%E0%B8%B5util/firebase_upload_image_.dart';
 import 'package:oilie_butt_skater_app/components/photo_gallery.dart';
 import 'package:oilie_butt_skater_app/components/text_custom.dart';
 import 'package:oilie_butt_skater_app/constant/color.dart';
@@ -21,56 +19,25 @@ class CreatePostPage extends StatefulWidget {
 
 class _CreatePostPageState extends State<CreatePostPage> {
   List<AssetEntity> images = [];
-  File? _imageFile;
+  List<File?> selectedImageFiles = []; // เก็บไฟล์ภาพที่เลือก
   bool isSelected = false;
 
-  void onImageSelected(AssetEntity image) async {
-    File? imageFile = await image.file;
-    _imageFile = imageFile;
-
-    // if (imageFile != null) {
-    //   String downloadUrl = await uploadImageToFirebaseMessage(imageFile);
-    //   if (downloadUrl.isNotEmpty) {
-    //     sendImageMessage(downloadUrl);
-
-    //   }
-    // }
-  }
-
-  Future<void> cropImage(String imagePath) async {
-    try {
-      var croppedImage = await ImageCropper().cropImage(
-        sourcePath: imagePath,
-        aspectRatio: CropAspectRatio(ratioX: 1.0, ratioY: 1.0),
-        uiSettings: [
-          AndroidUiSettings(
-            toolbarColor: AppColors.backgroundColor,
-            toolbarWidgetColor: AppColors.textColor,
-            initAspectRatio: CropAspectRatioPreset.original,
-            lockAspectRatio: true,
-          ),
-        ],
-      );
-
-      if (croppedImage != null) {
-        setState(() {
-          _imageFile = File(croppedImage.path);
-          Get.to(CreateTextPostPage(
-            imageFile: _imageFile,
-            update: widget.update
-          ));
-        });
+  void onImagesSelected(List<AssetEntity> selectedImages) async {
+    selectedImageFiles.clear(); // ล้างไฟล์ภาพที่เลือกก่อนหน้า
+    for (var image in selectedImages) {
+      File? imageFile = await image.file;
+      if (imageFile != null) {
+        selectedImageFiles.add(imageFile); // เพิ่มไฟล์ภาพลงในรายการ
       }
-    } catch (e) {
-      print("Image cropper error: $e");
     }
+    updateSelected(); // อัปเดตสถานะการเลือก
   }
 
   Future<void> _fetchImages() async {
     var status = await Permission.photos.request();
     if (status.isGranted) {
+      // Handle granted permission
     } else {
-      // Handle permission denied
       print('Permission denied');
     }
     final PermissionState permission =
@@ -78,7 +45,6 @@ class _CreatePostPageState extends State<CreatePostPage> {
     PhotoManager.setIgnorePermissionCheck(true);
 
     List<AssetPathEntity> albums = await PhotoManager.getAssetPathList();
-
     List<AssetEntity> photos =
         await albums[0].getAssetListPaged(page: 0, size: 100);
 
@@ -89,13 +55,13 @@ class _CreatePostPageState extends State<CreatePostPage> {
 
   void updateSelected() {
     setState(() {
-      isSelected = true;
+      isSelected = selectedImageFiles.isNotEmpty;
+      print(isSelected);
     });
   }
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _fetchImages();
   }
@@ -115,11 +81,16 @@ class _CreatePostPageState extends State<CreatePostPage> {
             text: 'ถัดไป',
             color: AppColors.secondaryColor,
             onTap: () {
+              print(isSelected);
               if (isSelected) {
-                if (_imageFile != null) {
-                  cropImage(_imageFile!.path);
-                }
+                // ส่งไฟล์ภาพที่เลือกไปยัง CreateTextPostPage
+                print("true");
+                Get.to(CreateTextPostPage(
+                  imageFiles: selectedImageFiles,
+                  update: widget.update,
+                ));
               }
+              print("false");
             },
           ),
         ],
@@ -127,7 +98,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
       ),
       body: PhotoGallery(
         images: images,
-        onImageSelected: onImageSelected,
+        onImagesSelected: onImagesSelected, // อัปเดตฟังก์ชันนี้
         isShowButton: false,
         updateSelected: updateSelected,
       ),

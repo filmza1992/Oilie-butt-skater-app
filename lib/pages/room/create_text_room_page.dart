@@ -1,8 +1,10 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:oilie_butt_skater_app/%E0%B8%B5util/firebase_upload_image_.dart';
+import 'package:oilie_butt_skater_app/api/api_chat_room.dart';
 import 'package:oilie_butt_skater_app/api/api_room.dart';
 import 'package:oilie_butt_skater_app/components/button_custom.dart';
 import 'package:oilie_butt_skater_app/components/text_custom.dart';
@@ -188,7 +190,21 @@ class _CreateTextRoomPageState extends State<CreateTextRoomPage> {
                             };
                             print(data);
                             Room room = await ApiRoom.createRoom(data);
-                            Get.to(RoomDetailPage(room: room));
+                            var chatRoomId =
+                                await ApiChatRoom.createRoomChatRoom([
+                              {
+                                'user_id': user.userId,
+                                'username': user.username,
+                                'image_url': user.imageUrl,
+                              }
+                            ], 2, room.roomId.toString());
+                            log(chatRoomId);
+                            Get.to(RoomDetailPage(
+                              room: room,
+                              roomType: "join_room",
+                              owner: user,
+                              chatRoomId: chatRoomId,
+                            ));
                           },
                           type: 'Elevated',
                         ),

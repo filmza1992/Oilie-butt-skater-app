@@ -4,19 +4,28 @@ import 'package:oilie_butt_skater_app/api/api_room.dart';
 import 'package:oilie_butt_skater_app/api/api_user.dart';
 import 'package:oilie_butt_skater_app/components/text_custom.dart';
 import 'package:oilie_butt_skater_app/constant/color.dart';
+import 'package:oilie_butt_skater_app/controller/user_controller.dart';
 import 'package:oilie_butt_skater_app/models/room_model.dart';
 import 'package:oilie_butt_skater_app/models/user.dart';
 import 'package:oilie_butt_skater_app/pages/map/map_room_page.dart';
 import 'package:oilie_butt_skater_app/pages/room/room_detail_page.dart';
 
 class ButtonDialog extends StatefulWidget {
-  const ButtonDialog({super.key, required this.room});
+  const ButtonDialog(
+      {super.key,
+      required this.room,
+      required this.type,
+      required this.roomType});
   final Room room;
+  final String type;
+  final String roomType;
   @override
   State<ButtonDialog> createState() => _ButtonDialogState();
 }
 
 class _ButtonDialogState extends State<ButtonDialog> {
+  UserController userController = Get.find<UserController>();
+
   ValueNotifier<User> user = ValueNotifier<User>(User(
       userId: "userId",
       username: "username",
@@ -27,9 +36,15 @@ class _ButtonDialogState extends State<ButtonDialog> {
       createAt: "createAt"));
 
   // ฟังก์ชันสำหรับเข้าห้อง
-  Future<void> _enterRoom(Room room, User user) async {
-    await ApiRoom.joinRoom(room, user);
-    Get.to(RoomDetailPage(room: room));
+  Future<void> _enterRoom(Room room, User user, User owner) async {
+    if (widget.type == 'join') {
+      await ApiRoom.joinRoom(room, user);
+    }
+    Get.to(RoomDetailPage(
+      room: room,
+      roomType: widget.roomType,
+      owner: owner,
+    ));
   }
 
   String formatDateInThai(DateTime dateTime) {
@@ -58,7 +73,6 @@ class _ButtonDialogState extends State<ButtonDialog> {
   }
 
   void _showRoomDetailsDialog(Room room, User user) {
-    print(user.username);
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -122,62 +136,6 @@ class _ButtonDialogState extends State<ButtonDialog> {
                 Row(
                   children: [
                     const TextCustom(
-                      text: "เวลา",
-                      size: 13,
-                      color: AppColors.textColor,
-                    ),
-                    const SizedBox(
-                      width: 10,
-                    ),
-                    Container(
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
-                        color: AppColors.primaryColor,
-                      ),
-                      child: TextCustom(
-                        text: " ${widget.room.dateTime.hour} ",
-                        size: 13,
-                      ),
-                    ),
-                    const SizedBox(
-                      width: 10,
-                    ),
-                    const TextCustom(
-                      text: "นาฬิกา",
-                      size: 13,
-                      color: AppColors.textColor,
-                    ),
-                    const SizedBox(
-                      width: 10,
-                    ),
-                    Container(
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
-                        color: AppColors.primaryColor,
-                      ),
-                      child: TextCustom(
-                        text: " ${widget.room.dateTime.minute} ",
-                        size: 13,
-                      ),
-                    ),
-                    const SizedBox(
-                      width: 10,
-                    ),
-                    const TextCustom(
-                      text: "นาที",
-                      size: 13,
-                      color: AppColors.textColor,
-                    ),
-                  ],
-                ),
-                const SizedBox(
-                  height: 15,
-                ),
-                Row(
-                  children: [
-                    const TextCustom(
                       text: "วันที่",
                       size: 13,
                       color: AppColors.textColor,
@@ -192,9 +150,25 @@ class _ButtonDialogState extends State<ButtonDialog> {
                         color: AppColors.primaryColor,
                       ),
                       child: TextCustom(
-                        text: " ${widget.room.dateTime.day} ",
+                        text:
+                            " ${widget.room.dateTime.day} ${formatDateInThai(widget.room.dateTime)} ${widget.room.dateTime.year} ",
                         size: 13,
                       ),
+                    ),
+                    const SizedBox(
+                      width: 10,
+                    ),
+                  ],
+                ),
+                const SizedBox(
+                  height: 15,
+                ),
+                Row(
+                  children: [
+                    const TextCustom(
+                      text: "เวลา",
+                      size: 13,
+                      color: AppColors.textColor,
                     ),
                     const SizedBox(
                       width: 10,
@@ -206,23 +180,18 @@ class _ButtonDialogState extends State<ButtonDialog> {
                         color: AppColors.primaryColor,
                       ),
                       child: TextCustom(
-                        text: formatDateInThai(widget.room.dateTime),
+                        text:
+                            " ${widget.room.dateTime.hour} : ${widget.room.dateTime.minute} ",
                         size: 13,
                       ),
                     ),
                     const SizedBox(
                       width: 10,
                     ),
-                    Container(
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
-                        color: AppColors.primaryColor,
-                      ),
-                      child: TextCustom(
-                        text: " ${widget.room.dateTime.year} ",
-                        size: 13,
-                      ),
+                    const TextCustom(
+                      text: "นาที",
+                      size: 13,
+                      color: AppColors.textColor,
                     ),
                   ],
                 ),
@@ -249,7 +218,8 @@ class _ButtonDialogState extends State<ButtonDialog> {
               onPressed: () {
                 // เพิ่มฟังก์ชันที่ต้องการทำเมื่อเข้าห้อง
                 Navigator.of(context).pop(); // ปิด dialog
-                _enterRoom(room, user); // เรียกใช้ฟังก์ชันเข้าห้อง
+                _enterRoom(room, userController.user.value,
+                    user); // เรียกใช้ฟังก์ชันเข้าห้อง
               },
             ),
           ],
@@ -286,12 +256,15 @@ class _ButtonDialogState extends State<ButtonDialog> {
             height: 25, // ปรับความสูงของปุ่ม
             child: Container(
               decoration: BoxDecoration(
-                color: AppColors.primaryColor, // สีพื้นหลัง
-                borderRadius: BorderRadius.circular(10), // มุมกลม
-              ),
+                  color: AppColors.primaryColor, // สีพื้นหลัง
+                  borderRadius: BorderRadius.circular(10), // มุมกลม
+                  border: Border.all(
+                    color: const Color.fromARGB(255, 89, 89, 89),
+                    width: 2,
+                  )),
               child: TextButton(
                 style: TextButton.styleFrom(
-                  foregroundColor: Colors.white, // สีข้อความ
+                  foregroundColor: AppColors.textColor, // สีข้อความ
                   padding: EdgeInsets.zero, // ปรับให้ไม่มี padding
                 ),
                 onPressed: () {

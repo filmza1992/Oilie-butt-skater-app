@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:oilie_butt_skater_app/api/api_profile.dart';
 import 'package:oilie_butt_skater_app/components/button_custom.dart';
+import 'package:oilie_butt_skater_app/components/post_empty.dart';
 import 'package:oilie_butt_skater_app/components/profile_image.dart';
 import 'package:oilie_butt_skater_app/components/text_custom.dart';
 import 'package:oilie_butt_skater_app/constant/color.dart';
@@ -13,7 +14,8 @@ import 'package:oilie_butt_skater_app/pages/setting_page.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({
-    super.key, required this.loadMorePosts,
+    super.key,
+    required this.loadMorePosts,
   });
 
   final Function loadMorePosts;
@@ -28,6 +30,7 @@ class _ProfilePageState extends State<ProfilePage> {
   String follower = "0";
   final UserController userController = Get.find<UserController>();
   ValueNotifier<List<Post>> posts = ValueNotifier<List<Post>>([]);
+  bool isLoading = true;
 
   void fetchPosts() async {
     print('initState');
@@ -38,6 +41,7 @@ class _ProfilePageState extends State<ProfilePage> {
         posts.value = fetchedProfile.posts;
         sumLikes = fetchedProfile.sumLikes.toString();
         follower = fetchedProfile.follow.toString();
+        isLoading = false;
       });
     } catch (e) {
       print('Error fetching profile post: $e');
@@ -72,6 +76,7 @@ class _ProfilePageState extends State<ProfilePage> {
         ],
         automaticallyImplyLeading: false,
         backgroundColor: AppColors.backgroundColor,
+        surfaceTintColor: AppColors.backgroundColor,
       ),
       body: ValueListenableBuilder(
         valueListenable: posts,
@@ -149,41 +154,51 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
 
                 // 2. ส่วน GridView ด้านล่างโปรไฟล์
-                GridView.builder(
-                  shrinkWrap: true, // ทำให้ GridView ขยายตามเนื้อหา
-                  physics:
-                      const NeverScrollableScrollPhysics(), // ปิดการเลื่อนในตัว GridView
-                  padding: const EdgeInsets.all(8.0),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 3,
-                    crossAxisSpacing: 4.0,
-                    mainAxisSpacing: 4.0,
-                  ),
-                  itemCount: value.length,
-                  itemBuilder: (context, index) {
-                    final post = value[index];
-                    return InkWell(
-                      onTap: () {
-                        // เมื่อกดที่รูป จะนำไปยังหน้าถัดไปพร้อมกับส่ง index และ list ของ posts
-                        Get.to(
-                          UserPostPage(
-                            posts: value,
-                            initialIndex: index, 
-                            loadMorePosts: widget.loadMorePosts,
+                isLoading
+                    ? Center(
+                        child: Container(
+                            margin: const EdgeInsets.symmetric(vertical: 150),
+                            child:
+                                const CircularProgressIndicator()), // แสดง loading ขณะโหลดข้อมูล
+                      )
+                    : posts.value.isEmpty
+                        ? const PostEmpty()
+                        : GridView.builder(
+                            shrinkWrap: true, // ทำให้ GridView ขยายตามเนื้อหา
+                            physics:
+                                const NeverScrollableScrollPhysics(), // ปิดการเลื่อนในตัว GridView
+                            padding: const EdgeInsets.all(8.0),
+                            gridDelegate:
+                                const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 3,
+                              crossAxisSpacing: 4.0,
+                              mainAxisSpacing: 4.0,
+                            ),
+                            itemCount: value.length,
+                            itemBuilder: (context, index) {
+                              final post = value[index];
+                              return InkWell(
+                                onTap: () {
+                                  // เมื่อกดที่รูป จะนำไปยังหน้าถัดไปพร้อมกับส่ง index และ list ของ posts
+                                  Get.to(
+                                    UserPostPage(
+                                      posts: value,
+                                      initialIndex: index,
+                                      loadMorePosts: widget.loadMorePosts,
+                                    ),
+                                  );
+                                },
+                                child: Ink(
+                                  decoration: BoxDecoration(
+                                    image: DecorationImage(
+                                      image: NetworkImage(post.content[0]),
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
                           ),
-                        );
-                      },
-                      child: Ink(
-                        decoration: BoxDecoration(
-                          image: DecorationImage(
-                            image: NetworkImage(post.content),
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                ),
               ],
             ),
           );

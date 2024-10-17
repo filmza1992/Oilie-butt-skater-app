@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:firebase_database/firebase_database.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:oilie_butt_skater_app/models/chat_model.dart';
 import 'package:oilie_butt_skater_app/models/user_chat_model.dart';
 
@@ -121,6 +122,41 @@ class ApiChat {
         'create_at': DateTime.now().toIso8601String(),
         'url': url,
         'type': 2, // Assuming type 1 is for text messages
+        'user_id': userId,
+      };
+
+      // Append the new message to the array
+      messagesList.add(messageData);
+
+      // Update the messages array in Firebase
+      await messagesRef.set(messagesList);
+    } catch (e) {
+      print('Error sending message: $e');
+      throw Exception('Failed to send message');
+    }
+  }
+
+  static Future<void> sendMessageLocation(
+      String roomId, String userId, LatLng location) async {
+    try {
+      final DatabaseReference messagesRef =
+          FirebaseDatabase.instance.ref().child('chat_rooms/$roomId/messages');
+
+      // Fetch the current messages array
+      final DataSnapshot snapshot = await messagesRef.get();
+      List<dynamic> messagesList = [];
+
+      if (snapshot.value != null) {
+        messagesList = snapshot.value as List<dynamic>;
+      }
+
+      messagesList = List.from(messagesList);
+      // Create a new message object
+      Map<String, dynamic> messageData = {
+        'create_at': DateTime.now().toIso8601String(),
+        'latitude': location.latitude,
+        'longitude': location.longitude,
+        'type': 3, // Assuming type 3 is for location messages
         'user_id': userId,
       };
 

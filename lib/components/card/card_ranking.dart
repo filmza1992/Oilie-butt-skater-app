@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:oilie_butt_skater_app/components/text_custom.dart';
 import 'package:oilie_butt_skater_app/constant/color.dart';
+import 'package:oilie_butt_skater_app/controller/user_controller.dart';
 import 'package:oilie_butt_skater_app/models/response_ranking.dart';
 
 class CardRanking extends StatefulWidget {
@@ -12,6 +14,16 @@ class CardRanking extends StatefulWidget {
 }
 
 class _CardRankingState extends State<CardRanking> {
+  UserController userController = Get.find<UserController>();
+  dynamic user;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    user = userController.user.value;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -39,20 +51,26 @@ class _CardRankingState extends State<CardRanking> {
               TextCustom(
                 text: widget.user.rank.toString(),
                 size: 15,
-                color: AppColors.textColor,
+                color: widget.user.userId == user.userId
+                    ? AppColors.secondaryColor
+                    : AppColors.textColor,
               ),
               const SizedBox(width: 30), // ช่องว่างระหว่างรูปภาพกับชื่อ
               TextCustom(
                 text: widget.user.username,
                 size: 15,
-                color: AppColors.textColor,
+                color: widget.user.userId == user.userId
+                    ? AppColors.secondaryColor
+                    : AppColors.textColor,
               ),
             ],
           ),
           trailing: TextCustom(
             text: widget.user.totalLikes,
             size: 15,
-            color: AppColors.textColor,
+            color: widget.user.userId == user.userId
+                ? AppColors.secondaryColor
+                : AppColors.textColor,
           ),
         ),
       ),

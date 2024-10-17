@@ -3,13 +3,13 @@ import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:oilie_butt_skater_app/models/post_model.dart';
-import 'package:oilie_butt_skater_app/models/response.search_tag.dart';
+import 'package:oilie_butt_skater_app/models/response_search_tag.dart';
 import 'package:oilie_butt_skater_app/models/response_profile.dart';
 import 'package:oilie_butt_skater_app/models/response_search_post.dart';
 import 'package:oilie_butt_skater_app/models/response_search_profile.dart';
 
 class ApiSearch {
-  static Future<DataSearchUser> getUsers(String username) async {
+  static Future<DataSearchUser> getUsers(String username, String userId) async {
     try {
       final url = Uri.parse(
           'http://${dotenv.env['SERVER_LOCAL_IP']}:${dotenv.env['SERVER_PORT_LOCAL']}/search/getUsers/');
@@ -19,7 +19,7 @@ class ApiSearch {
             'Content-Type':
                 'application/json', // Adjust the content type as needed.
           },
-          body: jsonEncode({"username": username}));
+          body: jsonEncode({"username": username,'user_id':userId}));
 
       if (response.statusCode == 200) {
         print('Post request successful');

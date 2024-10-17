@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:oilie_butt_skater_app/api/api_chat.dart';
+import 'package:oilie_butt_skater_app/api/api_chat_room.dart';
 import 'package:oilie_butt_skater_app/api/api_follow.dart';
 import 'package:oilie_butt_skater_app/api/api_profile.dart';
-import 'package:oilie_butt_skater_app/api/api_chat_room.dart';
 import 'package:oilie_butt_skater_app/components/button_custom.dart';
 import 'package:oilie_butt_skater_app/components/profile_image.dart';
 import 'package:oilie_butt_skater_app/components/text_custom.dart';
@@ -13,6 +12,7 @@ import 'package:oilie_butt_skater_app/models/chat_room_model.dart';
 import 'package:oilie_butt_skater_app/models/post_model.dart';
 import 'package:oilie_butt_skater_app/models/user.dart';
 import 'package:oilie_butt_skater_app/pages/chat/chat_message.dart';
+import 'package:oilie_butt_skater_app/pages/post/target_post_page.dart';
 import 'package:oilie_butt_skater_app/pages/post/user_post_page.dart';
 
 class TargetProfilePage extends StatefulWidget {
@@ -240,7 +240,7 @@ class _TargetProfilePageState extends State<TargetProfilePage> {
                           onTap: () {
                             // เมื่อกดที่รูป จะนำไปยังหน้าถัดไปพร้อมกับส่ง index และ list ของ posts
                             Get.to(
-                              UserPostPage(
+                              TargetPostPage(
                                 posts: value,
                                 initialIndex: index,
                                 loadMorePosts: widget.loadMorePosts,
@@ -250,7 +250,7 @@ class _TargetProfilePageState extends State<TargetProfilePage> {
                           child: Ink(
                             decoration: BoxDecoration(
                               image: DecorationImage(
-                                image: NetworkImage(post.content),
+                                image: NetworkImage(post.content[0]),
                                 fit: BoxFit.cover,
                               ),
                             ),

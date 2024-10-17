@@ -6,8 +6,8 @@ import 'package:get/get.dart';
 import 'package:oilie_butt_skater_app/%E0%B8%B5util/firebase_upload_image_.dart';
 import 'package:oilie_butt_skater_app/api/api_chat.dart'; // Import your API file
 import 'package:oilie_butt_skater_app/api/api_chat_room.dart';
+import 'package:oilie_butt_skater_app/components/function_sheet_component.dart';
 import 'package:oilie_butt_skater_app/components/message.dart';
-import 'package:oilie_butt_skater_app/components/photo_gallery.dart';
 import 'package:oilie_butt_skater_app/components/text_custom.dart';
 import 'package:oilie_butt_skater_app/constant/color.dart';
 import 'package:oilie_butt_skater_app/controller/user_controller.dart';
@@ -19,7 +19,8 @@ class ChatMessagePage extends StatefulWidget {
       {super.key,
       required this.roomId,
       required this.users,
-      this.updateRoomId, this.fetchChatRoom});
+      this.updateRoomId,
+      this.fetchChatRoom});
 
   final String roomId;
   final dynamic users;
@@ -38,7 +39,7 @@ class _ChatMessagePageState extends State<ChatMessagePage> {
 
   String targetImage = "";
   String defaultRoomId = "";
-   StreamSubscription? messagesSubscription;
+  StreamSubscription? messagesSubscription;
   String isPrivateChat() {
     bool isPrivate = false;
     if (widget.users.length == 2) {
@@ -75,10 +76,12 @@ class _ChatMessagePageState extends State<ChatMessagePage> {
   void setSubscription(value) {
     messagesSubscription = value;
   }
+
   void fetchMessages(String roomId, String userId) async {
     try {
       if (roomId != "") {
-        await ApiChat.getMessages(roomId, userId, updateMessage, setSubscription);
+        await ApiChat.getMessages(
+            roomId, userId, updateMessage, setSubscription);
         print(messagesNotifier.value);
       } else {
         String newId = await ApiChatRoom.createRoom(widget.users, 1);
@@ -89,7 +92,8 @@ class _ChatMessagePageState extends State<ChatMessagePage> {
           }
         });
         print("roomId: $newId");
-        await ApiChat.getMessages(newId, userId, updateMessage, setSubscription);
+        await ApiChat.getMessages(
+            newId, userId, updateMessage, setSubscription);
         print(messagesNotifier.value);
       }
     } catch (e) {
@@ -123,32 +127,52 @@ class _ChatMessagePageState extends State<ChatMessagePage> {
         await ApiChat.sendMessageImage(
             defaultRoomId, userController.user.value.userId, downloadUrl);
       }
+    }else{
+      
     }
   }
 
-  void _showImagePicker(BuildContext context) {
+  void _showFunctionBottomSheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
       builder: (BuildContext context) {
-        return FractionallySizedBox(
-          heightFactor: 0.8, // กำหนดสัดส่วนความสูงของหน้าจอ
-          child: PhotoGallery(
-            images: images,
-            onImageSelected: (selectedImage) {
-              // จัดการรูปภาพที่เลือกแล้ว
-              onImageSelected(selectedImage);
-              Navigator.pop(context);
-            },
-            isShowButton: true,
+        return GestureDetector(
+          onTap: () {
+            Navigator.pop(context);
+          },
+          child: Container(
+            color: Colors.transparent,
+            child: DraggableScrollableSheet(
+              initialChildSize: 0.6,
+              minChildSize: 0.4,
+              maxChildSize: 0.9,
+              builder:
+                  (BuildContext context, ScrollController scrollController) {
+                return GestureDetector(
+                  onTap: () {},
+                  child: Container(
+                    decoration: const BoxDecoration(
+                      color: Color.fromARGB(255, 27, 27, 27),
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(20),
+                        topRight: Radius.circular(20),
+                      ),
+                    ),
+                    child: FunctionBottomSheetContent(
+                      images: images,
+                      onImageSelected: onImageSelected,
+                      roomId: defaultRoomId,
+                    ),
+                  ),
+                );
+              },
+            ),
           ),
         );
       },
-    ).then((selectedImage) {
-      if (selectedImage != null) {
-        // จัดการรูปภาพที่เลือกแล้ว
-        // sendImageMessage(selectedImage);
-      }
-    });
+    );
   }
 
   // Function to send a messagehi
@@ -174,12 +198,12 @@ class _ChatMessagePageState extends State<ChatMessagePage> {
     _fetchImages();
   }
 
-@override
-    void dispose() {
+  @override
+  void dispose() {
+    messagesSubscription?.cancel();
+    super.dispose();
+  }
 
-      messagesSubscription?.cancel();
-      super.dispose();
-    }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -196,7 +220,7 @@ class _ChatMessagePageState extends State<ChatMessagePage> {
                 }
               });
             }
-            if(widget.fetchChatRoom != null){
+            if (widget.fetchChatRoom != null) {
               widget.fetchChatRoom!();
             }
             Navigator.pop(context);
@@ -246,7 +270,7 @@ class _ChatMessagePageState extends State<ChatMessagePage> {
                         color: AppColors.primaryColor,
                       ),
                       onPressed: () {
-                        _showImagePicker(context);
+                        _showFunctionBottomSheet(context);
                       },
                     ),
                     Expanded(
