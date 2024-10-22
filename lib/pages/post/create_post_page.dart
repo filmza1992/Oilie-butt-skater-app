@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:oilie_butt_skater_app/components/photo_gallery.dart';
 import 'package:oilie_butt_skater_app/components/text_custom.dart';
+import 'package:oilie_butt_skater_app/components/video_gallery.dart';
 import 'package:oilie_butt_skater_app/constant/color.dart';
 import 'package:oilie_butt_skater_app/pages/post/create_text_post_page.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -19,15 +20,18 @@ class CreatePostPage extends StatefulWidget {
 
 class _CreatePostPageState extends State<CreatePostPage> {
   List<AssetEntity> images = [];
-  List<File?> selectedImageFiles = []; // เก็บไฟล์ภาพที่เลือก
+  List<AssetEntity> videos = [];
+  List<File?> selectedMediaFiles =
+      []; // เก็บไฟล์สื่อที่เลือก (ทั้งรูปภาพและวิดีโอ)
   bool isSelected = false;
+  bool isVideoMode = false; // สลับระหว่างรูปภาพและวิดีโอ
 
-  void onImagesSelected(List<AssetEntity> selectedImages) async {
-    selectedImageFiles.clear(); // ล้างไฟล์ภาพที่เลือกก่อนหน้า
-    for (var image in selectedImages) {
-      File? imageFile = await image.file;
-      if (imageFile != null) {
-        selectedImageFiles.add(imageFile); // เพิ่มไฟล์ภาพลงในรายการ
+  void onMediaSelected(List<AssetEntity> selectedMedia) async {
+    selectedMediaFiles.clear(); // ล้างไฟล์สื่อที่เลือกก่อนหน้า
+    for (var media in selectedMedia) {
+      File? mediaFile = await media.file;
+      if (mediaFile != null) {
+        selectedMediaFiles.add(mediaFile); // เพิ่มไฟล์สื่อลงในรายการ
       }
     }
     updateSelected(); // อัปเดตสถานะการเลือก
@@ -50,7 +54,9 @@ class _CreatePostPageState extends State<CreatePostPage> {
         await PhotoManager.requestPermissionExtend();
     PhotoManager.setIgnorePermissionCheck(true);
 
-    List<AssetPathEntity> albums = await PhotoManager.getAssetPathList();
+    List<AssetPathEntity> albums = await PhotoManager.getAssetPathList(
+      type: RequestType.image,
+    );
 
     List<AssetEntity> photos =
         await albums[0].getAssetListPaged(page: 0, size: 100);
@@ -60,9 +66,21 @@ class _CreatePostPageState extends State<CreatePostPage> {
     });
   }
 
+  Future<void> _fetchVideos() async {
+    // ดึงข้อมูลวิดีโอ
+    List<AssetPathEntity> albums = await PhotoManager.getAssetPathList(
+      type: RequestType.video,
+    );
+    List<AssetEntity> videoFiles =
+        await albums[0].getAssetListPaged(page: 0, size: 100);
+    setState(() {
+      videos = videoFiles;
+    });
+  }
+
   void updateSelected() {
     setState(() {
-      isSelected = selectedImageFiles.isNotEmpty;
+      isSelected = selectedMediaFiles.isNotEmpty;
       print(isSelected);
     });
   }
@@ -83,32 +101,60 @@ class _CreatePostPageState extends State<CreatePostPage> {
           color: Colors.grey,
         ),
         actions: [
+          IconButton(
+            icon: Icon(isVideoMode ? Icons.image : Icons.videocam),
+            onPressed: () {
+              // สลับระหว่างการเลือก "รูปภาพ" และ "วิดีโอ"
+              setState(() {
+                isVideoMode = !isVideoMode;
+                if (isVideoMode) {
+                  _fetchVideos();
+                } else {
+                  _fetchImages();
+                }
+              });
+            },
+          ),
           TextCustom(
             size: 17,
             text: 'ถัดไป',
             color: AppColors.secondaryColor,
             onTap: () {
-              print(isSelected);
               if (isSelected) {
-                // ส่งไฟล์ภาพที่เลือกไปยัง CreateTextPostPage
-                print("true");
-                Get.to(CreateTextPostPage(
-                  imageFiles: selectedImageFiles,
-                  update: widget.update,
-                ));
+                if (isVideoMode) {
+                  Get.to(CreateTextPostPage(
+                    mediaFiles: selectedMediaFiles,
+                    update: widget.update,
+                    type: "video",
+                  ));
+                } else {
+                  Get.to(CreateTextPostPage(
+                      mediaFiles: selectedMediaFiles,
+                      update: widget.update,
+                      type: "image"));
+                }
               }
-              print("false");
             },
           ),
+          const SizedBox(
+            width: 15,
+          )
         ],
         backgroundColor: AppColors.backgroundColor,
       ),
-      body: PhotoGallery(
-        mediaItems: images,
-        onMediaSelected: onImagesSelected, // อัปเดตฟังก์ชันนี้
-        isShowButton: false,
-        updateSelected: updateSelected,
-      ),
+      body: isVideoMode
+          ? VideoGallery(
+              mediaItems: videos,
+              onMediaSelected: onMediaSelected,
+              isShowButton: false,
+              updateSelected: updateSelected,
+            )
+          : PhotoGallery(
+              mediaItems: images,
+              onMediaSelected: onMediaSelected,
+              isShowButton: false,
+              updateSelected: updateSelected,
+            ),
     );
   }
 }

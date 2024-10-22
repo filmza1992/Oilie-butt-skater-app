@@ -13,8 +13,8 @@ import 'package:oilie_butt_skater_app/pages/home_page.dart';
 class ApiPost {
   static Future<List<Post>> getAllPost(String userId) async {
     try {
-      final url = Uri.parse(
-          'http://${dotenv.env['SERVER_LOCAL_IP']}:${dotenv.env['SERVER_PORT_LOCAL']}/post/getAll/$userId');
+      final url =
+          Uri.parse('${dotenv.env['SERVER_LOCAL_IP']}/post/getAll/$userId');
       print(url);
       final response = await http.get(url);
 
@@ -46,7 +46,7 @@ class ApiPost {
       String postId, String userId) async {
     try {
       final url = Uri.parse(
-          'http://${dotenv.env['SERVER_LOCAL_IP']}:${dotenv.env['SERVER_PORT_LOCAL']}/post/getByPostId/$postId/$userId');
+          '${dotenv.env['SERVER_LOCAL_IP']}/post/getByPostId/$postId/$userId');
       print(url);
       final response = await http.get(url);
 
@@ -59,7 +59,7 @@ class ApiPost {
           final List<Post> posts = (jsonData['data'] as List)
               .map((postJson) => Post.fromJson(postJson))
               .toList();
-              
+
           return posts;
         } else {
           return [];
@@ -77,8 +77,8 @@ class ApiPost {
 
   static Future<List<Post>> getFeed(String userId) async {
     try {
-      final url = Uri.parse(
-          'http://${dotenv.env['SERVER_LOCAL_IP']}:${dotenv.env['SERVER_PORT_LOCAL']}/post/feed/$userId');
+      final url =
+          Uri.parse('${dotenv.env['SERVER_LOCAL_IP']}/post/feed/$userId');
       print(url);
       final response = await http.get(url);
 
@@ -108,25 +108,48 @@ class ApiPost {
 
   static Future<void> addPost(PostCreate post, context, update) async {
     try {
-      List<String> imageUrls = [];
+      List<String> mediaUrls = [];
 
+      showDialog(
+        context: context,
+        barrierDismissible: false, // ป้องกันการปิด dialog ด้วยการกดข้างนอก
+        builder: (BuildContext context) {
+          return const Center(child: CircularProgressIndicator());
+        },
+      );
       // อัปโหลดภาพทั้งหมดที่ได้รับจาก post.images
-      for (var imageFile in post.content) {
-        String imageUrl = await uploadImageToFirebasePost(imageFile);
-        imageUrls.add(imageUrl); // เก็บ URL ของแต่ละภาพ
+      if (post.type == 2) {
+        for (var videoFile in post.content) {
+          String imageUrl = await uploadVideoToFirebasePost(videoFile);
+          mediaUrls.add(imageUrl); // เก็บ URL ของแต่ละภาพ
+        }
+      } else {
+        for (var imageFile in post.content) {
+          String imageUrl = await uploadImageToFirebasePost(imageFile);
+          mediaUrls.add(imageUrl); // เก็บ URL ของแต่ละภาพ
+        }
       }
 
-      final url = Uri.parse(
-          'http://${dotenv.env['SERVER_LOCAL_IP']}:${dotenv.env['SERVER_PORT_LOCAL']}/post/addPost');
+      final url = Uri.parse('${dotenv.env['SERVER_LOCAL_IP']}/post/addPost');
       print(url);
-
-      final data = {
-        "title": post.title,
-        "user_id": post.user_id,
-        "create_at": DateTime.now().toIso8601String(),
-        "urls": imageUrls, // ส่งลิสต์ URL ของภาพ
-        "type": 1
-      };
+      var data = {};
+      if (post.type == 2) {
+        data = {
+          "title": post.title,
+          "user_id": post.user_id,
+          "create_at": DateTime.now().toIso8601String(),
+          "urls": mediaUrls, // ส่งลิสต์ URL ของภาพ
+          "type": 2
+        };
+      } else {
+        data = {
+          "title": post.title,
+          "user_id": post.user_id,
+          "create_at": DateTime.now().toIso8601String(),
+          "urls": mediaUrls, // ส่งลิสต์ URL ของภาพ
+          "type": 1
+        };
+      }
 
       final response = await http.post(
         url,
@@ -136,6 +159,7 @@ class ApiPost {
         body: jsonEncode(data),
       );
 
+      Navigator.pop(context);
       if (response.statusCode == 200) {
         print('Post request successful');
         Get.to(const HomePage());
@@ -157,8 +181,8 @@ class ApiPost {
   static Future<void> updatePost(
       PostCreate post, context, update, String postId) async {
     try {
-      final url = Uri.parse(
-          'http://${dotenv.env['SERVER_LOCAL_IP']}:${dotenv.env['SERVER_PORT_LOCAL']}/post/update/$postId');
+      final url =
+          Uri.parse('${dotenv.env['SERVER_LOCAL_IP']}/post/update/$postId');
       print(url);
 
       final data = {
@@ -200,8 +224,8 @@ class ApiPost {
   static Future<void> updatePostInteraction(
       String userId, int postId, int status) async {
     try {
-      final url = Uri.parse(
-          'http://${dotenv.env['SERVER_LOCAL_IP']}:${dotenv.env['SERVER_PORT_LOCAL']}/post/interaction');
+      final url =
+          Uri.parse('${dotenv.env['SERVER_LOCAL_IP']}/post/interaction');
       print(url);
 
       final data = {
@@ -240,8 +264,7 @@ class ApiPost {
   static Future<void> deletePost(String postId, String userId) async {
     try {
       // สร้าง URL สำหรับการลบโพสต์
-      final url = Uri.parse(
-          'http://${dotenv.env['SERVER_LOCAL_IP']}:${dotenv.env['SERVER_PORT_LOCAL']}/post/delete/');
+      final url = Uri.parse('${dotenv.env['SERVER_LOCAL_IP']}/post/delete/');
 
       print(url);
 

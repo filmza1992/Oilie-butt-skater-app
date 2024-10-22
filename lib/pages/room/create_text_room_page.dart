@@ -9,7 +9,6 @@ import 'package:oilie_butt_skater_app/api/api_room.dart';
 import 'package:oilie_butt_skater_app/components/button_custom.dart';
 import 'package:oilie_butt_skater_app/components/text_custom.dart';
 import 'package:oilie_butt_skater_app/components/textfield/text_field_custom.dart';
-import 'package:oilie_butt_skater_app/components/textfield/text_field_date.dart';
 import 'package:oilie_butt_skater_app/components/textfield/text_field_date_room.dart';
 import 'package:oilie_butt_skater_app/components/textfield/text_field_time.dart';
 import 'package:oilie_butt_skater_app/constant/color.dart';
@@ -60,6 +59,59 @@ class _CreateTextRoomPageState extends State<CreateTextRoomPage> {
     setState(() {
       _timeController = picked;
     });
+  }
+
+  void _validateAndSubmit() async {
+    print(_timeController);
+    print(TimeOfDay.now());
+    if (_nameController.text.isEmpty) {
+      Get.snackbar('เกิดข้อผิดพลาด', 'กรุณากรอกชื่อห้อง');
+      return;
+    }
+    if (_detailController.text.isEmpty) {
+      Get.snackbar('เกิดข้อผิดพลาด', 'กรุณากรอกรายละเอียด');
+      return;
+    }
+    if (_dateController.text.isEmpty) {
+      Get.snackbar('เกิดข้อผิดพลาด', 'กรุณาเลือกวันที่');
+      return;
+    }
+    if (_timeController == TimeOfDay.now()) {
+      Get.snackbar('เกิดข้อผิดพลาด', 'กรุณาเลือกเวลา');
+      return;
+    }
+
+    String imageUrl =
+        await uploadImageToFirebaseRoom(widget.data['image_file']);
+    var data = {
+      'user_id': user.userId,
+      'name': _nameController.text,
+      'detail': _detailController.text,
+      'image_url': imageUrl,
+      'latitude': widget.data['latitude'],
+      'longitude': widget.data['longitude'],
+      'date_time': combineDateTime(_dateController.text, _timeController),
+      'status': 1,
+      'create_at': DateTime.now().toIso8601String(),
+    };
+
+    print(data);
+    Room room = await ApiRoom.createRoom(data);
+    var chatRoomId = await ApiChatRoom.createRoomChatRoom([
+      {
+        'user_id': user.userId,
+        'username': user.username,
+        'image_url': user.imageUrl,
+      }
+    ], 2, room.roomId.toString());
+
+    log(chatRoomId);
+    Get.to(RoomDetailPage(
+      room: room,
+      roomType: "join_room",
+      owner: user,
+      chatRoomId: chatRoomId,
+    ));
   }
 
   @override
@@ -177,39 +229,7 @@ class _CreateTextRoomPageState extends State<CreateTextRoomPage> {
                         child: ButtonCustom(
                           height: 30,
                           text: 'สร้างห้อง',
-                          onPressed: () async {
-                            String imageUrl = await uploadImageToFirebaseRoom(
-                                widget.data['image_file']);
-                            var data = {
-                              'user_id': user.userId,
-                              'name': _nameController.text,
-                              'detail': _detailController.text,
-                              'image_url': imageUrl,
-                              'latitude': widget.data['latitude'],
-                              'longitude': widget.data['longitude'],
-                              'date_time': combineDateTime(
-                                  _dateController.text, _timeController),
-                              'status': 1,
-                              'create_at': DateTime.now().toIso8601String(),
-                            };
-                            print(data);
-                            Room room = await ApiRoom.createRoom(data);
-                            var chatRoomId =
-                                await ApiChatRoom.createRoomChatRoom([
-                              {
-                                'user_id': user.userId,
-                                'username': user.username,
-                                'image_url': user.imageUrl,
-                              }
-                            ], 2, room.roomId.toString());
-                            log(chatRoomId);
-                            Get.to(RoomDetailPage(
-                              room: room,
-                              roomType: "join_room",
-                              owner: user,
-                              chatRoomId: chatRoomId,
-                            ));
-                          },
+                          onPressed: _validateAndSubmit,
                           type: 'Elevated',
                         ),
                       ),

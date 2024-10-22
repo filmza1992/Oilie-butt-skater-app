@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:oilie_butt_skater_app/api/api_room.dart';
 import 'package:oilie_butt_skater_app/api/api_user.dart';
@@ -7,23 +8,23 @@ import 'package:oilie_butt_skater_app/constant/color.dart';
 import 'package:oilie_butt_skater_app/controller/user_controller.dart';
 import 'package:oilie_butt_skater_app/models/room_model.dart';
 import 'package:oilie_butt_skater_app/models/user.dart';
-import 'package:oilie_butt_skater_app/pages/map/map_room_page.dart';
 import 'package:oilie_butt_skater_app/pages/room/room_detail_page.dart';
 
-class ButtonDialog extends StatefulWidget {
-  const ButtonDialog(
+class ButtonDialogMap extends StatefulWidget {
+  const ButtonDialogMap(
       {super.key,
       required this.room,
       required this.type,
       required this.roomType});
+
   final Room room;
   final String type;
   final String roomType;
   @override
-  State<ButtonDialog> createState() => _ButtonDialogState();
+  State<ButtonDialogMap> createState() => _ButtonDialogMapState();
 }
 
-class _ButtonDialogState extends State<ButtonDialog> {
+class _ButtonDialogMapState extends State<ButtonDialogMap> {
   UserController userController = Get.find<UserController>();
 
   ValueNotifier<User> user = ValueNotifier<User>(User(
@@ -78,20 +79,14 @@ class _ButtonDialogState extends State<ButtonDialog> {
       builder: (BuildContext context) {
         return AlertDialog(
           backgroundColor: Colors.black, // สีพื้นหลังของ dialog
-          title: Row(
+          title: const Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const TextCustom(
+              TextCustom(
                 text: "ห้อง",
                 size: 18,
                 color: AppColors.textColor,
               ),
-              IconButton(
-                  onPressed: () {
-                    Get.to(MapRoomPage(
-                        latitude: room.latitude, longitude: room.longitude));
-                  },
-                  icon: const Icon(Icons.location_on_outlined))
             ],
           ), //
           content: SingleChildScrollView(
@@ -248,35 +243,15 @@ class _ButtonDialogState extends State<ButtonDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder(
-        valueListenable: user,
-        builder: (context, value, child) {
-          return SizedBox(
-            width: 50,
-            height: 25, // ปรับความสูงของปุ่ม
-            child: Container(
-              decoration: BoxDecoration(
-                  color: AppColors.primaryColor, // สีพื้นหลัง
-                  borderRadius: BorderRadius.circular(10), // มุมกลม
-                  border: Border.all(
-                    color: const Color.fromARGB(255, 89, 89, 89),
-                    width: 2,
-                  )),
-              child: TextButton(
-                style: TextButton.styleFrom(
-                  foregroundColor: AppColors.textColor, // สีข้อความ
-                  padding: EdgeInsets.zero, // ปรับให้ไม่มี padding
-                ),
-                onPressed: () {
-                  _showRoomDetailsDialog(widget.room, user.value);
-                },
-                child: const TextCustom(
-                  text: "ดู",
-                  size: 11,
-                ),
-              ),
-            ),
-          );
-        });
+    return IconButton(
+      onPressed: () => _showRoomDetailsDialog(
+          widget.room, user.value), // แสดงตำแหน่งเมื่อคลิกที่ marker
+      icon: SvgPicture.asset(
+        'assets/icons/marker.svg',
+        fit: BoxFit.cover,
+        color: AppColors.primaryColor,
+      ), // ใช้ icon ของ Google Maps
+      iconSize: 60.0, // ปรับขนาด icon ที่นี่
+    );
   }
 }

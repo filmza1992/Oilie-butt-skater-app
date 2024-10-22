@@ -5,6 +5,7 @@ import 'package:oilie_butt_skater_app/constant/color.dart';
 import 'package:oilie_butt_skater_app/controller/user_controller.dart';
 import 'package:oilie_butt_skater_app/models/post_model.dart';
 import 'package:oilie_butt_skater_app/pages/home_page.dart';
+import 'package:video_player/video_player.dart';
 
 class UserPostPage extends StatefulWidget {
   final List<Post> posts; // รายการของโพสต์ทั้งหมด
@@ -25,6 +26,9 @@ class _UserPostPageState extends State<UserPostPage> {
   late ScrollController _scrollController;
   UserController userController = Get.find<UserController>();
   dynamic user;
+  final List<VideoPlayerController> _activeControllers =
+      []; // เก็บ controller ที่เล่นอยู่
+
   @override
   void initState() {
     super.initState();
@@ -33,11 +37,29 @@ class _UserPostPageState extends State<UserPostPage> {
     user = userController.user.value;
   }
 
+  void disposeAllVideos() {
+    // หยุดและ dispose controller ทั้งหมดที่เล่นอยู่
+    for (var controller in _activeControllers) {
+      if (controller.value.isPlaying) {
+        controller.pause();
+      }
+    }
+    _activeControllers.clear(); // ล้างรายการ controller
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    disposeAllVideos();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
         print("will pop");
+        disposeAllVideos();
         Get.to(const HomePage(
           selectedIndex: 4,
         ));
@@ -51,6 +73,7 @@ class _UserPostPageState extends State<UserPostPage> {
           leading: IconButton(
             icon: const Icon(Icons.arrow_back),
             onPressed: () {
+              disposeAllVideos();
               Get.to(const HomePage(
                 selectedIndex: 4,
               ));
@@ -75,6 +98,7 @@ class _UserPostPageState extends State<UserPostPage> {
                 comments: post.comments,
                 content: post.content,
                 status: post.status,
+                type: post.type,
                 updateStatus: (int status, int likes, int dislikes) {
                   setState(() {
                     post.status = status;
@@ -84,18 +108,15 @@ class _UserPostPageState extends State<UserPostPage> {
                   });
                 },
                 user: user,
-               
+                onVideoStart: (controller) {
+                  _activeControllers.add(
+                      controller); // เพิ่ม controller ที่กำลังเล่นเข้าไปใน list
+                },
               );
             },
           ),
         ),
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    _scrollController.dispose();
-    super.dispose();
   }
 }

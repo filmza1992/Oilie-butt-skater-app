@@ -171,10 +171,10 @@ class _ButtonDialogState extends State<ButtonDialogHistory> {
                         color: AppColors.primaryColor,
                       ),
                       child: TextCustom(
-                        text:
-                            " ${widget.room.dateTime.hour} : ${widget.room.dateTime.minute} ",
-                        size: 13,
-                      ),
+                                      text:
+                                          " ${widget.room.dateTime.toLocal().hour} : ${widget.room.dateTime.toLocal().minute}",
+                                      size: 13,
+                                    ), 
                     ),
                     const SizedBox(
                       width: 10,

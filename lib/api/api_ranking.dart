@@ -11,7 +11,7 @@ class ApiRanking {
   static Future<DataRanking> getRankingPostPopular(String userId) async {
     try {
       final url = Uri.parse(
-          'http://${dotenv.env['SERVER_LOCAL_IP']}:${dotenv.env['SERVER_PORT_LOCAL']}/ranking/month');
+          '${dotenv.env['SERVER_LOCAL_IP']}/ranking/month');
       print(url);
       final response = await http.post(url,
           headers: <String, String>{
@@ -42,7 +42,7 @@ class ApiRanking {
    static Future<List<DataRankingAll>> getAllRanking(String userId) async {
     try {
       final url = Uri.parse(
-          'http://${dotenv.env['SERVER_LOCAL_IP']}:${dotenv.env['SERVER_PORT_LOCAL']}/ranking/allmonth');
+          '${dotenv.env['SERVER_LOCAL_IP']}/ranking/allmonth');
       print(url);
       final response = await http.post(url,
           headers: <String, String>{

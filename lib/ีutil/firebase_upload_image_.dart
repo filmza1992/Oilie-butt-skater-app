@@ -67,6 +67,24 @@ Future<String> uploadImageToFirebasePost(File imageFile) async {
 }
 
 
+
+Future<String> uploadVideoToFirebasePost(File videoFile) async {
+  String fileName =
+      '${DateFormat('yyyyMMdd_HHmmss').format(DateTime.now())}_${videoFile.path.split('/').last}';
+
+  try {
+    final storageRef =
+        FirebaseStorage.instance.ref().child("post/$fileName");
+    await storageRef.putFile(videoFile);
+    String downloadUrl = await storageRef.getDownloadURL();
+    return downloadUrl;
+  } catch (e) {
+    print("Error uploading image: $e");
+    return '';
+  }
+}
+
+
 void sendImageMessage(String imageUrl) {
   // Your logic to send the image message, e.g., update Firebase Realtime Database or Firestore
   print("Image uploaded and message sent with URL: $imageUrl");

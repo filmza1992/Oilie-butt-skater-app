@@ -10,7 +10,7 @@ class ApiComment {
       String commentText, updateComment) async {
     try {
       final url = Uri.parse(
-          'http://${dotenv.env['SERVER_LOCAL_IP']}:${dotenv.env['SERVER_PORT_LOCAL']}/comment/$postId');
+          '${dotenv.env['SERVER_LOCAL_IP']}/comment/$postId');
       print(url);
       final response = await http.post(url,
           headers: <String, String>{
@@ -47,7 +47,7 @@ class ApiComment {
   static Future<List<Comment>> getCommentByPostId(int postId) async {
     try {
       final url = Uri.parse(
-          'http://${dotenv.env['SERVER_LOCAL_IP']}:${dotenv.env['SERVER_PORT_LOCAL']}/comment/$postId');
+          '${dotenv.env['SERVER_LOCAL_IP']}/comment/$postId');
       print(url);
       final response = await http.get(url);
 

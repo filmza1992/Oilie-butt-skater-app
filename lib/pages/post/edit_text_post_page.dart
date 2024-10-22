@@ -48,66 +48,68 @@ class _EditTextPostPageState extends State<EditTextPostPage> {
         ],
         backgroundColor: AppColors.backgroundColor,
       ),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              if (widget.imageUrl != "")
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10),
-                  width: double.infinity,
-                  child: Image.network(
-                    widget.imageUrl,
-                    height: 400,
-                    fit: BoxFit.cover,
-                  ),
-                ),
-              const SizedBox(height: 10),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 10),
-                child: TextField(
-                  controller: _textController,
-                  maxLines: 5,
-                  decoration: const InputDecoration(
-                    hintText: 'เขียนรายละเอียดโพสต์...',
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              Row(
-                children: [
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                      child: ButtonCustom(
-                        height: 30,
-                        text: 'โพสต์',
-                        onPressed: () async {
-                          await ApiPost.updatePost(
-                            PostCreate(
-                                _textController.text,
-                                userController.user.value.userId,
-                                1,
-                                "tag",
-                                "create_at",
-                                widget.imageUrl),
-                            context,
-                            widget.update,
-                            widget.postId,
-                          );
-                        },
-                        type: 'Elevated',
-                      ),
+      body: SingleChildScrollView(
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                if (widget.imageUrl != "")
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    width: double.infinity,
+                    child: Image.network(
+                      widget.imageUrl,
+                      height: 400,
+                      fit: BoxFit.cover,
                     ),
-                  )
-                ],
-              )
-            ],
+                  ),
+                const SizedBox(height: 10),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  child: TextField(
+                    controller: _textController,
+                    maxLines: 5,
+                    decoration: const InputDecoration(
+                      hintText: 'เขียนรายละเอียดโพสต์...',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                        child: ButtonCustom(
+                          height: 30,
+                          text: 'โพสต์',
+                          onPressed: () async {
+                            await ApiPost.updatePost(
+                              PostCreate(
+                                  _textController.text,
+                                  userController.user.value.userId,
+                                  1,
+                                  "tag",
+                                  "create_at",
+                                  widget.imageUrl),
+                              context,
+                              widget.update,
+                              widget.postId,
+                            );
+                          },
+                          type: 'Elevated',
+                        ),
+                      ),
+                    )
+                  ],
+                )
+              ],
+            ),
           ),
         ),
       ),

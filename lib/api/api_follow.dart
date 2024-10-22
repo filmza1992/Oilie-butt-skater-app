@@ -10,7 +10,7 @@ class ApiFollow {
   static Future<DataProfile> followUser(String userId, String targetId) async {
     try {
       final url = Uri.parse(
-          'http://${dotenv.env['SERVER_LOCAL_IP']}:${dotenv.env['SERVER_PORT_LOCAL']}/follow/following');
+          '${dotenv.env['SERVER_LOCAL_IP']}/follow/following');
       print(url);
       final response = await http.post(url,
           headers: <String, String>{
@@ -55,7 +55,7 @@ class ApiFollow {
   static Future<DataProfile> unfollowUser(String userId, String targetId) async {
     try {
       final url = Uri.parse(
-          'http://${dotenv.env['SERVER_LOCAL_IP']}:${dotenv.env['SERVER_PORT_LOCAL']}/follow/unfollowing');
+          '${dotenv.env['SERVER_LOCAL_IP']}/follow/unfollowing');
       print(url);
       final response = await http.post(url,
           headers: <String, String>{
@@ -101,7 +101,7 @@ class ApiFollow {
       String userId, String targetId,room) async {
     try {
       final url = Uri.parse(
-          'http://${dotenv.env['SERVER_LOCAL_IP']}:${dotenv.env['SERVER_PORT_LOCAL']}/follow/check/following');
+          '${dotenv.env['SERVER_LOCAL_IP']}/follow/check/following');
       print(url);
       final response = await http.post(url,
           headers: <String, String>{

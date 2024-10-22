@@ -37,6 +37,7 @@ class _JoiningRoomPageState extends State<JoiningRoomPage>
     // สร้าง ScrollController และเลื่อนไปยัง index ที่ส่งมาเมื่อเริ่มต้น
     user = userController.user.value;
     _tabController = TabController(length: 2, vsync: this);
+    
     fetchRooms();
   }
 

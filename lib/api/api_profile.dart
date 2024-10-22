@@ -11,7 +11,7 @@ class ApiProfile {
   static Future<DataProfile> getAllPost(String userId) async {
     try {
       final url = Uri.parse(
-          'http://${dotenv.env['SERVER_LOCAL_IP']}:${dotenv.env['SERVER_PORT_LOCAL']}/profile/getAll/$userId');
+          '${dotenv.env['SERVER_LOCAL_IP']}/profile/getAll/$userId');
       print(url);
       final response = await http.get(url);
 
@@ -45,7 +45,7 @@ class ApiProfile {
    static Future<DataProfile> getAllPostByUserId(String targetId, String userId) async {
     try {
       final url = Uri.parse(
-          'http://${dotenv.env['SERVER_LOCAL_IP']}:${dotenv.env['SERVER_PORT_LOCAL']}/profile/getAllByUser/$targetId/$userId');
+          '${dotenv.env['SERVER_LOCAL_IP']}/profile/getAllByUser/$targetId/$userId');
       print(url);
       final response = await http.get(url);
 
@@ -80,7 +80,7 @@ class ApiProfile {
   static Future<User> editProfile(dynamic user) async {
     try {
       final url = Uri.parse(
-          'http://${dotenv.env['SERVER_LOCAL_IP']}:${dotenv.env['SERVER_PORT_LOCAL']}/profile/edit/');
+          '${dotenv.env['SERVER_LOCAL_IP']}/profile/edit/');
 
       // สร้าง body ของ request
       final response = await http.post(
@@ -114,7 +114,7 @@ class ApiProfile {
   static Future<User> editPassword(dynamic data, context) async {
     try {
       final url = Uri.parse(
-          'http://${dotenv.env['SERVER_LOCAL_IP']}:${dotenv.env['SERVER_PORT_LOCAL']}/profile/edit/password');
+          '${dotenv.env['SERVER_LOCAL_IP']}/profile/edit/password');
 
       // สร้าง body ของ request
       final response = await http.post(
@@ -150,7 +150,7 @@ class ApiProfile {
   static Future<bool> checkPassword(userId) async {
     try {
       final url = Uri.parse(
-          'http://${dotenv.env['SERVER_LOCAL_IP']}:${dotenv.env['SERVER_PORT_LOCAL']}/profile/check-empty-password');
+          '${dotenv.env['SERVER_LOCAL_IP']}/profile/check-empty-password');
 
       // สร้าง body ของ request
       final response = await http.post(

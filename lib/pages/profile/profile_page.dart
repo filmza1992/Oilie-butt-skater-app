@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:oilie_butt_skater_app/api/api_profile.dart';
 import 'package:oilie_butt_skater_app/components/button_custom.dart';
+import 'package:oilie_butt_skater_app/components/grid_post_item.dart';
 import 'package:oilie_butt_skater_app/components/post_empty.dart';
 import 'package:oilie_butt_skater_app/components/profile_image.dart';
 import 'package:oilie_butt_skater_app/components/text_custom.dart';
@@ -177,26 +178,22 @@ class _ProfilePageState extends State<ProfilePage> {
                             itemCount: value.length,
                             itemBuilder: (context, index) {
                               final post = value[index];
+                              final contentUrl = value[index].content[0];
+                              final isVideo = post.type == 2 ? true : false;
                               return InkWell(
-                                onTap: () {
-                                  // เมื่อกดที่รูป จะนำไปยังหน้าถัดไปพร้อมกับส่ง index และ list ของ posts
-                                  Get.to(
-                                    UserPostPage(
-                                      posts: value,
-                                      initialIndex: index,
-                                      loadMorePosts: widget.loadMorePosts,
-                                    ),
-                                  );
-                                },
-                                child: Ink(
-                                  decoration: BoxDecoration(
-                                    image: DecorationImage(
-                                      image: NetworkImage(post.content[0]),
-                                      fit: BoxFit.cover,
-                                    ),
-                                  ),
-                                ),
-                              );
+                                  onTap: () {
+                                    // เมื่อกดที่รูป จะนำไปยังหน้าถัดไปพร้อมกับส่ง index และ list ของ posts
+                                    Get.to(
+                                      UserPostPage(
+                                        posts: value,
+                                        initialIndex: index,
+                                        loadMorePosts: widget.loadMorePosts,
+                                      ),
+                                    );
+                                  },
+                                  child: GridPostItem(
+                                      contentUrl: contentUrl,
+                                      isVideo: isVideo));
                             },
                           ),
               ],

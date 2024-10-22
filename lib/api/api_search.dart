@@ -12,7 +12,7 @@ class ApiSearch {
   static Future<DataSearchUser> getUsers(String username, String userId) async {
     try {
       final url = Uri.parse(
-          'http://${dotenv.env['SERVER_LOCAL_IP']}:${dotenv.env['SERVER_PORT_LOCAL']}/search/getUsers/');
+          '${dotenv.env['SERVER_LOCAL_IP']}/search/getUsers/');
       print(url);
       final response = await http.post(url,
           headers: <String, String>{
@@ -49,7 +49,7 @@ class ApiSearch {
   static Future<DataSearchPost> getPosts(String tag,String userId) async {
     try {
       final url = Uri.parse(
-          'http://${dotenv.env['SERVER_LOCAL_IP']}:${dotenv.env['SERVER_PORT_LOCAL']}/search/getPosts/');
+          '${dotenv.env['SERVER_LOCAL_IP']}/search/getPosts/');
       print(url);
       final response = await http.post(url,
           headers: <String, String>{
@@ -87,7 +87,7 @@ class ApiSearch {
   static Future<DataSearchTag> getTags(String tag) async {
     try {
       final url = Uri.parse(
-          'http://${dotenv.env['SERVER_LOCAL_IP']}:${dotenv.env['SERVER_PORT_LOCAL']}/search/getTags/');
+          '${dotenv.env['SERVER_LOCAL_IP']}/search/getTags/');
       print(url);
       final response = await http.post(url,
           headers: <String, String>{

@@ -9,7 +9,7 @@ class ApiUser {
   static Future<User?> getUserByEmail(String email) async {
     try {
       final url = Uri.parse(
-          'http://${dotenv.env['SERVER_LOCAL_IP']}:${dotenv.env['SERVER_PORT_LOCAL']}/user/getByEmail/$email');
+          '${dotenv.env['SERVER_LOCAL_IP']}/user/getByEmail/$email');
       print(url);
       final response = await http.get(url);
 
@@ -37,7 +37,7 @@ class ApiUser {
   static Future<User> getUserById(String id) async {
     try {
       final url = Uri.parse(
-          'http://${dotenv.env['SERVER_LOCAL_IP']}:${dotenv.env['SERVER_PORT_LOCAL']}/user/getById/$id');
+          '${dotenv.env['SERVER_LOCAL_IP']}/user/getById/$id');
       final response = await http.get(
         url,
         headers: <String, String>{

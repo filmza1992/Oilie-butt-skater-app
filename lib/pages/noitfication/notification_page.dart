@@ -18,11 +18,13 @@ class NotificationPage extends StatefulWidget {
 class _NotificationPageState extends State<NotificationPage> {
   UserController userController = Get.find<UserController>();
   dynamic user;
+  Future<List<DataNotification>>? _notificationsFuture;
 
   @override
   void initState() {
     super.initState();
     user = userController.user.value;
+    _notificationsFuture = fetchNotifications();
   }
 
   Future<List<DataNotification>> fetchNotifications() async {
@@ -33,7 +35,10 @@ class _NotificationPageState extends State<NotificationPage> {
   }
 
   Future<void> _refreshNotifications() async {
-    setState(() {});
+    setState(() {
+      // ทำการรีเฟรชข้อมูลจาก API อีกครั้ง
+      _notificationsFuture = fetchNotifications();
+    });
   }
 
   @override
@@ -45,14 +50,22 @@ class _NotificationPageState extends State<NotificationPage> {
         automaticallyImplyLeading: false,
       ),
       body: FutureBuilder<List<DataNotification>>(
-        future: fetchNotifications(),
+        future: _notificationsFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const NotificationEmpty();
+            // กรณีที่ไม่มีข้อมูลแจ้งเตือน
+            return RefreshIndicator(
+              onRefresh: _refreshNotifications, // เพิ่ม RefreshIndicator
+              child: ListView(
+                children: const [
+                  NotificationEmpty(),
+                ],
+              ),
+            );
           } else {
             final notifications = snapshot.data!;
 

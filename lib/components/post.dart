@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:oilie_butt_skater_app/api/api_post.dart';
@@ -5,10 +7,12 @@ import 'package:oilie_butt_skater_app/components/post_image_slider.dart';
 import 'package:oilie_butt_skater_app/components/profile_post.dart';
 import 'package:oilie_butt_skater_app/components/tag_text.dart';
 import 'package:oilie_butt_skater_app/components/text_custom.dart';
+import 'package:oilie_butt_skater_app/components/video_player_widget.dart';
 import 'package:oilie_butt_skater_app/constant/color.dart';
 import 'package:oilie_butt_skater_app/controller/user_controller.dart';
 import 'package:oilie_butt_skater_app/pages/comment/comment.dart';
 import 'package:oilie_butt_skater_app/pages/post/edit_text_post_page.dart';
+import 'package:video_player/video_player.dart';
 
 class PostComponent extends StatefulWidget {
   final String userId;
@@ -23,6 +27,8 @@ class PostComponent extends StatefulWidget {
   final int status;
   final Function updateStatus;
   final dynamic user;
+  final int type;
+  final Function(VideoPlayerController controller) onVideoStart;
 
   const PostComponent(
       {super.key,
@@ -37,7 +43,9 @@ class PostComponent extends StatefulWidget {
       required this.content,
       required this.status,
       required this.updateStatus,
-      required this.user});
+      required this.user,
+      required this.type,
+      required this.onVideoStart});
 
   @override
   State<PostComponent> createState() => _PostComponentState();
@@ -53,6 +61,9 @@ class _PostComponentState extends State<PostComponent> {
 
   UserController userController = Get.find<UserController>();
   dynamic user;
+
+  VideoPlayerController? _videoController;
+  bool _videoDownloadFailed = false;
 
   void updateCommentCount(int number) {
     if (number != -1) {
@@ -81,6 +92,41 @@ class _PostComponentState extends State<PostComponent> {
       isDisliked = true;
     }
     user = userController.user.value;
+    if (widget.type == 2) {
+      log(widget.content[0]);
+      _initializeVideoPlayer(widget.content[0]); // ใช้ URL สำหรับวิดีโอ
+    }
+  }
+
+  void _initializeVideoPlayer(String videoUrl) {
+    _videoController = VideoPlayerController.network(videoUrl)
+      ..initialize().then((_) {
+        // ไม่เรียก play() ที่นี่ เพื่อไม่ให้เล่นอัตโนมัติ
+        setState(() {
+          widget.onVideoStart(
+              _videoController!); // ส่ง controller ไปยัง home เพื่อจัดการ
+        });
+      }).catchError((error) {
+        if (mounted) {
+          setState(() {
+            _videoDownloadFailed = true; // ถ้าวิดีโอโหลดไม่สำเร็จ
+          });
+        }
+      });
+  }
+
+  void _onPlayPause() {
+    setState(() {
+      _videoController!.value.isPlaying
+          ? _videoController!.pause()
+          : _videoController!.play();
+    });
+  }
+
+  @override
+  void dispose() {
+    _videoController?.dispose();
+    super.dispose();
   }
 
   bool visible = true;
@@ -171,7 +217,27 @@ class _PostComponentState extends State<PostComponent> {
                       ],
                     ),
                   ),
-                  PostImageSlider(content: widget.content),
+                  if (widget.type == 1) ...[
+                    PostImageSlider(content: widget.content),
+                  ],
+                  if (widget.type == 2) ...[
+                    _videoDownloadFailed
+                        ? const Text("ไม่สามารถดาวน์โหลดวิดีโอได้")
+                        : _videoController != null &&
+                                _videoController!.value.isInitialized
+                            ? VideoPlayerWidget(
+                                controller: _videoController!,
+                                onPlayPause: _onPlayPause)
+                            : const Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  SizedBox(
+                                    height: 150,
+                                  ),
+                                  CircularProgressIndicator(),
+                                ],
+                              ),
+                  ],
                   Padding(
                     padding:
                         const EdgeInsets.symmetric(horizontal: 10, vertical: 0),

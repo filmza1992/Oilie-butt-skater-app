@@ -33,96 +33,116 @@ class _RegisterPageState extends State<RegisterPage> {
         appBar: AppBar(
           backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         ),
-        body: SizedBox(
-          width: double.infinity,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 30),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  const Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Column(
-                        children: [
-                          TextCustom(
-                            text: "สร้างบัญชี",
-                            size: 20,
-                            color: AppColors.primaryColor,
-                            padding: EdgeInsets.fromLTRB(0, 3, 0, 0),
-                          ),
-                          TextCustom(
-                            text: "กรุณาใส่ข้อมูลบัญชีของคุณ",
-                            size: 14,
-                            color: AppColors.textColor,
-                            padding: EdgeInsets.symmetric(vertical: 5),
-                          ),
-                        ],
-                      )
-                    ],
-                  ),
-                  TextFieldCustom(
-                    controller: _usernameController,
-                    hint: 'ชื่อ',
-                    prefixIcon: const Icon(Icons.person_outlined),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'โปรดใส่ชื่อ';
-                      }
-                      return null;
-                    },
-                  ),
-                  TextFieldDateCustom(
-                    hint: "วันเกิด",
-                    controller: _dateController,
-                    widthSizedBox: 70,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'โปรดใส่วันเกิด';
-                      }
-                      return null;
-                    },
-                  ),
-                  TextFieldEmailCustom(
-                    controller: _emailController,
-                    hint: 'อีเมล',
-                    prefixIcon: const Icon(Icons.email_outlined),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'โปรดใส่อีเมล';
-                      }
-                      return null;
-                    },
-                  ),
-                  TextFieldPassword(
-                    controller: _passwordController,
-                    hint: 'รหัสผ่าน',
-                    prefixIcon: const Icon(Icons.lock_outline),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'โปรดใส่รหัสผ่าน';
-                      }
-                      return null;
-                    },
-                  ),
-                  TextFieldPassword(
-                    controller: _confirmPController,
-                    hint: 'ยืนยันรหัสผ่าน',
-                    prefixIcon: const Icon(Icons.lock_outline),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'โปรดใส่ยืนยันรหัสผ่าน';
-                      }
-                      return null;
-                    },
-                  ),
-                  ButtonCustom(
-                      text: "เข้าสู่ระบบ",
-                      onPressed: register,
-                      type: 'Elevated'),
-                ],
+        body: SingleChildScrollView(
+          child: SizedBox(
+            width: double.infinity,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 30),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    const Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Column(
+                          children: [
+                            TextCustom(
+                              text: "สร้างบัญชี",
+                              size: 23,
+                              color: AppColors.primaryColor,
+                              padding: EdgeInsets.fromLTRB(0, 3, 0, 0),
+                            ),
+                            TextCustom(
+                              text: "กรุณาใส่ข้อมูลบัญชีของคุณ",
+                              size: 17,
+                              color: AppColors.textColor,
+                              padding: EdgeInsets.symmetric(vertical: 5),
+                            ),
+                          ],
+                        )
+                      ],
+                    ),
+                    const SizedBox(
+                      height: 80,
+                    ),
+                    TextFieldCustom(
+                      controller: _usernameController,
+                      hint: 'ชื่อ',
+                      prefixIcon: const Icon(Icons.person_outlined),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'โปรดใส่ชื่อ';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    TextFieldDateCustom(
+                      hint: "วันเกิด",
+                      controller: _dateController,
+                      widthSizedBox: 70,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'โปรดใส่วันเกิด';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    TextFieldEmailCustom(
+                      controller: _emailController,
+                      hint: 'อีเมล',
+                      prefixIcon: const Icon(Icons.email_outlined),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'โปรดใส่อีเมล';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    TextFieldPassword(
+                      controller: _passwordController,
+                      hint: 'รหัสผ่าน',
+                      prefixIcon: const Icon(Icons.lock_outline),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'โปรดใส่รหัสผ่าน';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    TextFieldPassword(
+                      controller: _confirmPController,
+                      hint: 'ยืนยันรหัสผ่าน',
+                      prefixIcon: const Icon(Icons.lock_outline),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'โปรดใส่ยืนยันรหัสผ่าน';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    ButtonCustom(
+                        text: "เข้าสู่ระบบ",
+                        onPressed: register,
+                        type: 'Elevated'),
+                  ],
+                ),
               ),
             ),
           ),

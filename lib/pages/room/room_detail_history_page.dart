@@ -208,7 +208,7 @@ class _RoomDetailHistoryPageState extends State<RoomDetailHistoryPage> {
                                     ),
                                     child: TextCustom(
                                       text:
-                                          " ${widget.room.dateTime.hour} : ${widget.room.dateTime.minute} ",
+                                          " ${widget.room.dateTime.toLocal().hour} : ${widget.room.dateTime.toLocal().minute}",
                                       size: 13,
                                     ),
                                   ),

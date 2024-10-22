@@ -4,6 +4,7 @@ import 'package:oilie_butt_skater_app/api/api_chat_room.dart';
 import 'package:oilie_butt_skater_app/api/api_follow.dart';
 import 'package:oilie_butt_skater_app/api/api_profile.dart';
 import 'package:oilie_butt_skater_app/components/button_custom.dart';
+import 'package:oilie_butt_skater_app/components/grid_post_item.dart';
 import 'package:oilie_butt_skater_app/components/profile_image.dart';
 import 'package:oilie_butt_skater_app/components/text_custom.dart';
 import 'package:oilie_butt_skater_app/constant/color.dart';
@@ -13,7 +14,6 @@ import 'package:oilie_butt_skater_app/models/post_model.dart';
 import 'package:oilie_butt_skater_app/models/user.dart';
 import 'package:oilie_butt_skater_app/pages/chat/chat_message.dart';
 import 'package:oilie_butt_skater_app/pages/post/target_post_page.dart';
-import 'package:oilie_butt_skater_app/pages/post/user_post_page.dart';
 
 class TargetProfilePage extends StatefulWidget {
   const TargetProfilePage(
@@ -45,6 +45,7 @@ class _TargetProfilePageState extends State<TargetProfilePage> {
         posts.value = fetchedProfile.posts;
         sumLikes = fetchedProfile.sumLikes.toString();
         follower = fetchedProfile.follow.toString();
+        
       });
     } catch (e) {
       print('Error fetching profile post: $e');
@@ -236,6 +237,8 @@ class _TargetProfilePageState extends State<TargetProfilePage> {
                       itemCount: value.length,
                       itemBuilder: (context, index) {
                         final post = value[index];
+                        final contentUrl = value[index].content[0];
+                        final isVideo = post.type == 2 ? true : false;
                         return InkWell(
                           onTap: () {
                             // เมื่อกดที่รูป จะนำไปยังหน้าถัดไปพร้อมกับส่ง index และ list ของ posts
@@ -247,14 +250,8 @@ class _TargetProfilePageState extends State<TargetProfilePage> {
                               ),
                             );
                           },
-                          child: Ink(
-                            decoration: BoxDecoration(
-                              image: DecorationImage(
-                                image: NetworkImage(post.content[0]),
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                          ),
+                          child: GridPostItem(
+                              contentUrl: contentUrl, isVideo: isVideo),
                         );
                       },
                     ),

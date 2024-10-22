@@ -9,8 +9,8 @@ import '../models/user.dart';
 class ApiAuth {
   static Future<User> verifyUser(String email, String password) async {
     try {
-      final url = Uri.parse(
-          'http://${dotenv.env['SERVER_LOCAL_IP']}:${dotenv.env['SERVER_PORT_LOCAL']}/auth/login');
+      final url =
+          Uri.parse('${dotenv.env['SERVER_LOCAL_IP']}/auth/login');
       print(url);
       final response = await http.post(
         url,
@@ -45,7 +45,7 @@ class ApiAuth {
   static Future<User> signUpUser(dynamic user) async {
     try {
       final url = Uri.parse(
-          'http://${dotenv.env['SERVER_LOCAL_IP']}:${dotenv.env['SERVER_PORT_LOCAL']}/auth/signup');
+          '${dotenv.env['SERVER_LOCAL_IP']}/auth/signup');
       print(url);
       final response = await http.post(
         url,

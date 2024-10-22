@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:oilie_butt_skater_app/%E0%B8%B5util/location.dart';
 import 'package:oilie_butt_skater_app/%E0%B8%B5util/subString.dart';
 import 'package:oilie_butt_skater_app/api/api_room.dart';
@@ -10,6 +11,7 @@ import 'package:oilie_butt_skater_app/constant/color.dart';
 import 'package:oilie_butt_skater_app/controller/user_controller.dart';
 import 'package:oilie_butt_skater_app/models/room_model.dart';
 import 'package:oilie_butt_skater_app/pages/home_page.dart';
+import 'package:oilie_butt_skater_app/pages/map/map_all_page.dart';
 
 class PublicRoomPage extends StatefulWidget {
   const PublicRoomPage({super.key});
@@ -18,18 +20,23 @@ class PublicRoomPage extends StatefulWidget {
   State<PublicRoomPage> createState() => _PublicRoomPageState();
 }
 
-class _PublicRoomPageState extends State<PublicRoomPage> {
+class _PublicRoomPageState extends State<PublicRoomPage>
+    with SingleTickerProviderStateMixin {
   late final ScrollController _scrollController = ScrollController();
   UserController userController = Get.find<UserController>();
   dynamic user;
   bool isLoading = true;
   ValueNotifier<List<Room>> rooms = ValueNotifier<List<Room>>([]);
 
+  late TabController _tabController = TabController(length: 2, vsync: this);
+
   @override
   void initState() {
     super.initState();
     // สร้าง ScrollController และเลื่อนไปยัง index ที่ส่งมาเมื่อเริ่มต้น
     user = userController.user.value;
+    _tabController = TabController(length: 2, vsync: this);
+
     fetchRooms();
   }
 
@@ -58,7 +65,7 @@ class _PublicRoomPageState extends State<PublicRoomPage> {
     return "$day/$month/$year";
   }
 
- Color getRoomCardColor(DateTime roomDateTime) {
+  Color getRoomCardColor(DateTime roomDateTime) {
     final now = DateTime.now();
     final difference = roomDateTime.difference(now).inDays;
 
@@ -97,6 +104,7 @@ class _PublicRoomPageState extends State<PublicRoomPage> {
     }
   }
 
+
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -128,6 +136,28 @@ class _PublicRoomPageState extends State<PublicRoomPage> {
               width: 10,
             )
           ],
+          bottom: TabBar(
+            indicatorColor: AppColors.primaryColor,
+            labelColor: AppColors.textColor,
+            unselectedLabelColor: AppColors.textColor,
+            controller: _tabController,
+            tabs: const [
+              Tab(
+                icon: Icon(
+                  Icons.meeting_room_outlined,
+                  size: 24, // ขนาดไอคอน
+                  color: AppColors.textColor,
+                ),
+              ),
+              Tab(
+                icon: Icon(
+                  Icons.location_on_outlined,
+                  size: 24, // ขนาดไอคอน
+                  color: AppColors.textColor,
+                ),
+              ),
+            ],
+          ),
           leading: Row(
             children: [
               IconButton(
@@ -148,117 +178,123 @@ class _PublicRoomPageState extends State<PublicRoomPage> {
             ],
           ),
         ),
-        body: Center(
-          child: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(15.0),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Container(
-                        padding: const EdgeInsets.all(12.0),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          color: AppColors.backgroundColor,
-                          border: Border.all(
-                            color: const Color.fromARGB(255, 98, 98, 98),
-                            width: 2,
+        body: TabBarView(controller: _tabController, children: [
+          Center(
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(15.0),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Container(
+                          padding: const EdgeInsets.all(12.0),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            color: AppColors.backgroundColor,
+                            border: Border.all(
+                              color: const Color.fromARGB(255, 98, 98, 98),
+                              width: 2,
+                            ),
+                          ),
+                          child: const TextCustom(
+                            text: "รายชื่อห้อง",
+                            size: 18,
+                            color: AppColors.textColor,
+                            textAlign: TextAlign.center,
                           ),
                         ),
-                        child: const TextCustom(
-                          text: "รายชื่อห้อง",
-                          size: 18,
-                          color: AppColors.textColor,
-                          textAlign: TextAlign.center,
-                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-              isLoading
-                  ? Center(
-                      child: Container(
-                          margin: const EdgeInsets.symmetric(vertical: 150),
-                          child:
-                              const CircularProgressIndicator()), // แสดง loading ขณะโหลดข้อมูล
-                    )
-                  : rooms.value.isEmpty
-                      ? const RoomEmpty()
-                      : ValueListenableBuilder(
-                          valueListenable: rooms,
-                          builder: (context, value, child) {
-                            return Expanded(
-                              // ใช้ Expanded เพื่อบังคับ ListView ให้มีขนาดที่แน่นอน
-                              child: Padding(
-                                padding: const EdgeInsets.all(12.0),
-                                child: ListView.builder(
-                                  controller:
-                                      _scrollController, // เชื่อมต่อกับ ScrollController
-                                  itemCount: value.length,
-                                  itemBuilder: (context, index) {
-                                    final room = value[index];
-                                    return Card(
-                                      color: AppColors.backgroundColor,
-                                      child: Container(
-                                        decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                          color:
-                                              getRoomCardColor(room.dateTime),
-                                          border: Border.all(
-                                            color: const Color.fromARGB(
-                                                255, 98, 98, 98),
-                                            width: 2,
+                isLoading
+                    ? Center(
+                        child: Container(
+                            margin: const EdgeInsets.symmetric(vertical: 150),
+                            child:
+                                const CircularProgressIndicator()), // แสดง loading ขณะโหลดข้อมูล
+                      )
+                    : rooms.value.isEmpty
+                        ? const RoomEmpty()
+                        : ValueListenableBuilder(
+                            valueListenable: rooms,
+                            builder: (context, value, child) {
+                              return Expanded(
+                                // ใช้ Expanded เพื่อบังคับ ListView ให้มีขนาดที่แน่นอน
+                                child: Padding(
+                                  padding: const EdgeInsets.all(12.0),
+                                  child: ListView.builder(
+                                    controller:
+                                        _scrollController, // เชื่อมต่อกับ ScrollController
+                                    itemCount: value.length,
+                                    itemBuilder: (context, index) {
+                                      final room = value[index];
+                                      return Card(
+                                        color: AppColors.backgroundColor,
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                            color:
+                                                getRoomCardColor(room.dateTime),
+                                            border: Border.all(
+                                              color: const Color.fromARGB(
+                                                  255, 98, 98, 98),
+                                              width: 2,
+                                            ),
                                           ),
-                                        ),
-                                        child: ListTile(
-                                          leading: CircleAvatar(
-                                            backgroundImage: room.imageUrl != ""
-                                                ? NetworkImage(room.imageUrl)
-                                                : const NetworkImage(
-                                                    'https://i0.wp.com/sbcf.fr/wp-content/uploads/2018/03/sbcf-default-avatar.png'),
-                                            radius: 15,
-                                          ),
-                                          title: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceAround,
-                                            children: [
-                                              TextCustom(
-                                                text: SubString
-                                                        .truncateString(
-                                                            room.name, 12),
-                                                size: 11.5,
-                                                color: AppColors.textColor,
-                                              ),
-                                              const SizedBox(
-                                                width: 10,
-                                              ),
-                                              TextCustom(
-                                                  text: formatDateInThai(
-                                                      room.dateTime),
+                                          child: ListTile(
+                                            leading: CircleAvatar(
+                                              backgroundImage: room.imageUrl !=
+                                                      ""
+                                                  ? NetworkImage(room.imageUrl)
+                                                  : const NetworkImage(
+                                                      'https://i0.wp.com/sbcf.fr/wp-content/uploads/2018/03/sbcf-default-avatar.png'),
+                                              radius: 15,
+                                            ),
+                                            title: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.spaceAround,
+                                              children: [
+                                                TextCustom(
+                                                  text:
+                                                      SubString.truncateString(
+                                                          room.name, 12),
                                                   size: 11.5,
-                                                  color: AppColors.textColor),
-                                            ],
-                                          ),
-                                          trailing: ButtonDialog(
-                                            room: room,
-                                            type: 'join',
-                                            roomType: 'public_room',
+                                                  color: AppColors.textColor,
+                                                ),
+                                                const SizedBox(
+                                                  width: 10,
+                                                ),
+                                                TextCustom(
+                                                    text: formatDateInThai(
+                                                        room.dateTime),
+                                                    size: 11.5,
+                                                    color: AppColors.textColor),
+                                              ],
+                                            ),
+                                            trailing: ButtonDialog(
+                                              room: room,
+                                              type: 'join',
+                                              roomType: 'public_room',
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                    );
-                                  },
+                                      );
+                                    },
+                                  ),
                                 ),
-                              ),
-                            );
-                          },
-                        ),
-            ],
+                              );
+                            },
+                          ),
+              ],
+            ),
           ),
-        ),
+          MapAllPage(
+            rooms: rooms.value,
+          )
+        ]),
       ),
     );
   }

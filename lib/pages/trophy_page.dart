@@ -23,34 +23,33 @@ class _TrophyPageState extends State<TrophyPage> {
   String month = "";
 
   UserController userController = Get.find<UserController>();
-
   dynamic user;
   bool _isLoadingMore = false;
 
   final ScrollController _scrollController = ScrollController();
-
   ValueNotifier<List<DataRankingAll>> dataRankingAll =
       ValueNotifier<List<DataRankingAll>>([]);
+
+  late Future<Map<String, dynamic>>
+      _rankingDataFuture; // ใช้เก็บ Future ของ fetch
 
   void _loadMorePosts() {
     if (!_isLoadingMore) {
       setState(() {
         _isLoadingMore = true;
       });
-      // เรียกฟังก์ชันเพื่อโหลดโพสต์เพิ่มเติม
+
       Future.delayed(const Duration(seconds: 1), () {
         fetchRankingData();
         setState(() {
-          _isLoadingMore = false; // เมื่อโหลดเสร็จแล้ว ตั้งค่าเป็นไม่กำลังโหลด
+          _isLoadingMore = false;
         });
-
         print("การโหลดเพิ่มเติมเสร็จสิ้น");
       });
     }
   }
 
   Future<Map<String, dynamic>> fetchRankingData() async {
-    // Fetch user ranking
     final result = await ApiRanking.getRankingPostPopular(
         userController.user.value.userId);
     final allRanking =
@@ -64,35 +63,24 @@ class _TrophyPageState extends State<TrophyPage> {
     };
   }
 
-  String selectedMonth = "";
-  void updateDataForSelectedMonth() {
-    // ค้นหา DataRankingAll ที่ตรงกับเดือนที่เลือก
-    setState(() {
-      if (dataRankingAll.value.isNotEmpty) {
-        selectedMonth = dataRankingAll.value.first.month;
-      }
-    });
+  @override
+  void initState() {
+    super.initState();
+    user = userController.user.value;
+    // เรียก fetch ข้อมูลครั้งแรกใน initState
+    _rankingDataFuture = fetchRankingData();
   }
 
   Future<void> _refreshPosts() async {
-    // ฟังก์ชันเพื่อรีเฟรชโพสต์ (pull to refresh)
-    print("refreshPost");
-    _loadMorePosts();
+    setState(() {
+      _rankingDataFuture = fetchRankingData(); // เรียก fetch ใหม่ตอน refresh
+    });
   }
 
   @override
   void dispose() {
     _scrollController.dispose();
     super.dispose();
-  }
-
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    _loadMorePosts();
-
-    user = userController.user.value;
   }
 
   @override
@@ -104,7 +92,7 @@ class _TrophyPageState extends State<TrophyPage> {
         automaticallyImplyLeading: false,
       ),
       body: FutureBuilder<Map<String, dynamic>>(
-        future: fetchRankingData(),
+        future: _rankingDataFuture, // ใช้ Future ที่เก็บไว้
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -121,9 +109,7 @@ class _TrophyPageState extends State<TrophyPage> {
           final allRanking = data['allRanking'] as List<DataRankingAll>;
 
           return RefreshIndicator(
-            onRefresh: () async {
-              setState(() {});
-            },
+            onRefresh: _refreshPosts, // ใช้ฟังก์ชัน refresh
             child: ListView(
               children: [
                 Rankingbackground(

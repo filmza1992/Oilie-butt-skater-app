@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
@@ -13,6 +15,7 @@ import 'package:oilie_butt_skater_app/pages/profile/profile_page.dart';
 import 'package:oilie_butt_skater_app/pages/room/room_page.dart';
 import 'package:oilie_butt_skater_app/pages/search/search_page.dart';
 import 'package:oilie_butt_skater_app/pages/trophy_page.dart';
+import 'package:video_player/video_player.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key, this.selectedIndex});
@@ -27,6 +30,8 @@ class _HomePageState extends State<HomePage> {
 
   final ScrollController _scrollController = ScrollController();
   bool _isLoadingMore = false;
+  final List<VideoPlayerController> _activeControllers =
+      []; // เก็บ controller ที่เล่นอยู่
 
   final List<BottomNavigationBarItem> _bottomNavItems = [
     const BottomNavigationBarItem(
@@ -67,6 +72,7 @@ class _HomePageState extends State<HomePage> {
   ];
 
   void _onItemTapped(int index) {
+    disposeAllVideos();
     setState(() {
       _selectedIndex = index;
     });
@@ -153,7 +159,22 @@ class _HomePageState extends State<HomePage> {
   @override
   void dispose() {
     _scrollController.dispose();
+
+    disposeAllVideos();
     super.dispose();
+  }
+
+  void disposeAllVideos() {
+    // หยุดและ dispose controller ทั้งหมดที่เล่นอยู่
+    log("disposeall");
+    for (var controller in _activeControllers) {
+      log("is playing");
+      if (controller.value.isPlaying) {
+        log("pause");
+        controller.pause();
+      }
+    }
+    _activeControllers.clear(); // ล้างรายการ controller
   }
 
   @override
@@ -222,27 +243,31 @@ class _HomePageState extends State<HomePage> {
                         itemBuilder: (context, index) {
                           final post = value[index];
                           return PostComponent(
-                            key: ValueKey(post),
-                            userId: post.userId,
-                            postId: post.postId,
-                            username: post.username,
-                            userImage: post.userImage,
-                            postText: post.title,
-                            likes: post.likes,
-                            dislikes: post.dislikes,
-                            comments: post.comments,
-                            content: post.content,
-                            status: post.status,
-                            updateStatus:
-                                (int status, int likes, int dislikes) {
-                              setState(() {
-                                post.status = status;
-                                post.likes = likes;
-                                post.dislikes = dislikes;
+                              key: ValueKey(post),
+                              userId: post.userId,
+                              postId: post.postId,
+                              username: post.username,
+                              userImage: post.userImage,
+                              postText: post.title,
+                              likes: post.likes,
+                              dislikes: post.dislikes,
+                              comments: post.comments,
+                              content: post.content,
+                              status: post.status,
+                              type: post.type,
+                              updateStatus:
+                                  (int status, int likes, int dislikes) {
+                                setState(() {
+                                  post.status = status;
+                                  post.likes = likes;
+                                  post.dislikes = dislikes;
+                                });
+                              },
+                              user: userController.user.value,
+                              onVideoStart: (controller) {
+                                _activeControllers.add(
+                                    controller); // เพิ่ม controller ที่กำลังเล่นเข้าไปใน list
                               });
-                            },
-                            user: userController.user.value,
-                          );
                         },
                       ),
                     );

@@ -8,7 +8,7 @@ class ApiNotification {
   static Future<List<DataNotification>> getNotification(String userId) async {
     try {
       final url = Uri.parse(
-          'http://${dotenv.env['SERVER_LOCAL_IP']}:${dotenv.env['SERVER_PORT_LOCAL']}/notification/$userId');
+          '${dotenv.env['SERVER_LOCAL_IP']}/notification/$userId');
       print(url);
       final response = await http.get(
         url,
@@ -37,7 +37,7 @@ class ApiNotification {
       String postId) async {
     try {
       final url = Uri.parse(
-          'http://${dotenv.env['SERVER_LOCAL_IP']}:${dotenv.env['SERVER_PORT_LOCAL']}/notification/$postId/');
+          '${dotenv.env['SERVER_LOCAL_IP']}/notification/$postId/');
 
       print(url);
 
@@ -74,7 +74,7 @@ class ApiNotification {
       String followId) async {
     try {
       final url = Uri.parse(
-          'http://${dotenv.env['SERVER_LOCAL_IP']}:${dotenv.env['SERVER_PORT_LOCAL']}/notification/follow/$followId/');
+          '${dotenv.env['SERVER_LOCAL_IP']}/notification/follow/$followId/');
 
       print(url);
 

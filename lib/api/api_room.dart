@@ -17,7 +17,7 @@ import 'package:oilie_butt_skater_app/models/user.dart';
 class ApiRoom {
   static Future<Room> createRoom(dynamic data) async {
     final url = Uri.parse(
-        'http://${dotenv.env['SERVER_LOCAL_IP']}:${dotenv.env['SERVER_PORT_LOCAL']}/room/');
+        '${dotenv.env['SERVER_LOCAL_IP']}/room/');
     print(url);
 
     try {
@@ -50,7 +50,7 @@ class ApiRoom {
 
   static Future<void> joinRoom(Room room, User user) async {
     final url = Uri.parse(
-        'http://${dotenv.env['SERVER_LOCAL_IP']}:${dotenv.env['SERVER_PORT_LOCAL']}/room/join');
+        '${dotenv.env['SERVER_LOCAL_IP']}/room/join');
     print(url);
 
     try {
@@ -107,7 +107,7 @@ class ApiRoom {
 
   static Future<void> quitRoom(Room room, User user) async {
     final url = Uri.parse(
-        'http://${dotenv.env['SERVER_LOCAL_IP']}:${dotenv.env['SERVER_PORT_LOCAL']}/room/quit');
+        '${dotenv.env['SERVER_LOCAL_IP']}/room/quit');
     print(url);
 
     try {
@@ -139,7 +139,7 @@ class ApiRoom {
 
   static Future<void> deleteRoom(dynamic data) async {
     final url = Uri.parse(
-        'http://${dotenv.env['SERVER_LOCAL_IP']}:${dotenv.env['SERVER_PORT_LOCAL']}/room/$data');
+        '${dotenv.env['SERVER_LOCAL_IP']}/room/$data');
     print(url);
 
     try {
@@ -164,7 +164,7 @@ class ApiRoom {
 
   static Future<List<DataPlayer>> getPlayers(String roomId) async {
     final url = Uri.parse(
-        'http://${dotenv.env['SERVER_LOCAL_IP']}:${dotenv.env['SERVER_PORT_LOCAL']}/room/$roomId/users');
+        '${dotenv.env['SERVER_LOCAL_IP']}/room/$roomId/users');
     print(url);
 
     try {
@@ -194,7 +194,7 @@ class ApiRoom {
   static Future<List<Room>> getPublicRoom(
       userId, double latitude, double longitude) async {
     final url = Uri.parse(
-        'http://${dotenv.env['SERVER_LOCAL_IP']}:${dotenv.env['SERVER_PORT_LOCAL']}/room/public/$userId');
+        '${dotenv.env['SERVER_LOCAL_IP']}/room/public/$userId');
     print(url);
 
     try {
@@ -230,7 +230,7 @@ class ApiRoom {
   static Future<DataJoinRoom> getJoinRoom(
       userId, double latitude, double longitude) async {
     final url = Uri.parse(
-        'http://${dotenv.env['SERVER_LOCAL_IP']}:${dotenv.env['SERVER_PORT_LOCAL']}/room/join/$userId');
+        '${dotenv.env['SERVER_LOCAL_IP']}/room/join/$userId');
     print(url);
 
     try {
@@ -268,7 +268,7 @@ class ApiRoom {
   static Future<List<Room>> getFriendRoom(
       userId, double latitude, double longitude) async {
     final url = Uri.parse(
-        'http://${dotenv.env['SERVER_LOCAL_IP']}:${dotenv.env['SERVER_PORT_LOCAL']}/room/follow/$userId');
+        '${dotenv.env['SERVER_LOCAL_IP']}/room/follow/$userId');
     print(url);
 
     try {
@@ -303,7 +303,7 @@ class ApiRoom {
 
   static Future<DataHistoryRoom> getHistoryRoom(userId) async {
     final url = Uri.parse(
-        'http://${dotenv.env['SERVER_LOCAL_IP']}:${dotenv.env['SERVER_PORT_LOCAL']}/room/history/$userId');
+        '${dotenv.env['SERVER_LOCAL_IP']}/room/history/$userId');
     print(url);
 
     try {
