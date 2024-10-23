@@ -28,7 +28,7 @@ class _CreateTextRoomPageState extends State<CreateTextRoomPage> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _detailController = TextEditingController();
   final TextEditingController _dateController = TextEditingController();
-  TimeOfDay _timeController = TimeOfDay.now();
+  TimeOfDay _timeController = const TimeOfDay(hour: 0, minute: 0);
 
   UserController userController = Get.find<UserController>();
   dynamic user;
@@ -76,7 +76,7 @@ class _CreateTextRoomPageState extends State<CreateTextRoomPage> {
       Get.snackbar('เกิดข้อผิดพลาด', 'กรุณาเลือกวันที่');
       return;
     }
-    if (_timeController == TimeOfDay.now()) {
+    if (_timeController.hour == 0 && _timeController.minute == 0) {
       Get.snackbar('เกิดข้อผิดพลาด', 'กรุณาเลือกเวลา');
       return;
     }

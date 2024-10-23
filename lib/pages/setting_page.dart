@@ -13,6 +13,49 @@ class SettingPage extends StatefulWidget {
   State<SettingPage> createState() => _SettingPageState();
 }
 
+void _confirmLogout(BuildContext context) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: const TextCustom(
+          text: 'ยืนยันการออกจากระบบ',
+          size: 20,
+          color: AppColors.textColor,
+        ),
+        content: const TextCustom(
+          text: 'คุณแน่ใจหรือไม่ว่าต้องการออกจากระบบ?',
+          size: 15,
+          color: AppColors.textColor,
+        ),
+        actions: <Widget>[
+          TextButton(
+            child: const TextCustom(
+              text: 'ไม่',
+              size: 15,
+              color: AppColors.primaryColor,
+            ),
+            onPressed: () {
+              Navigator.of(context).pop(); // ปิด dialog เมื่อกดปุ่มไม่
+            },
+          ),
+          TextButton(
+            child: const TextCustom(
+              text: 'ใช่',
+              size: 15,
+              color: Color.fromARGB(255, 244, 50, 50),
+            ),
+            onPressed: () {
+              Navigator.of(context).pop(); // ปิด dialog เมื่อกดใช่
+              _logout(context); // เรียกฟังก์ชัน logout
+            },
+          ),
+        ],
+      );
+    },
+  );
+}
+
 void _logout(context) {
   // Implement your logout logic here
   print("User logged out");
@@ -96,7 +139,7 @@ class _SettingPageState extends State<SettingPage> {
               ),
               ElevatedButton(
                 onPressed: () {
-                  _logout(context);
+                  _confirmLogout(context);
                 },
                 style: ElevatedButton.styleFrom(
                   shape: RoundedRectangleBorder(

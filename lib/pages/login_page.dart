@@ -62,7 +62,7 @@ class _LoginPageState extends State<LoginPage>
 
   Future<void> myLogin() async {
     user = await ApiAuth.verifyUser(
-        _emailController.text, _passwordController.text);
+        _emailController.text, _passwordController.text, context);
 
     userController.updateUser(user);
     Get.to(const HomePage());
@@ -94,7 +94,7 @@ class _LoginPageState extends State<LoginPage>
           userId: user.userId, // ID ควรดึงมาจากฐานข้อมูล
           username: user.username,
           email: user.email,
-          password: '', // ไม่ควรเก็บรหัสผ่านในกรณีนี้
+          password: user.password, // ไม่ควรเก็บรหัสผ่านในกรณีนี้
           imageUrl: user.imageUrl,
           birthDay: user.birthDay,
           createAt: '',

@@ -1,4 +1,3 @@
-
 class Room {
     int roomId;
     String userId;
@@ -10,6 +9,7 @@ class Room {
     DateTime dateTime;
     int status;
     DateTime createAt;
+    double? distance; // เพิ่ม distance เป็น nullable
 
     Room({
         required this.roomId,
@@ -22,6 +22,7 @@ class Room {
         required this.dateTime,
         required this.status,
         required this.createAt,
+        this.distance, // ไม่จำเป็นต้องระบุเมื่อสร้าง Room
     });
 
     factory Room.fromJson(Map<String, dynamic> json) => Room(
@@ -35,6 +36,7 @@ class Room {
         dateTime: DateTime.parse(json["date_time"]),
         status: json["status"],
         createAt: DateTime.parse(json["create_at"]),
+        distance: json["distance"]?.toDouble(), // ตรวจสอบและแปลง distance
     );
 
     Map<String, dynamic> toJson() => {
@@ -48,5 +50,6 @@ class Room {
         "date_time": dateTime.toIso8601String(),
         "status": status,
         "create_at": createAt.toIso8601String(),
+        "distance": distance, // แค่รวม distance ถ้ามีค่า
     };
 }

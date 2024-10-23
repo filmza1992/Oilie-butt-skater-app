@@ -10,8 +10,8 @@ import 'package:oilie_butt_skater_app/models/user.dart';
 class ApiProfile {
   static Future<DataProfile> getAllPost(String userId) async {
     try {
-      final url = Uri.parse(
-          '${dotenv.env['SERVER_LOCAL_IP']}/profile/getAll/$userId');
+      final url =
+          Uri.parse('${dotenv.env['SERVER_LOCAL_IP']}/profile/getAll/$userId');
       print(url);
       final response = await http.get(url);
 
@@ -42,7 +42,9 @@ class ApiProfile {
       throw Exception(e);
     }
   }
-   static Future<DataProfile> getAllPostByUserId(String targetId, String userId) async {
+
+  static Future<DataProfile> getAllPostByUserId(
+      String targetId, String userId) async {
     try {
       final url = Uri.parse(
           '${dotenv.env['SERVER_LOCAL_IP']}/profile/getAllByUser/$targetId/$userId');
@@ -79,8 +81,7 @@ class ApiProfile {
 
   static Future<User> editProfile(dynamic user) async {
     try {
-      final url = Uri.parse(
-          '${dotenv.env['SERVER_LOCAL_IP']}/profile/edit/');
+      final url = Uri.parse('${dotenv.env['SERVER_LOCAL_IP']}/profile/edit/');
 
       // สร้าง body ของ request
       final response = await http.post(
@@ -113,8 +114,8 @@ class ApiProfile {
 
   static Future<User> editPassword(dynamic data, context) async {
     try {
-      final url = Uri.parse(
-          '${dotenv.env['SERVER_LOCAL_IP']}/profile/edit/password');
+      final url =
+          Uri.parse('${dotenv.env['SERVER_LOCAL_IP']}/profile/edit/password');
 
       // สร้าง body ของ request
       final response = await http.post(

@@ -1,6 +1,7 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:latlong2/latlong.dart';
 import 'package:oilie_butt_skater_app/%E0%B8%B5util/location.dart';
 import 'package:oilie_butt_skater_app/%E0%B8%B5util/subString.dart';
 import 'package:oilie_butt_skater_app/api/api_room.dart';
@@ -27,8 +28,21 @@ class _PublicRoomPageState extends State<PublicRoomPage>
   dynamic user;
   bool isLoading = true;
   ValueNotifier<List<Room>> rooms = ValueNotifier<List<Room>>([]);
+  ValueNotifier<List<Room>> filteredRooms = ValueNotifier<List<Room>>([]);
 
   late TabController _tabController = TabController(length: 2, vsync: this);
+
+  final List<String> distanceOptions = [
+    "เลือกระยะทาง",
+    "1",
+    "5",
+    "10",
+    "50",
+    "100",
+    "มากกว่า 100"
+  ];
+
+  String selectedDistance = "เลือกระยะทาง"; // เปลี่ยนจาก double เป็น String
 
   @override
   void initState() {
@@ -94,6 +108,7 @@ class _PublicRoomPageState extends State<PublicRoomPage>
           await ApiRoom.getPublicRoom(user.userId, latitude, longitude);
       setState(() {
         rooms.value = fetchedRoom;
+        filteredRooms.value = fetchedRoom;
         isLoading = false;
       });
     } catch (e) {
@@ -103,7 +118,6 @@ class _PublicRoomPageState extends State<PublicRoomPage>
       });
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -205,6 +219,44 @@ class _PublicRoomPageState extends State<PublicRoomPage>
                           ),
                         ),
                       ),
+                      Padding(
+                        padding: const EdgeInsets.all(15.0),
+                        child: DropdownButton<String>(
+                          value: selectedDistance,
+                          underline: const SizedBox(),
+                          onChanged: (String? newValue) {
+                            setState(() {
+                              selectedDistance = newValue!;
+                              log(selectedDistance);
+                              // การกรองห้องตามเงื่อนไขที่เลือก
+                              if (selectedDistance == "เลือกระยะทาง") {
+                                filteredRooms.value = rooms.value;
+                              } else if (selectedDistance == 'มากกว่า 100') {
+                                filteredRooms.value = rooms.value.where((room) {
+                                  return room.distance! > 100;
+                                }).toList();
+                              } else {
+                                double distanceValue =
+                                    double.parse(selectedDistance);
+                                filteredRooms.value = rooms.value.where((room) {
+                                  return room.distance! <= distanceValue;
+                                }).toList();
+                              }
+                            });
+                          },
+                          items: distanceOptions
+                              .map<DropdownMenuItem<String>>((String value) {
+                            return DropdownMenuItem<String>(
+                              value: value,
+                              child: TextCustom(
+                                text: "$value กม.",
+                                size: 14,
+                                color: AppColors.textColor,
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -215,10 +267,10 @@ class _PublicRoomPageState extends State<PublicRoomPage>
                             child:
                                 const CircularProgressIndicator()), // แสดง loading ขณะโหลดข้อมูล
                       )
-                    : rooms.value.isEmpty
+                    : filteredRooms.value.isEmpty
                         ? const RoomEmpty()
                         : ValueListenableBuilder(
-                            valueListenable: rooms,
+                            valueListenable: filteredRooms,
                             builder: (context, value, child) {
                               return Expanded(
                                 // ใช้ Expanded เพื่อบังคับ ListView ให้มีขนาดที่แน่นอน
@@ -293,7 +345,8 @@ class _PublicRoomPageState extends State<PublicRoomPage>
           ),
           MapAllPage(
             rooms: rooms.value,
-          )
+            roomType: 'public_room',
+          ),
         ]),
       ),
     );

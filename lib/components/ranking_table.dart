@@ -103,26 +103,26 @@ class _RankingTableState extends State<RankingTable> {
                           EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
                       leading: CircleAvatar(
                         backgroundColor: Colors.black,
-                        maxRadius: 17,
+                        maxRadius: 4,
                       ),
                       title: Row(
                         children: [
                           // ใช้ Image.network เพื่อแสดงภาพ
                           TextCustom(
-                            text: "rank",
+                            text: "อันดับ",
                             size: 15,
                             color: AppColors.textColor,
                           ),
                           SizedBox(width: 30), // ช่องว่างระหว่างรูปภาพกับชื่อ
                           TextCustom(
-                            text: "name",
+                            text: "ชื่อ",
                             size: 15,
                             color: AppColors.textColor,
                           ),
                         ],
                       ),
                       trailing: TextCustom(
-                        text: "score",
+                        text: "คะแนน",
                         size: 15,
                         color: AppColors.textColor,
                       ),
@@ -218,7 +218,7 @@ class _RankingTableState extends State<RankingTable> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const TextCustom(
-                  text: "History Rankings",
+                  text: "ประวัติอันดับความนิยม",
                   size: 18,
                   color: AppColors.rankingLabelColor,
                 ),
@@ -278,25 +278,26 @@ class _RankingTableState extends State<RankingTable> {
                             vertical: 8.0, horizontal: 16.0),
                         leading: CircleAvatar(
                           backgroundColor: Colors.black,
-                          maxRadius: 17,
+                          maxRadius: 4,
                         ),
                         title: Row(
                           children: [
+                            // ใช้ Image.network เพื่อแสดงภาพ
                             TextCustom(
-                              text: "rank",
+                              text: "อันดับ",
                               size: 15,
                               color: AppColors.textColor,
                             ),
-                            SizedBox(width: 30),
+                            SizedBox(width: 30), // ช่องว่างระหว่างรูปภาพกับชื่อ
                             TextCustom(
-                              text: "name",
+                              text: "ชื่อ",
                               size: 15,
                               color: AppColors.textColor,
                             ),
                           ],
                         ),
                         trailing: TextCustom(
-                          text: "score",
+                          text: "คะแนน",
                           size: 15,
                           color: AppColors.textColor,
                         ),

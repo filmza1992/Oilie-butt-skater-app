@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:oilie_butt_skater_app/api/api_chat_room.dart';
 import 'package:oilie_butt_skater_app/api/api_room.dart';
 import 'package:oilie_butt_skater_app/components/button_custom.dart';
+import 'package:oilie_butt_skater_app/components/dialog/confirm_dialog.dart';
 import 'package:oilie_butt_skater_app/components/text_custom.dart';
 import 'package:oilie_butt_skater_app/constant/color.dart';
 import 'package:oilie_butt_skater_app/controller/user_controller.dart';
@@ -103,6 +104,88 @@ class _RoomDetailPageState extends State<RoomDetailPage> {
       setState(() {
         chatRoom = response;
       });
+    }
+  }
+
+  Future<void> _deleteRoom(String roomId) async {
+    try {
+      await ApiRoom.deleteRoom(roomId); // เรียก API เพื่อลบห้อง
+      Get.to(const HomePage(
+          selectedIndex: 1)); // เปลี่ยนหน้าไปยัง HomePage หลังจากลบห้องสำเร็จ
+    } catch (e) {
+      print("Error deleting room: $e");
+      // แสดง dialog แจ้งข้อผิดพลาด
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const TextCustom(
+              text: 'การลบห้องล้มเหลว',
+              size: 20,
+              color: AppColors.textColor,
+            ),
+            content: const TextCustom(
+              text: 'ไม่สามารถลบห้องได้ กรุณาลองใหม่อีกครั้ง',
+              size: 15,
+              color: Color.fromARGB(255, 255, 255, 255),
+            ),
+            actions: <Widget>[
+              TextButton(
+                child: const TextCustom(
+                  text: 'ตกลง',
+                  size: 15,
+                  color: AppColors.primaryColor,
+                ),
+                onPressed: () {
+                  Navigator.of(context).pop(); // ปิด dialog
+                },
+              ),
+            ],
+          );
+        },
+      );
+    }
+  }
+
+  Future<void> _quitRoom(Room room, User user) async {
+    try {
+      await ApiRoom.quitRoom(room, user); // เรียก API เพื่อออกจากห้อง
+      // หลังจากออกจากห้องเสร็จ เปลี่ยนหน้าไปยัง HomePage
+      Get.to(const HomePage(
+        selectedIndex: 1,
+      ));
+    } catch (e) {
+      print("Error quitting room: $e");
+      // สามารถแสดง dialog แจ้งข้อผิดพลาดถ้าออกจากห้องล้มเหลว
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const TextCustom(
+              text: 'การออกจากห้องล้มเหลว',
+              size: 20,
+              color: AppColors.textColor,
+            ),
+            content: const TextCustom(
+              text: 'ไม่สามารถออกจากห้องได้ กรุณาลองใหม่อีกครั้ง',
+              size: 15,
+              color: AppColors.textColor,
+            ),
+            actions: <Widget>[
+              TextButton(
+                child: const TextCustom(
+                  text: 'ตกลง',
+                  size: 15,
+                  color: AppColors.primaryColor,
+                ),
+                onPressed: () {
+                  Navigator.of(context).pop(); // ปิด dialog
+                },
+              ),
+            ],
+          );
+        },
+      );
     }
   }
 
@@ -383,21 +466,21 @@ class _RoomDetailPageState extends State<RoomDetailPage> {
                                         ? ButtonCustom(
                                             text: "ลบห้อง",
                                             onPressed: () {
-                                              ApiRoom.deleteRoom(
-                                                  widget.room.roomId);
-                                              Get.to(const HomePage(
-                                                selectedIndex: 1,
-                                              ));
+                                              DialogUtils.confirmDeleteRoom(
+                                                  context, () {
+                                                _deleteRoom(widget.room.roomId
+                                                    .toString()); // เรียกฟังก์ชันลบห้องเมื่อยืนยัน
+                                              });
                                             },
                                             type: "Outlined")
                                         : ButtonCustom(
                                             text: "ออกจากการเข้าร่วม",
                                             onPressed: () {
-                                              ApiRoom.quitRoom(
-                                                  widget.room, user);
-                                              Get.to(const HomePage(
-                                                selectedIndex: 1,
-                                              ));
+                                              DialogUtils.confirmQuitRoom(
+                                                  context, () {
+                                                _quitRoom(widget.room,
+                                                    user); // เรียกฟังก์ชันออกจากห้องเมื่อยืนยัน
+                                              });
                                             },
                                             type: "Outlined"),
                                   )

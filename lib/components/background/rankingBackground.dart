@@ -18,12 +18,12 @@ class Rankingbackground extends StatelessWidget {
       children: [
         const TextCustom(
           size: 45,
-          text: "Ranking",
+          text: "อันดับ",
           color: AppColors.rankingSecondaryLabelColor,
         ),
         const TextCustom(
           size: 30,
-          text: "Popular",
+          text: "ความนิยม",
           color: AppColors.rankingThirdLabelColor,
         ),
         const SizedBox(height: 10),
@@ -67,7 +67,6 @@ class Rankingbackground extends StatelessWidget {
             Expanded(
               child: child,
             ),
-            
           ],
         )
       ],

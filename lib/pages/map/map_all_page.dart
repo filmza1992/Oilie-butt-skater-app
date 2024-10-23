@@ -4,7 +4,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:oilie_butt_skater_app/api/api_room.dart';
-import 'package:oilie_butt_skater_app/components/%E0%B8%B4%E0%B8%B5button_dialog.map.dart';
+import 'package:oilie_butt_skater_app/components/button_dialog_map.dart';
 import 'package:oilie_butt_skater_app/controller/user_controller.dart';
 import 'package:oilie_butt_skater_app/models/room_model.dart';
 import 'package:oilie_butt_skater_app/models/user.dart';
@@ -14,9 +14,11 @@ class MapAllPage extends StatefulWidget {
   const MapAllPage({
     super.key,
     required this.rooms,
+    required this.roomType,
   });
 
   final List<Room> rooms;
+  final String roomType;
   @override
   State<MapAllPage> createState() => _MapAllPageState();
 }
@@ -118,7 +120,7 @@ class _MapAllPageState extends State<MapAllPage> {
             Transform.scale(
                 scale: 3.3,
                 child: ButtonDialogMap(
-                    room: room, type: 'join', roomType: 'public_room')),
+                    room: room, type: 'join', roomType: widget.roomType)),
             // รูปภาพหรือ widget ที่ต้องการวางไว้บน marker
             Positioned(
               top: 0, // ปรับตำแหน่งให้อยู่ด้านบนของ marker

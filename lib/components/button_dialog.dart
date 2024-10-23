@@ -37,14 +37,113 @@ class _ButtonDialogState extends State<ButtonDialog> {
 
   // ฟังก์ชันสำหรับเข้าห้อง
   Future<void> _enterRoom(Room room, User user, User owner) async {
+    bool isJoinSuccessful = false; // สถานะการเข้าห้อง
     if (widget.type == 'join') {
-      await ApiRoom.joinRoom(room, user);
+      try {
+        await ApiRoom.joinRoom(room, user); // พยายามเข้าห้อง
+        isJoinSuccessful = true; // ถ้าสำเร็จเปลี่ยนสถานะ
+      } catch (e) {
+        print("Error joining room: $e");
+      }
+
+      // แสดง Dialog เพื่อแจ้งผล
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: TextCustom(
+              text: isJoinSuccessful
+                  ? "เข้าร่วมห้องสำเร็จ"
+                  : "การเข้าร่วมห้องล้มเหลว",
+              color: AppColors.textColor,
+              size: 20,
+            ),
+            content: TextCustom(
+              text: isJoinSuccessful
+                  ? "คุณได้เข้าร่วมห้องเรียบร้อยแล้ว"
+                  : "เกิดข้อผิดพลาดในการเข้าร่วมห้อง กรุณาลองใหม่อีกครั้ง",
+              size: 15,
+              color: AppColors.textColor,
+            ),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop(); // ปิด dialog
+                  if (isJoinSuccessful) {
+                    // ถ้าเข้าร่วมห้องสำเร็จ ให้เปลี่ยนหน้าไปที่ RoomDetailPage
+                    Get.to(RoomDetailPage(
+                      room: room,
+                      roomType: widget.roomType,
+                      owner: owner,
+                    ));
+                  }
+                },
+                child: const TextCustom(
+                  text: 'ตกลง',
+                  size: 15,
+                  color: AppColors.primaryColor,
+                ),
+              ),
+            ],
+          );
+        },
+      );
+    } else {
+      Get.to(RoomDetailPage(
+        room: room,
+        roomType: widget.roomType,
+        owner: owner,
+      ));
     }
-    Get.to(RoomDetailPage(
-      room: room,
-      roomType: widget.roomType,
-      owner: owner,
-    ));
+  }
+
+  Future<void> _confirmJoinRoom(Room room, User user, User owner) async {
+    if (widget.type == 'join') {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const TextCustom(
+              text: 'ยืนยันการเข้าร่วมห้อง',
+              size: 20,
+              color: AppColors.textColor,
+            ),
+            content: const TextCustom(
+              text: 'คุณต้องการเข้าร่วมห้องนี้หรือไม่?',
+              size: 15,
+              color: AppColors.textColor,
+            ),
+            actions: <Widget>[
+              TextButton(
+                child: const TextCustom(
+                  text: 'ไม่',
+                  size: 15,
+                  color: AppColors.textColor,
+                ),
+                onPressed: () {
+                  Navigator.of(context).pop(); // ปิด dialog เมื่อกดไม่
+                },
+              ),
+              TextButton(
+                child: const TextCustom(
+                    text: 'ใช่', size: 15, color: AppColors.primaryColor),
+                onPressed: () async {
+                  Navigator.of(context).pop(); // ปิด dialog เมื่อกดใช่
+                  await _enterRoom(
+                      room, user, owner); // เรียกใช้ API เพื่อเข้าร่วมห้อง
+                },
+              ),
+            ],
+          );
+        },
+      );
+    } else {
+      Get.to(RoomDetailPage(
+        room: room,
+        roomType: widget.roomType,
+        owner: owner,
+      ));
+    }
   }
 
   String formatDateInThai(DateTime dateTime) {
@@ -218,7 +317,7 @@ class _ButtonDialogState extends State<ButtonDialog> {
               onPressed: () {
                 // เพิ่มฟังก์ชันที่ต้องการทำเมื่อเข้าห้อง
                 Navigator.of(context).pop(); // ปิด dialog
-                _enterRoom(room, userController.user.value,
+                _confirmJoinRoom(room, userController.user.value,
                     user); // เรียกใช้ฟังก์ชันเข้าห้อง
               },
             ),

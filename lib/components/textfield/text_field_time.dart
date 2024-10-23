@@ -48,7 +48,9 @@ class _TextFieldTimeCustomState extends State<TextFieldTimeCustom> {
     );
     if (picked != null) {
       setState(() {
-        _timeController.text = picked.toString().split(" ")[0];
+        final hours = picked.hour.toString().padLeft(2, '0');
+        final minutes = picked.minute.toString().padLeft(2, '0');
+        _timeController.text = '$hours:$minutes'; // แสดงเวลาในรูปแบบ HH:mm
         // เก็บค่า TimeOfDay ที่เลือก
         print(widget.controller);
         widget.updateDateTime!(picked);

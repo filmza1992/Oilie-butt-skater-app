@@ -119,7 +119,7 @@ class _TrophyPageState extends State<TrophyPage> {
                     padding: const EdgeInsets.symmetric(
                         vertical: 3.0, horizontal: 20),
                     child: RankingTable(
-                      text: "Popular Player",
+                      text: "อันดับผู้เล่นที่มีความนิยมมากที่สุด",
                       users: top5Rankings,
                       user: userRanking,
                       dataRankingAll: allRanking,

@@ -3,14 +3,14 @@ import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:oilie_butt_skater_app/api/api_user.dart';
+import 'package:oilie_butt_skater_app/components/alert.dart';
 
 import '../models/user.dart';
 
 class ApiAuth {
-  static Future<User> verifyUser(String email, String password) async {
+  static Future<User> verifyUser(String email, String password, context) async {
     try {
-      final url =
-          Uri.parse('${dotenv.env['SERVER_LOCAL_IP']}/auth/login');
+      final url = Uri.parse('${dotenv.env['SERVER_LOCAL_IP']}/auth/login');
       print(url);
       final response = await http.post(
         url,
@@ -35,6 +35,9 @@ class ApiAuth {
         print('Failed to make the POST request');
         print('Status code: ${response.statusCode}');
         print('Response data: ${response.body}');
+        Alert().newWarning(
+            context, 'กรุณาลองใหม่อีกครั้ง', 'อีเมล หรือ รหัสผ่านไม่ถูกต้อง');
+
         return throw Exception();
       }
     } catch (e) {
@@ -44,8 +47,7 @@ class ApiAuth {
 
   static Future<User> signUpUser(dynamic user) async {
     try {
-      final url = Uri.parse(
-          '${dotenv.env['SERVER_LOCAL_IP']}/auth/signup');
+      final url = Uri.parse('${dotenv.env['SERVER_LOCAL_IP']}/auth/signup');
       print(url);
       final response = await http.post(
         url,
